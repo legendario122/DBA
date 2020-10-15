@@ -1,7 +1,6 @@
 package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
-//import LarvaAgent.LarvaAgent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
