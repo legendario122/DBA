@@ -31,8 +31,9 @@ public class MyWorldExplorer extends IntegratedAgent {
     String resultado =desparsearJson(in);
     
     
-       read();      
+             
     if(resultado == "ok"){
+       read();
        in= this.blockingReceive();
        resultado =desparsearJson(in);
        if(resultado=="ok"){
