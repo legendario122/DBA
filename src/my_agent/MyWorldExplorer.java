@@ -23,7 +23,8 @@ public class MyWorldExplorer extends IntegratedAgent {
     
     /// Dialogar con receiver para entrar en el mundo
     //  moverse y leer los sensores
-    int sabufu = 0;
+    int sabufu = 1;
+    int pepe;
     }
 
     @Override
