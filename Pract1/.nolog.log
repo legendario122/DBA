@@ -110,3 +110,23 @@
 {"date":"15/10/2020_14:49:00","record":{"agent":"BBVA","info":"Trying to checkout from the platform"}}
 {"date":"15/10/2020_14:49:00","record":{"agent":"BBVA","info":"Checked-out from the platform"}}
 {"date":"15/10/2020_14:49:00","record":{"agent":"BBVA","info":"Take down"}}
+{"date":"15/10/2020_14:54:33","record":{"agent":"BBVA","info":"Load configuration"}}
+{"date":"15/10/2020_14:54:33","record":{"agent":"BBVA","info":"Found CardID"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"CardID: gjpkMfgZf4kCjFxq which belongs to SAMUEL BURGUEÑO FUENTES (BBVA)"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Trying to checkin in the platform"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Chekin confirmed in the platform"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Trying to register in LARVA"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Found ASSIGNMENTID 1"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Behaviour REGULAR starts"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Execute body"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Single shutting down"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Requesting unregistration in LARVA"}}
+{"date":"15/10/2020_14:54:34","record":{"agent":"BBVA","info":"Succesfully unregistered in LARVA"}}
+{"date":"15/10/2020_14:54:38","record":{"agent":"BBVA","info":"Trying to checkout from the platform"}}
+{"date":"15/10/2020_14:54:38","record":{"agent":"BBVA","info":"Checked-out from the platform"}}
+{"date":"15/10/2020_14:54:38","record":{"agent":"BBVA","info":"Take down"}}
