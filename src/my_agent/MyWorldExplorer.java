@@ -23,26 +23,27 @@ public class MyWorldExplorer extends IntegratedAgent {
     
     /// Dialogar con receiver para entrar en el mundo
     //  moverse y leer los sensores
+
     //Funcion que enviara un mensaje al agente worldmanager para loguearse. 
     loguearse();
-    
     ACLMessage in= this.blockingReceive();
     
     String resultado =desparsearJson(in);
     
-    if(resultado == "ok"){
+    
        read();      
+    if(resultado == "ok"){
        in= this.blockingReceive();
        resultado =desparsearJson(in);
-       
        if(resultado=="ok"){
+       
            ejecutar();
            in= this.blockingReceive();
            resultado =desparsearJson(in);
            
            if(resultado=="ok"){
-               logout();
            }
+               logout();
        
        }
     }
