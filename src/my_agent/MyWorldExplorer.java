@@ -23,10 +23,30 @@ public class MyWorldExplorer extends IntegratedAgent {
     
     /// Dialogar con receiver para entrar en el mundo
     //  moverse y leer los sensores
-    int sabufu = 0;
-    int sabufu = 1;
-    int pepe;
-    //misco
+    //Funcion que enviara un mensaje al agente worldmanager para loguearse. 
+    loguearse();
+    
+    ACLMessage in= this.blockingReceive();
+    
+    String resultado =desparsearJson(in);
+    
+    if(resultado == "ok"){
+       read();      
+       in= this.blockingReceive();
+       resultado =desparsearJson(in);
+       
+       if(resultado=="ok"){
+           ejecutar();
+           in= this.blockingReceive();
+           resultado =desparsearJson(in);
+           
+           if(resultado=="ok"){
+               logout();
+           }
+       
+       }
+    }
+    
     }
 
     @Override
@@ -34,5 +54,29 @@ public class MyWorldExplorer extends IntegratedAgent {
         this.doCheckoutLARVA();
         this.doCheckoutPlatform();
         super.takeDown();
+    }
+
+    private void loguearse() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String desparsearJson(ACLMessage in) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void read() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void ejecutar() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void logout() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private void parsearJson() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
