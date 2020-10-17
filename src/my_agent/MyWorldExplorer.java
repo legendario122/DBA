@@ -1,6 +1,7 @@
 package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -109,16 +110,19 @@ public class MyWorldExplorer extends IntegratedAgent {
         switch (comando) {
             case "login":
                 json_parseado.add("world", argumento1);
-                JsonArray vector = new JsonArray;
+                JsonArray vector = new JsonArray();
+                for (int i=0; i<argumento2.size(); i++)
+                    vector.add(argumento2.get(i));
+                json_parseado.add("attach", vector);
                 
             case "read":
                 json_parseado.add("key", argumento1);
                 
                 
             case "execute":
-                json_parseado.add("world", argumento1);
-                JsonArray vector = new JsonArray;
-                
+                json_parseado.add("action", argumento1);
+                json_parseado.add("key", argumento2.get(1));
+
             case "logout":     
         }
 
