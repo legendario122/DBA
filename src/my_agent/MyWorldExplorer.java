@@ -76,7 +76,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void read() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        objeto = parsearJson("leer",key,null);
+        objeto = parsearJson("read",key,null);
         out.setContent(objeto.toString());
         this.send(out);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -86,9 +86,9 @@ public class MyWorldExplorer extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
         String accion="moveF";
-        ArrayList<String> acciones = new ArrayList<String>;
-        
-        objeto = parsearJson("ejecutar",key,accion);
+        ArrayList<String> acciones = new ArrayList<String>();
+        acciones.add(accion);
+        objeto = parsearJson("execute",key,acciones);
         out.setContent(objeto.toString());
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -104,24 +104,25 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
     
     private JsonObject parsearJson(String comando, String argumento1, ArrayList<String> argumento2) {
-        //JsonObject objeto = new JsonObject();
-        objeto.add("command", comando);
+        JsonObject json_parseado = new JsonObject();
+        json_parseado.add("command", comando);
         switch (comando) {
             case "login":
-                objeto.add("world", argumento1);
+                json_parseado.add("world", argumento1);
                 JsonArray vector = new JsonArray;
                 
             case "read":
-                objeto.add("key", argumento1);
+                json_parseado.add("key", argumento1);
                 
                 
             case "execute":
-                objeto.add("world", argumento1);
+                json_parseado.add("world", argumento1);
                 JsonArray vector = new JsonArray;
                 
             case "logout":     
         }
 
+        return json_parseado;
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
