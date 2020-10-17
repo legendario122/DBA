@@ -1,13 +1,17 @@
 package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
+import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
 public class MyWorldExplorer extends IntegratedAgent {
 
     String receiver;
-
+    String key;
+    ACLMessage out = new ACLMessage();
+    JsonObject objeto = new JsonObject();
+    
     @Override
     public void setup() {
         super.setup();
@@ -24,7 +28,9 @@ public class MyWorldExplorer extends IntegratedAgent {
     /// Dialogar con receiver para entrar en el mundo
     //  moverse y leer los sensores
 
-    //Funcion que enviara un mensaje al agente worldmanager para loguearse. 
+    //Funcion que enviara un mensaje al agente worldmanager para loguearse.
+    
+        
     loguearse();
     ACLMessage in= this.blockingReceive();
     
@@ -67,10 +73,20 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private void read() {
+        out.setSender(getAID());
+        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+        objeto = parsearJson("leer",key,null);
+        out.setContent(objeto.toString());
+        this.send(out);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void ejecutar() {
+        out.setSender(getAID());
+        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+        String accion="moveF";
+        objeto = parsearJson("ejecutar",key,accion);
+        out.setContent(objeto.toString());
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -78,7 +94,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private void parsearJson() {
+    private JsonObject parsearJson(String comando, String argumento1, String argumento2) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
