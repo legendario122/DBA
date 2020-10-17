@@ -1,6 +1,7 @@
 package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
@@ -20,8 +21,6 @@ public class MyWorldExplorer extends IntegratedAgent {
         doCheckinPlatform();
         doCheckinLARVA();
         receiver = this.whoLarvaAgent();
-
-
     }
 
     @Override
@@ -31,29 +30,22 @@ public class MyWorldExplorer extends IntegratedAgent {
     //  moverse y leer los sensores
 
     //Funcion que enviara un mensaje al agente worldmanager para loguearse.
-    
-        
+           
     loguearse();
-    ACLMessage in= this.blockingReceive();
-    
-    String resultado =desparsearJson(in);
-    
-    
-             
+    ACLMessage in = this.blockingReceive();  
+    String resultado = desparsearJson(in,true);
+                
     if(resultado == "ok"){
        read();
        in= this.blockingReceive();
-       resultado =desparsearJson(in);
-       if(resultado=="ok"){
-       
+       resultado = desparsearJson(in,false);
+       if(resultado=="ok"){    
            ejecutar();
            in= this.blockingReceive();
-           resultado =desparsearJson(in);
-           
+           resultado = desparsearJson(in,false);
            if(resultado=="ok"){
            }
-               logout();
-       
+           logout();      
        }
     }
     
@@ -67,11 +59,28 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private void loguearse() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        out.setSender(getAID());
+        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+        String mundo = "BasePlayground";
+        ArrayList<String> sensores = new ArrayList<String>();
+        sensores.add("alive");
+        sensores.add("compass");
+        sensores.add("altimeter");
+        sensores.add("visual");
+        objeto = parsearJson("login",mundo,sensores);
+        out.setContent(objeto.toString());
+        this.send(out);
     }
 
-    private String desparsearJson(ACLMessage in) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private String desparsearJson(ACLMessage in, boolean b) {
+        String answer = in.getContent();
+        JsonObject json = new JsonObject();
+        json = Json.parse(answer).asObject();
+        String resultado = json.get("result").asString();
+        if(b==true){
+            key = json.get("key").asString();
+        }      
+        return resultado;
     }
 
     private void read() {
@@ -80,7 +89,6 @@ public class MyWorldExplorer extends IntegratedAgent {
         objeto = parsearJson("read",key,null);
         out.setContent(objeto.toString());
         this.send(out);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void ejecutar() {
@@ -91,7 +99,6 @@ public class MyWorldExplorer extends IntegratedAgent {
         acciones.add(accion);
         objeto = parsearJson("execute",key,acciones);
         out.setContent(objeto.toString());
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void logout() {
@@ -100,8 +107,6 @@ public class MyWorldExplorer extends IntegratedAgent {
         objeto = parsearJson("logout",null,null);
         out.setContent(objeto.toString());
         this.send(out);
-        
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     private JsonObject parsearJson(String comando, String argumento1, ArrayList<String> argumento2) {
@@ -127,6 +132,6 @@ public class MyWorldExplorer extends IntegratedAgent {
         }
 
         return json_parseado;
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 }
