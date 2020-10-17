@@ -4,6 +4,7 @@ import IntegratedAgent.IntegratedAgent;
 import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
+import java.util.ArrayList;
 
 public class MyWorldExplorer extends IntegratedAgent {
 
@@ -85,16 +86,42 @@ public class MyWorldExplorer extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
         String accion="moveF";
+        ArrayList<String> acciones = new ArrayList<String>;
+        
         objeto = parsearJson("ejecutar",key,accion);
         out.setContent(objeto.toString());
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void logout() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        out.setSender(getAID());
+        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+        objeto = parsearJson("logout",null,null);
+        out.setContent(objeto.toString());
+        this.send(out);
+        
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private JsonObject parsearJson(String comando, String argumento1, String argumento2) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private JsonObject parsearJson(String comando, String argumento1, ArrayList<String> argumento2) {
+        //JsonObject objeto = new JsonObject();
+        objeto.add("command", comando);
+        switch (comando) {
+            case "login":
+                objeto.add("world", argumento1);
+                JsonArray vector = new JsonArray;
+                
+            case "read":
+                objeto.add("key", argumento1);
+                
+                
+            case "execute":
+                objeto.add("world", argumento1);
+                JsonArray vector = new JsonArray;
+                
+            case "logout":     
+        }
+
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
