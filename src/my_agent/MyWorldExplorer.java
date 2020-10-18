@@ -12,6 +12,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     String receiver;
     String key;
+    ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     JsonObject objeto = new JsonObject();
     
@@ -32,22 +33,28 @@ public class MyWorldExplorer extends IntegratedAgent {
     //Funcion que enviara un mensaje al agente worldmanager para loguearse.
            
     loguearse();
-    ACLMessage in = this.blockingReceive();  
+    in = this.blockingReceive();  
     String resultado = desparsearJson(in,true);
                 
-    if(resultado == "ok"){
+    Info("El resultado del login es "+resultado);
+    
+    //if(resultado == "ok"){
+       Info("He entrado en el primer if");
        read();
        in= this.blockingReceive();
        resultado = desparsearJson(in,false);
-       if(resultado=="ok"){    
+       Info("El resultado del read es "+resultado);
+       //if(resultado=="ok"){    
            ejecutar();
-           in= this.blockingReceive();
+           in = this.blockingReceive();
+           String answer = in.getContent();
+           Info("La respuesta es: "+answer);
            resultado = desparsearJson(in,false);
-           if(resultado=="ok"){
-           }
+           //if(resultado=="ok"){
+           //}
            logout();      
-       }
-    }
+       //}
+    //}
     
     }
 
@@ -84,27 +91,30 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private void read() {
-        out.setSender(getAID());
-        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        objeto = parsearJson("read",key,null);
+        ArrayList<String> vacio = new ArrayList<String>();
+        objeto = parsearJson("read",key,vacio);
+        Info("He pasado el parsear");
+        out = in.createReply();
         out.setContent(objeto.toString());
-        this.send(out);
+        this.sendServer(out);
     }
 
     private void ejecutar() {
-        out.setSender(getAID());
-        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
         String accion="moveF";
         ArrayList<String> acciones = new ArrayList<String>();
         acciones.add(accion);
         objeto = parsearJson("execute",key,acciones);
+        out = in.createReply();
         out.setContent(objeto.toString());
+        this.sendServer(out);
     }
 
     private void logout() {
+        String vacio="";
+        ArrayList<String> vector_vacio = new ArrayList<String>();
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        objeto = parsearJson("logout",null,null);
+        objeto = parsearJson("logout",vacio,vector_vacio);
         out.setContent(objeto.toString());
         this.send(out);
     }
@@ -126,11 +136,13 @@ public class MyWorldExplorer extends IntegratedAgent {
                 
             case "execute":
                 json_parseado.add("key", argumento1);
-                JsonArray vector_ejecutar = new JsonArray();
+                Info("Argumento2.get0 : "+argumento2.get(0));
+                json_parseado.add("action", argumento2.get(0));
+                /*JsonArray vector_ejecutar = new JsonArray();
                 for (int i=0; i<argumento2.size(); i++)
                     vector_ejecutar.add(argumento2.get(i));
-                json_parseado.add("action", vector_ejecutar);
-                //json_parseado.add("action", argumento2.get(0));
+                json_parseado.add("action", vector_ejecutar);*/
+                
 
             case "logout":     
         }
