@@ -35,28 +35,27 @@ public class MyWorldExplorer extends IntegratedAgent {
     loguearse();
     in = this.blockingReceive();  
     String resultado = desparsearJson(in,true);
-                
     Info("El resultado del login es "+resultado);
-    
-    //if(resultado == "ok"){
-       Info("He entrado en el primer if");
+    if("ok".equals(resultado)){
+       Info("El resultado del read es "+resultado);
        read();
        in= this.blockingReceive();
        resultado = desparsearJson(in,false);
        Info("El resultado del read es "+resultado);
-       //if(resultado=="ok"){    
+       if("ok".equals(resultado)){    
            ejecutar();
            in = this.blockingReceive();
            String answer = in.getContent();
            Info("La respuesta es: "+answer);
            resultado = desparsearJson(in,false);
-           //if(resultado=="ok"){
-           //}
-           logout();      
-       //}
-    //}
-    
+           if("ok".equals(resultado)){
+               logout(); 
+           }
+          }          
+       }
     }
+    
+    
 
     @Override
     public void takeDown() {
@@ -76,7 +75,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         sensores.add("visual");
         objeto = parsearJson("login",mundo,sensores);
         out.setContent(objeto.toString());
-        this.send(out);
+        this.sendServer(out);
     }
 
     private String desparsearJson(ACLMessage in, boolean b) {
@@ -93,7 +92,6 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void read() {
         ArrayList<String> vacio = new ArrayList<String>();
         objeto = parsearJson("read",key,vacio);
-        Info("He pasado el parsear");
         out = in.createReply();
         out.setContent(objeto.toString());
         this.sendServer(out);
@@ -129,22 +127,23 @@ public class MyWorldExplorer extends IntegratedAgent {
                 for (int i=0; i<argumento2.size(); i++)
                     vector.add(argumento2.get(i));
                 json_parseado.add("attach", vector);
-                
+                break;
+             
             case "read":
                 json_parseado.add("key", argumento1);
-                
+                break;
                 
             case "execute":
                 json_parseado.add("key", argumento1);
-                Info("Argumento2.get0 : "+argumento2.get(0));
                 json_parseado.add("action", argumento2.get(0));
+                break;
                 /*JsonArray vector_ejecutar = new JsonArray();
                 for (int i=0; i<argumento2.size(); i++)
                     vector_ejecutar.add(argumento2.get(i));
                 json_parseado.add("action", vector_ejecutar);*/
                 
-
-            case "logout":     
+            case "logout":  
+                break;
         }
 
         return json_parseado;
