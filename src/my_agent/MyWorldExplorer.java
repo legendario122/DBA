@@ -125,8 +125,12 @@ public class MyWorldExplorer extends IntegratedAgent {
                 
                 
             case "execute":
-                json_parseado.add("action", argumento1);
-                json_parseado.add("key", argumento2.get(1));
+                json_parseado.add("key", argumento1);
+                JsonArray vector_ejecutar = new JsonArray();
+                for (int i=0; i<argumento2.size(); i++)
+                    vector_ejecutar.add(argumento2.get(i));
+                json_parseado.add("action", vector_ejecutar);
+                //json_parseado.add("action", argumento2.get(0));
 
             case "logout":     
         }
