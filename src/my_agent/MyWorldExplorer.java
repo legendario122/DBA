@@ -15,6 +15,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     JsonObject objeto = new JsonObject();
+    Boolean on_target = false;
+    String accion; //Parametro para ejecutar 
+    int energia =1000;
+    String estado;
     
     @Override
     public void setup() {
@@ -37,21 +41,40 @@ public class MyWorldExplorer extends IntegratedAgent {
     String resultado = desparsearJson(in,true);
     Info("El resultado del login es "+resultado);
     if("ok".equals(resultado)){
-       Info("El resultado del read es "+resultado);
-       read();
-       in= this.blockingReceive();
-       resultado = desparsearJson(in,false);
-       Info("El resultado del read es "+resultado);
-       if("ok".equals(resultado)){    
+       while(on_target==false){
+           read();
+           in= this.blockingReceive();
+           resultado = desparsearJson(in,false);
+           if("ok".equals(resultado)){
+               
+               switch (estado){
+                   case "orientacion":
+                       estado = operacion_orientarse(); //DEBE DEVOLVER EL SIGUIENTE ESTADO
+                       break;
+                   case "desplazamiento":
+                       estado = operacion_altura();
+                       break;
+                   case "objetivo":
+                       estado = operacion_objetivo();
+                       break;
+                   case "recargar":
+                       estado = operacion_recargar();
+                       break;
+                   case "finalizado":
+                       logout();
+              
+               }
            ejecutar();
            in = this.blockingReceive();
            String answer = in.getContent();
-           Info("La respuesta es: "+answer);
            resultado = desparsearJson(in,false);
-           if("ok".equals(resultado)){
-               logout(); 
-           }
-          }          
+           estado = comprobar_energia();
+          }
+       }
+       
+       
+       
+                 
        }
     }
     
@@ -72,7 +95,9 @@ public class MyWorldExplorer extends IntegratedAgent {
         sensores.add("alive");
         sensores.add("compass");
         sensores.add("altimeter");
-        sensores.add("visual");
+        sensores.add("lidar");
+        sensores.add("distance");
+        sensores.add("angular");
         objeto = parsearJson("login",mundo,sensores);
         out.setContent(objeto.toString());
         this.sendServer(out);
@@ -98,7 +123,6 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private void ejecutar() {
-        String accion="moveF";
         ArrayList<String> acciones = new ArrayList<String>();
         acciones.add(accion);
         objeto = parsearJson("execute",key,acciones);
@@ -148,5 +172,25 @@ public class MyWorldExplorer extends IntegratedAgent {
 
         return json_parseado;
         
+    }
+
+    private String operacion_orientarse() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String operacion_altura() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String operacion_objetivo() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String operacion_recargar() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String comprobar_energia() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
