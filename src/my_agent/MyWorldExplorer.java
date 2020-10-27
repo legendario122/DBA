@@ -22,6 +22,8 @@ public class MyWorldExplorer extends IntegratedAgent {
     //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
     int compass;
     int angular;
+    int altimeter;
+    int distance;
     
     @Override
     public void setup() {
@@ -50,21 +52,24 @@ public class MyWorldExplorer extends IntegratedAgent {
            resultado = desparsearJson(in,false);
            if("ok".equals(resultado)){
                
+                //DEBE DEVOLVER EL SIGUIENTE ESTADO
                switch (estado){
                    case "orientacion":
-                       estado = operacion_orientarse(); //DEBE DEVOLVER EL SIGUIENTE ESTADO
+                       estado = operacion_orientarse(); //DONE
                        break;
                    case "desplazamiento":
                        estado = operacion_altura();
                        break;
                    case "objetivo":
-                       estado = operacion_objetivo();
+                       estado = operacion_objetivo(); //DONE
                        break;
                    case "recargar":
                        estado = operacion_recargar();
                        break;
                    case "finalizado":
                        logout();
+                       on_target=true;
+                       break;
               
                }
            ejecutar();
@@ -254,7 +259,20 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String operacion_objetivo() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        if(altimeter>=5){
+            
+            estado="objetivo";
+            accion="moveD";
+            
+        }else{
+            
+            estado="finalizado";
+            accion="touchD";
+        }
+        
+        
+        return estado;
     }
 
     private String operacion_recargar() {
