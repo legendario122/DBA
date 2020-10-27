@@ -7,12 +7,12 @@ package my_agent;
 
 import AppBoot.ConsoleBoot;
 
-public class Pract1 {
+public class Pract2{
 
     public static void main(String[] args) {
-        ConsoleBoot _app = new ConsoleBoot("Pract1",args);
+        ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
-        _app.launchAgent("BBVA1", MyWorldExplorer.class);
+        _app.launchAgent("BBVA", MyWorldExplorer.class);
         _app.shutDown();
     }
 

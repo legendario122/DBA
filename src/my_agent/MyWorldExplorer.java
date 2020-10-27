@@ -18,7 +18,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     Boolean on_target = false;
     String accion; //Parametro para ejecutar 
     int energia =1000;
-    String estado;
+    String estado="orientacion";
+    //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
+    int compass;
+    int angular;
     
     @Override
     public void setup() {
@@ -175,7 +178,75 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String operacion_orientarse() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int x=compass;
+        int derecha=45;
+        int izquierda=-45;
+        ArrayList<Integer> rotacion_derecha = new ArrayList<Integer>();
+        ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
+        
+        if(compass!=angular){
+            
+            rotacion_derecha.add(x);
+            if(x!=180){
+            x+=derecha;
+            }else{
+                x=-135;
+            }
+            
+            while(x!=angular){      
+                rotacion_derecha.add(x);
+                if(x==180){
+                    x=-135;
+                    if(x!=angular)
+                        rotacion_derecha.add(x);
+                }
+                if(x!=angular)
+                    x+=derecha;
+            }
+            
+            x=compass;
+            rotacion_izquierda.add(x);
+            if(x!=-135){
+            x+=izquierda;
+            }else{
+                x=180;
+            }
+            
+            while(x!=angular){           
+
+                rotacion_izquierda.add(x);
+                if(x==-135){
+                    x=180;
+                    if(x!=angular)
+                        rotacion_izquierda.add(x);
+                }
+                if(x!=angular)
+                    x+=izquierda;
+            }
+            
+            if(rotacion_derecha.size()>rotacion_izquierda.size()){
+                if(rotacion_izquierda.size()==1){
+                    estado="desplazamiento";
+                    accion="rotateL";
+                }else{
+                    estado="orientacion";
+                    accion="rotateL";
+                }
+            }else{
+                if(rotacion_derecha.size()==1){
+                    estado="desplazamiento";
+                    accion="rotateR";
+                }else{
+                    estado="orientacion";
+                    accion="rotateR";
+                }
+            }
+            
+        }else{
+            estado = operacion_altura();
+        }
+        
+        return estado;
     }
 
     private String operacion_altura() {
