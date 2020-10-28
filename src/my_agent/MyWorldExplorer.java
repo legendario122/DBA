@@ -7,6 +7,7 @@ import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MyWorldExplorer extends IntegratedAgent {
 
@@ -189,56 +190,9 @@ public class MyWorldExplorer extends IntegratedAgent {
         int izquierda=-45;
         ArrayList<Integer> rotacion_derecha = new ArrayList<Integer>();
         ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
+        ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+        angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, angular);
         
-        if(angular<=-90 || angular>=-135){
-            if((-135-angular)<= (angular-(-90))){
-                angulo_mas_cercano=-90;
-            }else{
-                angulo_mas_cercano=-135;
-            }
-        }else if(angular<=-45 || angular>=-90){
-            if((-90-angular)<= (angular-(-45))){
-                angulo_mas_cercano=-45;
-            }else{
-                angulo_mas_cercano=-90;
-            }
-        }else if(angular<=0 || angular>=-45){
-            if((-45-angular)<= (angular-(0))){
-                angulo_mas_cercano=0;
-            }else{
-                angulo_mas_cercano=-45;
-            }
-        }else if(angular<=45 || angular>=0){
-            if((0-angular)<= (angular-(45))){
-                angulo_mas_cercano=45;
-            }else{
-                angulo_mas_cercano=0;
-            }
-        }else if(angular<=90 || angular>=45){
-            if((45-angular)<= (angular-(90))){
-                angulo_mas_cercano=90;
-            }else{
-                angulo_mas_cercano=45;
-            }
-        }else if(angular<=135 || angular>=90){
-            if((90-angular)<= (angular-(135))){
-                angulo_mas_cercano=135;
-            }else{
-                angulo_mas_cercano=90;
-            }
-        }else if(angular<=180 || angular>=135){
-            if((135-angular)<= (angular-(180))){
-                angulo_mas_cercano=180;
-            }else{
-                angulo_mas_cercano=135;
-            }
-        }else{
-            if((-135)-angular >= 180 - Math.abs(angular)){
-                angulo_mas_cercano=180;               
-            }else{
-                angulo_mas_cercano=-135;
-            }
-        }
         
         if(compass!=angulo_mas_cercano){
             
@@ -332,5 +286,36 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String comprobar_energia() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private int calcular_angulo_mas_cercano(ArrayList<Integer> angulos, int angular1) {
+        int angulo_calc=-1;
+        int menor=-1, mayor=-1;
+        int i;
+        if(angular1>=-135){
+            for(i=0; i<angulos.size()-1; i++){
+                if(angulos.get(i)>=angular1){
+                    menor= angulos.get(i);
+                    mayor=angulos.get(i+1);
+                }
+            }
+            
+            if((menor-angular)<= (angular-mayor)){
+                angulo_calc=mayor;
+            }else{
+                angulo_calc=menor;
+            }
+        }else{
+            menor=-135;
+            mayor=180;
+            if(menor-angular >= mayor - Math.abs(angular)){
+                angulo_calc=mayor;               
+            }else{
+                angulo_calc=menor;
+            }
+        }
+        
+        
+        return angulo_calc;
     }
 }
