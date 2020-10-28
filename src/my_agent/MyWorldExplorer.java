@@ -77,7 +77,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            String answer = in.getContent();
            resultado = desparsearJson(in,false);
            estado = comprobar_energia();
-          }
+          } 
        }
        
        
@@ -184,12 +184,63 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_orientarse() {
         int x=compass;
+        int angulo_mas_cercano;
         int derecha=45;
         int izquierda=-45;
         ArrayList<Integer> rotacion_derecha = new ArrayList<Integer>();
         ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
         
-        if(compass!=angular){
+        if(angular<=-90 || angular>=-135){
+            if((-135-angular)<= (angular-(-90))){
+                angulo_mas_cercano=-90;
+            }else{
+                angulo_mas_cercano=-135;
+            }
+        }else if(angular<=-45 || angular>=-90){
+            if((-90-angular)<= (angular-(-45))){
+                angulo_mas_cercano=-45;
+            }else{
+                angulo_mas_cercano=-90;
+            }
+        }else if(angular<=0 || angular>=-45){
+            if((-45-angular)<= (angular-(0))){
+                angulo_mas_cercano=0;
+            }else{
+                angulo_mas_cercano=-45;
+            }
+        }else if(angular<=45 || angular>=0){
+            if((0-angular)<= (angular-(45))){
+                angulo_mas_cercano=45;
+            }else{
+                angulo_mas_cercano=0;
+            }
+        }else if(angular<=90 || angular>=45){
+            if((45-angular)<= (angular-(90))){
+                angulo_mas_cercano=90;
+            }else{
+                angulo_mas_cercano=45;
+            }
+        }else if(angular<=135 || angular>=90){
+            if((90-angular)<= (angular-(135))){
+                angulo_mas_cercano=135;
+            }else{
+                angulo_mas_cercano=90;
+            }
+        }else if(angular<=180 || angular>=135){
+            if((135-angular)<= (angular-(180))){
+                angulo_mas_cercano=180;
+            }else{
+                angulo_mas_cercano=135;
+            }
+        }else{
+            if((-135)-angular >= 180 - Math.abs(angular)){
+                angulo_mas_cercano=180;               
+            }else{
+                angulo_mas_cercano=-135;
+            }
+        }
+        
+        if(compass!=angulo_mas_cercano){
             
             rotacion_derecha.add(x);
             if(x!=180){
@@ -198,14 +249,14 @@ public class MyWorldExplorer extends IntegratedAgent {
                 x=-135;
             }
             
-            while(x!=angular){      
+            while(x!=angulo_mas_cercano){      
                 rotacion_derecha.add(x);
                 if(x==180){
                     x=-135;
-                    if(x!=angular)
+                    if(x!=angulo_mas_cercano)
                         rotacion_derecha.add(x);
                 }
-                if(x!=angular)
+                if(x!=angulo_mas_cercano)
                     x+=derecha;
             }
             
@@ -217,15 +268,15 @@ public class MyWorldExplorer extends IntegratedAgent {
                 x=180;
             }
             
-            while(x!=angular){           
+            while(x!=angulo_mas_cercano){           
 
                 rotacion_izquierda.add(x);
                 if(x==-135){
                     x=180;
-                    if(x!=angular)
+                    if(x!=angulo_mas_cercano)
                         rotacion_izquierda.add(x);
                 }
-                if(x!=angular)
+                if(x!=angulo_mas_cercano)
                     x+=izquierda;
             }
             
