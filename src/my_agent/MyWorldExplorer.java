@@ -4,6 +4,7 @@ import IntegratedAgent.IntegratedAgent;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
@@ -23,8 +24,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
     int compass;
     int angular;
-    int altimeter;
+    double altimeter;
     int distance;
+    int alive;
+    int lidar[][] = new int[7][7];
     
     @Override
     public void setup() {
@@ -44,13 +47,13 @@ public class MyWorldExplorer extends IntegratedAgent {
            
     loguearse();
     in = this.blockingReceive();  
-    String resultado = desparsearJson(in,true);
+    String resultado = desparsearJson(in,"login");
     Info("El resultado del login es "+resultado);
     if("ok".equals(resultado)){
        while(on_target==false){
            read();
            in= this.blockingReceive();
-           resultado = desparsearJson(in,false);
+           resultado = desparsearJson(in,"read");
            if("ok".equals(resultado)){
                
                 //DEBE DEVOLVER EL SIGUIENTE ESTADO
@@ -76,7 +79,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            ejecutar();
            in = this.blockingReceive();
            String answer = in.getContent();
-           resultado = desparsearJson(in,false);
+           resultado = desparsearJson(in,"execute");
            estado = comprobar_energia();
           } 
        }
@@ -112,14 +115,58 @@ public class MyWorldExplorer extends IntegratedAgent {
         this.sendServer(out);
     }
 
-    private String desparsearJson(ACLMessage in, boolean b) {
+    private String desparsearJson(ACLMessage in, String operacion) {
         String answer = in.getContent();
+        String sensor;
+        int i;
+        int z=0;
+        JsonArray vector = new JsonArray();
+        JsonArray matriz =  new JsonArray();
+        JsonArray matriz_bis =  new JsonArray();
         JsonObject json = new JsonObject();
         json = Json.parse(answer).asObject();
         String resultado = json.get("result").asString();
-        if(b==true){
-            key = json.get("key").asString();
-        }      
+        if("ok".equals(resultado)){
+            switch (operacion) {
+                case "login":
+                    key = json.get("key").asString();
+                    break;
+
+                case "read":
+                    vector = json.get("details").asObject().get("perceptions").asArray();
+                    for(JsonValue j : vector){
+                        sensor = j.asObject().get("sensor").asString();
+                        if("alive".equals(sensor)){
+                            alive = j.asObject().get("data").asInt();
+                        }else if("compass".equals(sensor)){
+                            compass = j.asObject().get("data").asInt();
+                        }else if("altimeter".equals(sensor)){
+                           altimeter = j.asObject().get("data").asDouble();
+                        }else if("lidar".equals(sensor)){
+                            matriz = j.asObject().get("data").asArray();
+                            i=0;
+                            for(JsonValue v : matriz){
+                                matriz_bis = v.asObject().asArray();
+                                for(JsonValue s : matriz_bis){
+                                    lidar[i][z]=s.asInt();
+                                    z++;
+                                }
+                                z=0;
+                                i++;
+                            }
+                        }else if("distance".equals(sensor)){
+                            distance = j.asObject().get("data").asInt();
+                        }else if("angular".equals(sensor)){
+                            angular = j.asObject().get("data").asInt();
+                        }                    
+                    }
+                    break;
+
+                case "execute":
+                    break;
+            }   
+        }
+        
         return resultado;
     }
 
