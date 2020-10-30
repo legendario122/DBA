@@ -68,7 +68,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                        estado = operacion_objetivo(); //DONE
                        break;
                    case "recargar":
-                       estado = operacion_recargar();
+                       estado = operacion_recargar(); //DONE
                        break;
                    case "finalizado":
                        logout();
@@ -328,7 +328,19 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String operacion_recargar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(altimeter>5 || altimeter==5){
+            accion="moveD";
+        }else if(altimeter>0 && altimeter<5){
+            accion="touchD";
+        }else if(altimeter==0){
+            accion="recharge";
+        }
+        if(altimeter>0){
+            estado="recargar";
+        }else if(altimeter==0){
+            estado="desplazamiento";
+        }
+        return estado;
     }
 
     private String comprobar_energia() {
