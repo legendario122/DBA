@@ -1,5 +1,6 @@
 package my_agent;
 
+import ControlPanel.TTYControlPanel;
 import IntegratedAgent.IntegratedAgent;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -21,6 +22,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     String accion; //Parametro para ejecutar 
     int energia =1000;
     String estado="orientacion";
+    //TTYControlPanel myControlPanel;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
     //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
     int compass;
     int angular;
@@ -35,6 +37,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         doCheckinPlatform();
         doCheckinLARVA();
         receiver = this.whoLarvaAgent();
+        //myControlPanel = new TTYControlPanel(getAID());////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     @Override
@@ -53,6 +56,7 @@ public class MyWorldExplorer extends IntegratedAgent {
        while(on_target==false){
            read();
            in= this.blockingReceive();
+           //myControlPanel.feedData(in, width, height);/////////////////////////////////////////////////////////////////////////////////////////////////////////////7
            resultado = desparsearJson(in,"read");
            if("ok".equals(resultado)){
                
@@ -306,7 +310,8 @@ public class MyWorldExplorer extends IntegratedAgent {
         return estado;
     }
 
-    private String operacion_altura() {
+    private String operacion_altura() { //DEL SABUFU
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -343,8 +348,36 @@ public class MyWorldExplorer extends IntegratedAgent {
         return estado;
     }
 
-    private String comprobar_energia() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private String comprobar_energia() { //DEL SABUFU
+        //String estado_inicial = estado;
+        energia = energia - 6; //consumo de los sensores
+        
+        switch (accion){
+            case "moveF":
+                energia--;
+                break;
+            case "rotateL":
+                energia--;
+                break;
+            case "rotateR":
+                energia--;
+                break;
+            case "moveUp":
+                energia = energia - 5;
+                break;
+            case "moveD":
+                energia = energia -5;
+                break;
+            case "recharge":
+                energia = 1000;
+                break;
+        }
+        
+        if (altimeter * 5 <= energia - 5){ //si la energia restante es la justa para aterrizar, recargamos
+            return "recharge";
+        }
+        
+        return estado; 
     }
 
     private int calcular_angulo_mas_cercano(ArrayList<Integer> angulos, int angular1) {
