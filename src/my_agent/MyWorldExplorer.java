@@ -111,7 +111,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "Playground1";
+        String mundo = "Playground2";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("compass");
@@ -218,11 +218,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private void logout() {
-        String vacio="";
         ArrayList<String> vector_vacio = new ArrayList<String>();
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        objeto = parsearJson("logout",vacio,vector_vacio);
+        objeto = parsearJson("logout",key,vector_vacio);
         out.setContent(objeto.toString());
         this.send(out);
     }
@@ -341,71 +340,76 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String operacion_altura() { //DEL SABUFU
-        if(compass == 0){
-            if(lidar[2][3] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
+        if(distance > 1){
+            if(compass == 0){
+                if(lidar[2][3] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
+            }else if(compass == 45){
+                if(lidar[2][4] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
+            }else if(compass == 90){
+                if(lidar[3][4] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }    
+            }else if(compass == 135){
+                if(lidar[4][4] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
+            }else if(compass == 180){
+                if(lidar[4][3] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
+            }else if(compass == -135){
+                if(lidar[4][2] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
+            }else if(compass == -90){
+                if(lidar[3][2] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
+            }else if(compass == -45){
+                if(lidar[2][2] >= 0){
+                    accion = "moveF";
+                    estado = "orientacion";
+                }else{
+                    accion = "moveUp";
+                    estado = "desplazamiento";
+                }
             }
-        }else if(compass == 45){
-            if(lidar[2][4] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }
-        }else if(compass == 90){
-            if(lidar[3][4] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }    
-        }else if(compass == 135){
-            if(lidar[4][4] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }
-        }else if(compass == 180){
-            if(lidar[4][3] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }
-        }else if(compass == -135){
-            if(lidar[4][2] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }
-        }else if(compass == -90){
-            if(lidar[3][2] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }
-        }else if(compass == -45){
-            if(lidar[2][2] >= 0){
-                accion = "moveF";
-                estado = "orientacion";
-            }else{
-                accion = "moveUp";
-                estado = "desplazamiento";
-            }
-        }    
+        }else{
+            estado = "objetivo";
+            accion = "moveF";
+        }
         return estado;        
     }
     
@@ -468,10 +472,14 @@ public class MyWorldExplorer extends IntegratedAgent {
                 break;
         }
         
+        /*
         if ((energia - altimeter - 6 * (altimeter/5))==0){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
-        
+        */
+        if (energia==6){ //si la energia restante es la justa para aterrizar, recargamos
+            return "recargar";
+        }
         return estado; 
     }
 
