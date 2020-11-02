@@ -71,7 +71,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                        estado = operacion_orientarse(); //DONE
                        break;
                    case "desplazamiento":
-                       estado = operacion_altura();
+                       estado = operacion_altura();   //DONE
                        break;
                    case "objetivo":
                        estado = operacion_objetivo(); //DONE
