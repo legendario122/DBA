@@ -111,7 +111,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "Playground2";
+        String mundo = "World1";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("compass");
@@ -346,7 +346,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }else if(compass == 45){
@@ -354,7 +354,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }else if(compass == 90){
@@ -362,7 +362,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }    
             }else if(compass == 135){
@@ -370,7 +370,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }else if(compass == 180){
@@ -378,7 +378,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }else if(compass == -135){
@@ -386,7 +386,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }else if(compass == -90){
@@ -394,7 +394,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }else if(compass == -45){
@@ -402,7 +402,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion = "moveF";
                     estado = "orientacion";
                 }else{
-                    accion = "moveUp";
+                    accion = "moveUP";
                     estado = "desplazamiento";
                 }
             }
