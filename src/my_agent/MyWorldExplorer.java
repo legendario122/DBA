@@ -90,6 +90,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            String answer = in.getContent();
            resultado = desparsearJson(in,"execute");
            estado = comprobar_energia();
+           Info("El estado es: "+estado);
           } 
        }
                       
@@ -259,6 +260,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String operacion_orientarse() {
+        Info("He entrado en operacion_orientarse");
         int x=(int)compass;
         int angulo_mas_cercano;
         int derecha=45;
@@ -309,8 +311,11 @@ public class MyWorldExplorer extends IntegratedAgent {
                     x+=izquierda;
             }
             
+            Info("La longitud derecha es "+rotacion_derecha.size());
+            Info("La longitud izquierda es "+rotacion_izquierda.size());
+            
             if(rotacion_derecha.size()>rotacion_izquierda.size()){
-                if(rotacion_izquierda.size()==1){
+                if(rotacion_izquierda.size()==2){ //aqui iba 1
                     estado="desplazamiento";
                     accion="rotateL";
                 }else{
@@ -318,7 +323,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion="rotateL";
                 }
             }else{
-                if(rotacion_derecha.size()==1){
+                if(rotacion_derecha.size()==2){ //aqui iba 1
                     estado="desplazamiento";
                     accion="rotateR";
                 }else{
@@ -462,8 +467,8 @@ public class MyWorldExplorer extends IntegratedAgent {
                 break;
         }
         
-        if (altimeter * 5 <= energia - 5){ //si la energia restante es la justa para aterrizar, recargamos
-            return "recharge";
+        if ((energia - altimeter - 6 * (altimeter/5))==0){ //si la energia restante es la justa para aterrizar, recargamos
+            return "recargar";
         }
         
         return estado; 
@@ -484,9 +489,9 @@ public class MyWorldExplorer extends IntegratedAgent {
             }
             
             if((menor-angular)<= (angular-mayor)){
-                angulo_calc=menor;
-            }else{
                 angulo_calc=mayor;
+            }else{
+                angulo_calc=menor;
             }
         }else{
             menor=-135;
