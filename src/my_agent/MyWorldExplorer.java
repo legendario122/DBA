@@ -29,7 +29,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     int maxflight;
     //int compass;
     double compass;
-    int angular;
+    double angular;
     double altimeter;
     double distance;
     int alive;
@@ -91,6 +91,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            resultado = desparsearJson(in,"execute");
            estado = comprobar_energia();
            Info("El estado es: "+estado);
+           Info("La energia que tenemos es "+energia);
           } 
        }
                       
@@ -185,7 +186,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                         }else if("angular".equals(sensor)){
                             //angular = j.asObject().get("data").asInt();
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
-                                angular = a.asInt();
+                                angular = a.asDouble();
                             }
                         }                    
                     }
@@ -268,7 +269,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         ArrayList<Integer> rotacion_derecha = new ArrayList<Integer>();
         ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
         ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-        angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, angular);
+        angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
         
         
         if(compass!=angulo_mas_cercano){
@@ -315,7 +316,7 @@ public class MyWorldExplorer extends IntegratedAgent {
             Info("La longitud izquierda es "+rotacion_izquierda.size());
             
             if(rotacion_derecha.size()>rotacion_izquierda.size()){
-                if(rotacion_izquierda.size()==2){ //aqui iba 1
+                if(rotacion_izquierda.size()==1){ //aqui iba 1
                     estado="desplazamiento";
                     accion="rotateL";
                 }else{
@@ -323,7 +324,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     accion="rotateL";
                 }
             }else{
-                if(rotacion_derecha.size()==2){ //aqui iba 1
+                if(rotacion_derecha.size()==1){ //aqui iba 1
                     estado="desplazamiento";
                     accion="rotateR";
                 }else{
@@ -341,7 +342,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_altura() { //DEL SABUFU
         if(compass == 0){
-            if(lidar[2][3] > 0){
+            if(lidar[2][3] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -349,7 +350,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }
         }else if(compass == 45){
-            if(lidar[2][4] > 0){
+            if(lidar[2][4] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -357,7 +358,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }
         }else if(compass == 90){
-            if(lidar[3][4] > 0){
+            if(lidar[3][4] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -365,7 +366,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }    
         }else if(compass == 135){
-            if(lidar[4][4] > 0){
+            if(lidar[4][4] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -373,7 +374,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }
         }else if(compass == 180){
-            if(lidar[4][3] > 0){
+            if(lidar[4][3] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -381,7 +382,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }
         }else if(compass == -135){
-            if(lidar[4][2] > 0){
+            if(lidar[4][2] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -389,7 +390,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }
         }else if(compass == -90){
-            if(lidar[3][2] > 0){
+            if(lidar[3][2] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -397,7 +398,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 estado = "desplazamiento";
             }
         }else if(compass == -45){
-            if(lidar[2][2] > 0){
+            if(lidar[2][2] >= 0){
                 accion = "moveF";
                 estado = "orientacion";
             }else{
@@ -474,7 +475,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         return estado; 
     }
 
-    private int calcular_angulo_mas_cercano(ArrayList<Integer> angulos, int angular1) {
+    private int calcular_angulo_mas_cercano(ArrayList<Integer> angulos,int angular1) {
         int angulo_calc=-1;
         int menor=-1, mayor=-1;
         int i;
