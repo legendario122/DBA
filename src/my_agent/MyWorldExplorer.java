@@ -22,12 +22,16 @@ public class MyWorldExplorer extends IntegratedAgent {
     String accion; //Parametro para ejecutar 
     int energia =1000;
     String estado="orientacion";
-    //TTYControlPanel myControlPanel;/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
+    TTYControlPanel myControlPanel;
     //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
-    int compass;
+    int width; 
+    int height;
+    int maxflight;
+    //int compass;
+    double compass;
     int angular;
     double altimeter;
-    int distance;
+    double distance;
     int alive;
     int lidar[][] = new int[7][7];
     
@@ -37,7 +41,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         doCheckinPlatform();
         doCheckinLARVA();
         receiver = this.whoLarvaAgent();
-        //myControlPanel = new TTYControlPanel(getAID());////////////////////////////////////////////////////////////////////////////////////////////////
+        myControlPanel = new TTYControlPanel(getAID());
     }
 
     @Override
@@ -56,8 +60,9 @@ public class MyWorldExplorer extends IntegratedAgent {
        while(on_target==false){
            read();
            in= this.blockingReceive();
-           //myControlPanel.feedData(in, width, height);/////////////////////////////////////////////////////////////////////////////////////////////////////////////7
            resultado = desparsearJson(in,"read");
+           myControlPanel.feedData(in, width, height);
+           myControlPanel.fancyShow();
            if("ok".equals(resultado)){
                
                 //DEBE DEVOLVER EL SIGUIENTE ESTADO
@@ -87,11 +92,9 @@ public class MyWorldExplorer extends IntegratedAgent {
            estado = comprobar_energia();
           } 
        }
-       
-       
-       
-                 
+                      
        }
+    myControlPanel.close();
     }
     
     
@@ -106,7 +109,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "BasePlayground";
+        String mundo = "Playground1";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("compass");
@@ -125,6 +128,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         int i;
         int z=0;
         JsonArray vector = new JsonArray();
+        JsonArray prueba = new JsonArray();
         JsonArray matriz =  new JsonArray();
         JsonArray matriz_bis =  new JsonArray();
         JsonObject json = new JsonObject();
@@ -134,6 +138,9 @@ public class MyWorldExplorer extends IntegratedAgent {
             switch (operacion) {
                 case "login":
                     key = json.get("key").asString();
+                    width = json.get("width").asInt(); 
+                    height = json.get("height").asInt();
+                    maxflight = json.get("maxflight").asInt();
                     break;
 
                 case "read":
@@ -141,16 +148,27 @@ public class MyWorldExplorer extends IntegratedAgent {
                     for(JsonValue j : vector){
                         sensor = j.asObject().get("sensor").asString();
                         if("alive".equals(sensor)){
-                            alive = j.asObject().get("data").asInt();
+                            //alive = j.asObject().get("data").asInt();
+                            for(JsonValue a : prueba = j.asObject().get("data").asArray()){
+                                alive = a.asInt();
+                            }
                         }else if("compass".equals(sensor)){
-                            compass = j.asObject().get("data").asInt();
+                            //compass = j.asObject().get("data").asInt();
+                            for(JsonValue a : prueba = j.asObject().get("data").asArray()){
+                                //compass = a.asInt();
+                                compass = a.asDouble();
+                            }
                         }else if("altimeter".equals(sensor)){
-                           altimeter = j.asObject().get("data").asDouble();
+                           //altimeter = j.asObject().get("data").asDouble();
+                           for(JsonValue a : prueba = j.asObject().get("data").asArray()){
+                                altimeter = a.asDouble();
+                            }
                         }else if("lidar".equals(sensor)){
                             matriz = j.asObject().get("data").asArray();
                             i=0;
                             for(JsonValue v : matriz){
-                                matriz_bis = v.asObject().asArray();
+                                //matriz_bis = v.asObject().asArray();
+                                matriz_bis = v.asArray();
                                 for(JsonValue s : matriz_bis){
                                     lidar[i][z]=s.asInt();
                                     z++;
@@ -159,9 +177,15 @@ public class MyWorldExplorer extends IntegratedAgent {
                                 i++;
                             }
                         }else if("distance".equals(sensor)){
-                            distance = j.asObject().get("data").asInt();
+                            //distance = j.asObject().get("data").asInt();
+                            for(JsonValue a : prueba = j.asObject().get("data").asArray()){
+                                distance = a.asDouble();
+                            }
                         }else if("angular".equals(sensor)){
-                            angular = j.asObject().get("data").asInt();
+                            //angular = j.asObject().get("data").asInt();
+                            for(JsonValue a : prueba = j.asObject().get("data").asArray()){
+                                angular = a.asInt();
+                            }
                         }                    
                     }
                     break;
@@ -235,7 +259,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String operacion_orientarse() {
-        int x=compass;
+        int x=(int)compass;
         int angulo_mas_cercano;
         int derecha=45;
         int izquierda=-45;
@@ -265,7 +289,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                     x+=derecha;
             }
             
-            x=compass;
+            x=(int)compass;
             rotacion_izquierda.add(x);
             if(x!=-135){
             x+=izquierda;
@@ -449,18 +473,20 @@ public class MyWorldExplorer extends IntegratedAgent {
         int angulo_calc=-1;
         int menor=-1, mayor=-1;
         int i;
+        boolean encontrado=false;
         if(angular1>=-135){
             for(i=0; i<angulos.size()-1; i++){
-                if(angulos.get(i)>=angular1){
+                if(angulos.get(i)>=angular1 && encontrado==false){
                     menor= angulos.get(i);
                     mayor=angulos.get(i+1);
+                    encontrado=true;
                 }
             }
             
             if((menor-angular)<= (angular-mayor)){
-                angulo_calc=mayor;
-            }else{
                 angulo_calc=menor;
+            }else{
+                angulo_calc=mayor;
             }
         }else{
             menor=-135;
