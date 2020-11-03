@@ -111,7 +111,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World3";
+        String mundo = "Playground2";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("compass");
@@ -271,7 +271,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
         
         
-        if(compass!=angulo_mas_cercano){
+        if((int) compass!=angulo_mas_cercano){
             
             rotacion_derecha.add(x);
             if(x!=180){
@@ -333,7 +333,12 @@ public class MyWorldExplorer extends IntegratedAgent {
             }
             
         }else{
-            estado = operacion_altura();
+            if(distance>0){
+                estado = operacion_altura();
+            }else{
+                estado = operacion_objetivo();
+            }
+            
         }
         
         return estado;
@@ -478,7 +483,7 @@ public class MyWorldExplorer extends IntegratedAgent {
             return "recargar";
         }
         */
-        if (energia < 550){ //si la energia restante es la justa para aterrizar, recargamos
+        if (energia < 100){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
