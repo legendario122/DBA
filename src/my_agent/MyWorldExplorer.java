@@ -80,6 +80,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                        estado = operacion_recargar(); //DONE
                        break;
                    case "finalizado":
+                       accion="touchD";
                        logout();
                        on_target=true;
                        break;
@@ -91,6 +92,8 @@ public class MyWorldExplorer extends IntegratedAgent {
            resultado = desparsearJson(in,"execute");
            estado = comprobar_energia();
            Info("El estado es: "+estado);
+           Info("La altura: "+altimeter);
+            Info("La distancia que tenemos es "+distance);
            Info("La energia que tenemos es "+energia);
           } 
        }
@@ -111,9 +114,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "Playground2";
+        String mundo = "World5";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
+        sensores.add("gps");
         sensores.add("compass");
         sensores.add("altimeter");
         sensores.add("lidar");
@@ -316,7 +320,11 @@ public class MyWorldExplorer extends IntegratedAgent {
             
             if(rotacion_derecha.size()>rotacion_izquierda.size()){
                 if(rotacion_izquierda.size()==1){ //aqui iba 1
-                    estado="desplazamiento";
+                    if(distance==0){
+                        estado="objetivo";
+                    }else{
+                        estado="desplazamiento";
+                    }
                     accion="rotateL";
                 }else{
                     estado="orientacion";
@@ -324,7 +332,11 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }
             }else{
                 if(rotacion_derecha.size()==1){ //aqui iba 1
-                    estado="desplazamiento";
+                    if(distance==0){
+                        estado="objetivo";
+                    }else{
+                        estado="desplazamiento";
+                    }
                     accion="rotateR";
                 }else{
                     estado="orientacion";
@@ -333,7 +345,8 @@ public class MyWorldExplorer extends IntegratedAgent {
             }
             
         }else{
-            if(distance>0){
+            if(distance>1){
+                               
                 estado = operacion_altura();
             }else{
                 estado = operacion_objetivo();
@@ -346,7 +359,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_altura() { //DEL SABUFU
         int angulo = (int)compass;
-        if(distance > 0.5){
+        if(distance > 1){
             if(angulo == 0){
                 if(lidar[2][3] >= 0){
                     accion = "moveF";
@@ -422,7 +435,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_objetivo() {
         
-        if(altimeter>=5){
+        if(altimeter>=9){
             
             estado="objetivo";
             accion="moveD";
@@ -430,7 +443,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         }else{
             
             estado="finalizado";
-            accion="touchD";
+            accion="moveD";
         }
         
         
@@ -483,7 +496,7 @@ public class MyWorldExplorer extends IntegratedAgent {
             return "recargar";
         }
         */
-        if (energia < 100){ //si la energia restante es la justa para aterrizar, recargamos
+        if (energia < 300){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
