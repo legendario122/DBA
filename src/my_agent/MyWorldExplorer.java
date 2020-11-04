@@ -365,7 +365,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_altura() { //DEL SABUFU
         int angulo = (int)compass;
-        if(distance > 1){
+        if(distance >= 1){
             if(angulo == 0){
                 if(lidar[2][3] >= 0){
                     accion = "moveF";
@@ -445,7 +445,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_objetivo() {
         
-        if(altimeter>=15){
+        if(altimeter>=10){
             
             estado="objetivo";
             accion="moveD";
@@ -477,8 +477,8 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String comprobar_energia() { //DEL SABUFU
-        int energia = energy - 5;
-        if (energia <= (int) altimeter){ //si la energia restante es la justa para aterrizar, recargamos
+        int energia = energy - 50;
+        if (energia <= (int) altimeter + (altimeter/5)*7){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
