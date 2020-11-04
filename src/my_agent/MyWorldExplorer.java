@@ -426,7 +426,11 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }
             }
         }else{
-            estado = "objetivo";
+            if(altimeter==0){
+                estado = "finalizado";
+            }else{
+                estado = "objetivo";
+            }
             accion = "moveF";
         }
         return estado;        
@@ -435,7 +439,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_objetivo() {
         
-        if(altimeter>=9){
+        if(altimeter>=15){
             
             estado="objetivo";
             accion="moveD";
