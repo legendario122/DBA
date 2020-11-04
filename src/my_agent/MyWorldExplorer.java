@@ -114,10 +114,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World5";
+        String mundo = "World1";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
-        sensores.add("gps");
+        sensores.add("energy");
         sensores.add("compass");
         sensores.add("altimeter");
         sensores.add("lidar");
@@ -468,7 +468,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String comprobar_energia() { //DEL SABUFU
         //String estado_inicial = estado;
-        energia = energia - 6; //consumo de los sensores
+        energia = energia - 7; //consumo de los sensores
         
         switch (accion){
             case "moveF":
@@ -496,7 +496,7 @@ public class MyWorldExplorer extends IntegratedAgent {
             return "recargar";
         }
         */
-        if (energia < 300){ //si la energia restante es la justa para aterrizar, recargamos
+        if (energia < 500){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
@@ -507,7 +507,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         int menor=-1, mayor=-1;
         int i;
         boolean encontrado=false;
-        if(angular1>=-135){
+        if(angular1>=-135 && angular1<180){
             for(i=0; i<angulos.size()-1; i++){
                 if(angulos.get(i)>=angular1 && encontrado==false){
                     menor= angulos.get(i);
@@ -522,13 +522,18 @@ public class MyWorldExplorer extends IntegratedAgent {
                 angulo_calc=menor;
             }
         }else{
-            menor=-135;
-            mayor=180;
-            if(menor-angular >= mayor - Math.abs(angular)){
-                angulo_calc=mayor;               
+            if(angular1>=180){
+                angulo_calc=180;
             }else{
-                angulo_calc=menor;
+                menor=-135;
+                mayor=180;
+                if(menor-angular >= mayor - Math.abs(angular)){
+                    angulo_calc=mayor;               
+                }else{
+                    angulo_calc=menor;
+                }
             }
+
         }
         
         
