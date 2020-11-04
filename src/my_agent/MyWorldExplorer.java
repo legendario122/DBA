@@ -121,7 +121,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World5";
+        String mundo = "World3";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("energy");
@@ -303,13 +303,11 @@ public class MyWorldExplorer extends IntegratedAgent {
         int izquierda=-45;
         ArrayList<Integer> rotacion_derecha = new ArrayList<Integer>();
         ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
-        if(angulo_aux==-1){
+        
             
-            ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-            angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
-        }else{
-            angulo_mas_cercano=angulo_aux;
-        }
+        ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+        angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
+        
         
         if((int) compass!=angulo_mas_cercano){
             
@@ -385,7 +383,9 @@ public class MyWorldExplorer extends IntegratedAgent {
                                
                 estado = operacion_altura();
             }else{
+               
                 estado = operacion_objetivo();
+                
             }
             
         }
@@ -400,145 +400,74 @@ public class MyWorldExplorer extends IntegratedAgent {
                 if(lidar[2][3] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == 45){
                 if(lidar[2][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
+                
                 }
             }else if(angulo == 90){
                 if(lidar[3][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
-                }   
+                }
             }else if(angulo == 135){
                 if(lidar[4][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == 180){
                 if(lidar[4][3] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == -135){
                 if(lidar[4][2] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == -90){
                 if(lidar[3][2] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == -45){
                 if(lidar[2][2] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else if(y<maxflight){
+                }else{
                     
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }else{
-                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-                    for(int i=0; i<angulos.size(); i++){
-                        if(angulos.get(i)==angulo){
-                            angulos.remove(i);
-                        }
-                    }
-                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
-                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }
         }else{
@@ -563,7 +492,12 @@ public class MyWorldExplorer extends IntegratedAgent {
         }else{
             
             estado="finalizado";
-            accion="moveD";
+            if(altimeter!=0){
+                accion="moveD";
+            }else{
+                accion="touchD";
+            }
+            
         }
         
         
@@ -587,7 +521,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String comprobar_energia() { //DEL SABUFU
-        int energia = energy - 50;
+        int energia = energy - 70;
         if (energia <= (int) altimeter + (altimeter/5)*7){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
@@ -600,10 +534,10 @@ public class MyWorldExplorer extends IntegratedAgent {
         int i;
         boolean encontrado=false;
         if(angular1>=-135 && angular1<180){
-            for(i=0; i<angulos.size()-1; i++){
+            for(i=1; i<angulos.size()-1; i++){
                 if(angulos.get(i)>=angular1 && encontrado==false){
-                    menor= angulos.get(i);
-                    mayor=angulos.get(i+1);
+                    menor= angulos.get(i-1);
+                    mayor=angulos.get(i);
                     encontrado=true;
                 }
             }
