@@ -20,7 +20,6 @@ public class MyWorldExplorer extends IntegratedAgent {
     JsonObject objeto = new JsonObject();
     Boolean on_target = false;
     String accion; //Parametro para ejecutar 
-    int energia =1000;
     String estado="orientacion";
     TTYControlPanel myControlPanel;
     //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
@@ -32,6 +31,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     double angular;
     double altimeter;
     double distance;
+    int energy;
     int alive;
     int lidar[][] = new int[7][7];
     
@@ -94,7 +94,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            Info("El estado es: "+estado);
            Info("La altura: "+altimeter);
             Info("La distancia que tenemos es "+distance);
-           Info("La energia que tenemos es "+energia);
+           Info("La energia que tenemos es "+energy);
           } 
        }
                       
@@ -120,6 +120,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         sensores.add("energy");
         sensores.add("compass");
         sensores.add("altimeter");
+        sensores.add("energy");
         sensores.add("lidar");
         sensores.add("distance");
         sensores.add("angular");
@@ -192,7 +193,12 @@ public class MyWorldExplorer extends IntegratedAgent {
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 angular = a.asDouble();
                             }
-                        }                    
+                        }else if("energy".equals(sensor)){
+                            //angular = j.asObject().get("data").asInt();
+                            for(JsonValue a : prueba = j.asObject().get("data").asArray()){
+                                energy = a.asInt();
+                            }
+                        }
                     }
                     break;
 
@@ -471,36 +477,8 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String comprobar_energia() { //DEL SABUFU
-        //String estado_inicial = estado;
-        energia = energia - 7; //consumo de los sensores
-        
-        switch (accion){
-            case "moveF":
-                energia--;
-                break;
-            case "rotateL":
-                energia--;
-                break;
-            case "rotateR":
-                energia--;
-                break;
-            case "moveUp":
-                energia = energia - 5;
-                break;
-            case "moveD":
-                energia = energia -5;
-                break;
-            case "recharge":
-                energia = 1000;
-                break;
-        }
-        
-        /*
-        if ((energia - altimeter - 6 * (altimeter/5))==0){ //si la energia restante es la justa para aterrizar, recargamos
-            return "recargar";
-        }
-        */
-        if (energia < 500){ //si la energia restante es la justa para aterrizar, recargamos
+        int energia = energy - 5;
+        if (energia <= (int) altimeter){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
