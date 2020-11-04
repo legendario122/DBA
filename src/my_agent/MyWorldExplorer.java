@@ -31,6 +31,9 @@ public class MyWorldExplorer extends IntegratedAgent {
     double angular;
     double altimeter;
     double distance;
+    int x;
+    int y;
+    int z;
     int energy;
     int alive;
     int lidar[][] = new int[7][7];
@@ -68,7 +71,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 //DEBE DEVOLVER EL SIGUIENTE ESTADO
                switch (estado){
                    case "orientacion":
-                       estado = operacion_orientarse(); //DONE
+                       estado = operacion_orientarse(-1); //DONE
                        break;
                    case "desplazamiento":
                        estado = operacion_altura();   //DONE
@@ -80,9 +83,13 @@ public class MyWorldExplorer extends IntegratedAgent {
                        estado = operacion_recargar(); //DONE
                        break;
                    case "finalizado":
-                       accion="touchD";
-                       logout();
-                       on_target=true;
+                       if(altimeter==5){
+                           accion="moveD";
+                       }else{
+                            accion="touchD";
+                            logout();
+                            on_target=true;
+                       }
                        break;
               
                }
@@ -93,7 +100,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            estado = comprobar_energia();
            Info("El estado es: "+estado);
            Info("La altura: "+altimeter);
-            Info("La distancia que tenemos es "+distance);
+           Info("La distancia que tenemos es "+distance);
            Info("La energia que tenemos es "+energy);
           } 
        }
@@ -114,13 +121,13 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World1";
+        String mundo = "World5";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("energy");
+        sensores.add("gps");
         sensores.add("compass");
         sensores.add("altimeter");
-        sensores.add("energy");
         sensores.add("lidar");
         sensores.add("distance");
         sensores.add("angular");
@@ -133,9 +140,10 @@ public class MyWorldExplorer extends IntegratedAgent {
         String answer = in.getContent();
         String sensor;
         int i;
-        int z=0;
+        int zeta=0;
         JsonArray vector = new JsonArray();
         JsonArray prueba = new JsonArray();
+        JsonArray prueba1 = new JsonArray();
         JsonArray matriz =  new JsonArray();
         JsonArray matriz_bis =  new JsonArray();
         JsonObject json = new JsonObject();
@@ -177,10 +185,10 @@ public class MyWorldExplorer extends IntegratedAgent {
                                 //matriz_bis = v.asObject().asArray();
                                 matriz_bis = v.asArray();
                                 for(JsonValue s : matriz_bis){
-                                    lidar[i][z]=s.asInt();
-                                    z++;
+                                    lidar[i][zeta]=s.asInt();
+                                    zeta++;
                                 }
-                                z=0;
+                                zeta=0;
                                 i++;
                             }
                         }else if("distance".equals(sensor)){
@@ -198,8 +206,26 @@ public class MyWorldExplorer extends IntegratedAgent {
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 energy = a.asInt();
                             }
+                        }else if("gps".equals(sensor)){
+                            //angular = j.asObject().get("data").asInt();
+                            int cont=0;
+                                prueba = j.asObject().get("data").asArray();
+                                prueba1 = j.asObject().asArray();
+                                for(JsonValue b : prueba1){
+                                    if(cont==0){
+                                        x = b.asInt();
+                                        cont++;
+                                    }else if(cont==1){
+                                        y = b.asInt();
+                                        cont++;
+                                    }else{
+                                        z = b.asInt();
+                                    }
+                                }
+                                
+                            }
                         }
-                    }
+                    
                     break;
 
                 case "execute":
@@ -269,7 +295,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         
     }
 
-    private String operacion_orientarse() {
+    private String operacion_orientarse(int angulo_aux) {
         Info("He entrado en operacion_orientarse");
         int x=(int)compass;
         int angulo_mas_cercano;
@@ -277,9 +303,13 @@ public class MyWorldExplorer extends IntegratedAgent {
         int izquierda=-45;
         ArrayList<Integer> rotacion_derecha = new ArrayList<Integer>();
         ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
-        ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-        angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
-        
+        if(angulo_aux==-1){
+            
+            ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+            angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
+        }else{
+            angulo_mas_cercano=angulo_aux;
+        }
         
         if((int) compass!=angulo_mas_cercano){
             
@@ -351,7 +381,7 @@ public class MyWorldExplorer extends IntegratedAgent {
             }
             
         }else{
-            if(distance>1){
+            if(distance>=1){
                                
                 estado = operacion_altura();
             }else{
@@ -370,65 +400,145 @@ public class MyWorldExplorer extends IntegratedAgent {
                 if(lidar[2][3] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == 45){
                 if(lidar[2][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == 90){
                 if(lidar[3][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
-                }    
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
+                }   
             }else if(angulo == 135){
                 if(lidar[4][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == 180){
                 if(lidar[4][3] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == -135){
                 if(lidar[4][2] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == -90){
                 if(lidar[3][2] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }else if(angulo == -45){
                 if(lidar[2][2] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
-                }else{
+                }else if(y<maxflight){
+                    
                     accion = "moveUP";
                     estado = "desplazamiento";
+                }else{
+                    ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+                    for(int i=0; i<angulos.size(); i++){
+                        if(angulos.get(i)==angulo){
+                            angulos.remove(i);
+                        }
+                    }
+                    int angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) compass);
+                    estado = operacion_orientarse(angulo_mas_cercano);
                 }
             }
         }else{
@@ -445,7 +555,7 @@ public class MyWorldExplorer extends IntegratedAgent {
 
     private String operacion_objetivo() {
         
-        if(altimeter>=10){
+        if(altimeter>=15){
             
             estado="objetivo";
             accion="moveD";
