@@ -473,8 +473,8 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String comprobar_energia() { //DEL SABUFU
-        int energia = energy -10;
-        if (energia <= (int) altimeter || energy < 50){ //si la energia restante es la justa para aterrizar, recargamos
+        int energia = energy - 5;
+        if (energia <= (int) altimeter){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
