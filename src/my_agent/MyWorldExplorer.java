@@ -25,7 +25,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
     int width; 
     int height;
-    int maxflight;
+    int maxflight = 255;
     //int compass;
     double compass;
     double angular;
@@ -124,7 +124,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World5";
+        String mundo = "World6";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("energy");
@@ -523,8 +523,8 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     private String comprobar_energia() { //DEL SABUFU
-        int energia = energy - 70;
-        if (energia <= (int) altimeter + (altimeter/5)*7){ //si la energia restante es la justa para aterrizar, recargamos
+        int energia = energy - 100;
+        if (energia <= (int) altimeter + (altimeter/5)*8){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
         }
         return estado; 
@@ -689,45 +689,46 @@ public class MyWorldExplorer extends IntegratedAgent {
     boolean encontrado = false;
     int angulo_factible = -1;
     int i = 0;
+    int maxflight1 = maxflight - 5;
         while(encontrado != true){
     
             if(Lista_angulo_ordenados.get(i) == 0){
-                if(lidar[2][3] >= 0 && maxflight >= y){
+                if(lidar[2][3] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == 45){
-                  if(lidar[2][4] >= 0 && maxflight >= y){
+                if(lidar[2][4] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == 90){
-                if(lidar[3][4] >= 0 && maxflight >= y){
+                if(lidar[3][4] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == 135){
-                if(lidar[4][4] >= 0 && maxflight >= y){
+                if(lidar[4][4] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == 180){
-                if(lidar[4][3] >= 0 && maxflight >= y){
+                if(lidar[4][3] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == -135){
-                if(lidar[4][2] >= 0 && maxflight >= y){
+                if(lidar[4][2] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == -90){
-                if(lidar[3][2] >= 0 && maxflight >= y){
+                if(lidar[3][2] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }
             }else if(Lista_angulo_ordenados.get(i) == -45){
-                if(lidar[2][2] >= 0 && maxflight >= y){
+                if(lidar[2][2] >= 0 || maxflight1 > z){
                     encontrado = true;
                     angulo_factible = Lista_angulo_ordenados.get(i);
                 }

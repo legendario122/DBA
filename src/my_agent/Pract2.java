@@ -12,7 +12,7 @@ public class Pract2{
     public static void main(String[] args) {
         ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
-        _app.launchAgent("BBVA009", MyWorldExplorer.class);
+        _app.launchAgent("BBVA", MyWorldExplorer.class);
         _app.shutDown();
     }
 
