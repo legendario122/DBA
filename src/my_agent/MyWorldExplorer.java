@@ -102,6 +102,9 @@ public class MyWorldExplorer extends IntegratedAgent {
            Info("La altura: "+altimeter);
            Info("La distancia que tenemos es "+distance);
            Info("La energia que tenemos es "+energy);
+           Info("La coordenada x es "+x);
+           Info("La coordenada y es "+y);
+           Info("La coordenada z es "+z);
           } 
        }
                       
@@ -141,6 +144,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         String sensor;
         int i;
         int zeta=0;
+        int cont=0;
         JsonArray vector = new JsonArray();
         JsonArray prueba = new JsonArray();
         JsonArray prueba1 = new JsonArray();
@@ -207,24 +211,23 @@ public class MyWorldExplorer extends IntegratedAgent {
                                 energy = a.asInt();
                             }
                         }else if("gps".equals(sensor)){
-                            //angular = j.asObject().get("data").asInt();
-                            int cont=0;
-                                prueba = j.asObject().get("data").asArray();
-                                prueba1 = j.asObject().asArray();
-                                for(JsonValue b : prueba1){
+                            prueba = j.asObject().get("data").asArray();
+                            cont=0;
+                            for(JsonValue v : prueba){
+                                prueba1 = v.asArray();
+                                for(JsonValue s : prueba1){
                                     if(cont==0){
-                                        x = b.asInt();
-                                        cont++;
+                                        x = s.asInt();
                                     }else if(cont==1){
-                                        y = b.asInt();
-                                        cont++;
-                                    }else{
-                                        z = b.asInt();
+                                        y = s.asInt();
+                                    }else if(cont==2){
+                                        z = s.asInt();
                                     }
+                                    cont++;
                                 }
-                                
                             }
                         }
+                    }
                     
                     break;
 
@@ -282,10 +285,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 json_parseado.add("key", argumento1);
                 json_parseado.add("action", argumento2.get(0));
                 break;
-                /*JsonArray vector_ejecutar = new JsonArray();
-                for (int i=0; i<argumento2.size(); i++)
-                    vector_ejecutar.add(argumento2.get(i));
-                json_parseado.add("action", vector_ejecutar);*/
+                
                 
             case "logout":  
                 break;
