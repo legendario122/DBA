@@ -305,9 +305,8 @@ public class MyWorldExplorer extends IntegratedAgent {
         ArrayList<Integer> rotacion_izquierda = new ArrayList<Integer>();
         
             
-        ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
-        angulo_mas_cercano = calcular_angulo_mas_cercano(angulos, (int) angular);
-        
+        ArrayList<Integer> lista_angulos=new ArrayList<Integer>();
+        lista_angulos = calcular_lista_angulos();
         
         if((int) compass!=angulo_mas_cercano){
             
@@ -409,6 +408,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 if(lidar[2][4] >= 0){
                     accion = "moveF";
                     estado = "orientacion";
+                    
                 }else{
                     
                     accion = "moveUP";
@@ -534,29 +534,47 @@ public class MyWorldExplorer extends IntegratedAgent {
         int i;
         boolean encontrado=false;
         if(angular1>=-135 && angular1<180){
-            for(i=1; i<angulos.size()-1; i++){
+            for(i=0; i<angulos.size(); i++){
                 if(angulos.get(i)>=angular1 && encontrado==false){
-                    menor= angulos.get(i-1);
+                    if(angulos.size()!=1 && i!=0){
+                        menor= angulos.get(i-1);
+                    }else{
+                        menor=-180;
+                    }
                     mayor=angulos.get(i);
                     encontrado=true;
                 }
             }
             
-            if((menor-angular)<= (angular-mayor)){
-                angulo_calc=mayor;
+            if(encontrado==false && angulos.size()==1){
+                angulo_calc=angulos.get(0);
+            }else if(angular1>=157.5 && angulos.get(angulos.size()-1)!=180){
+                angulo_calc= angulos.get(angulos.size()-1);
             }else{
-                angulo_calc=menor;
+                if((menor-angular1)<= (angular1-mayor)){
+                angulo_calc=mayor;
+                }else{
+                    angulo_calc=menor;
+                }
             }
+            
+            
         }else{
             if(angular1>=180){
                 angulo_calc=180;
             }else{
-                menor=-135;
-                mayor=180;
-                if(menor-angular >= mayor - Math.abs(angular)){
-                    angulo_calc=mayor;               
+                if(angulos.get(angulos.size()-1)==180 && angulos.get(0)==-135){
+                    menor=-135;
+                    mayor=180;
+                    if(menor-angular1 >= mayor - Math.abs(angular1)){
+                        angulo_calc=mayor;               
+                    }else{
+                        angulo_calc=menor;
+                    }
+                }else if(angulos.get(angulos.size()-1)!=180){
+                        angulo_calc=-135;
                 }else{
-                    angulo_calc=menor;
+                        angulo_calc=180;
                 }
             }
 
@@ -564,5 +582,104 @@ public class MyWorldExplorer extends IntegratedAgent {
         
         
         return angulo_calc;
+    }
+
+    private ArrayList<Integer> calcular_lista_angulos() {
+        ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+        boolean encontrado=false;
+        int iterador1 = calcular_angulo_mas_cercano(angulos, (int) angular);
+        
+        ArrayList<Integer> lista_angulos = new ArrayList<Integer>();
+        lista_angulos.add(iterador1);
+        for( int i=0; i<angulos.size(); i++){
+            if(angulos.get(i)==iterador1 && encontrado==false){
+                angulos.remove(i);
+                iterador1=i;
+                encontrado=true;
+            }
+        }
+        int iterador2 = calcular_angulo_mas_cercano(angulos, (int) angular);
+        
+        lista_angulos.add(iterador2);
+        encontrado=false;
+        angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
+        for( int i=0; i<angulos.size(); i++){
+            if(angulos.get(i)==iterador2 && encontrado==false){
+                iterador2=i;
+                encontrado=true;
+            }
+        }
+        boolean extremos=false;
+        if(iterador1>iterador2){
+            if(iterador1==7 && iterador2==0){
+                iterador1=iterador2;
+                iterador2=7;
+                extremos=true;
+            }
+            while(lista_angulos.size()!=8){
+                if(angulos.get(iterador1)==180){
+                    if(iterador2!=0){
+                        iterador1=0;
+                    }else{
+                        break;
+                    }
+                }else{
+                    iterador1++;
+                }
+                
+                if(angulos.get(iterador2)==-135){
+                    if(iterador1!=angulos.size()-1){
+                        iterador2=angulos.size()-1;
+                    }else{
+                        break;
+                    }
+                }else{
+                    iterador2--;
+                }
+                if(extremos==false){
+                    lista_angulos.add(angulos.get(iterador1));
+                    lista_angulos.add(angulos.get(iterador2));
+                }else{
+                    lista_angulos.add(angulos.get(iterador2));
+                    lista_angulos.add(angulos.get(iterador1));
+                }
+                
+            }
+        }else{
+            if(iterador1==0 && iterador2==7){
+                iterador1=iterador2;
+                iterador2=0;
+                extremos=true;
+            }
+            while(lista_angulos.size()!=8){
+                if(angulos.get(iterador1)==-135){
+                    if(iterador2!=angulos.size()-1){
+                        iterador1=angulos.size()-1;
+                    }else{
+                        break;
+                    }
+                }else{
+                    iterador1--;
+                }
+                
+                if(angulos.get(iterador2)==180){
+                    if(iterador1!=0){
+                        iterador2=0;
+                    }else{
+                        break;
+                    }
+                }else{
+                    iterador2++;
+                }
+                if(extremos==false){
+                    lista_angulos.add(angulos.get(iterador1));
+                    lista_angulos.add(angulos.get(iterador2));
+                }else{
+                    lista_angulos.add(angulos.get(iterador2));
+                    lista_angulos.add(angulos.get(iterador1));
+                }
+            }
+        }
+        return lista_angulos;
     }
 }
