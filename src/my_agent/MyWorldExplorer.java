@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MyWorldExplorer extends IntegratedAgent {
-
+    /**
+    * Variables necesarias para el funcionamiento basico del agente.
+    **/
     String receiver;
     String key;
     ACLMessage in = new ACLMessage();
@@ -21,12 +23,18 @@ public class MyWorldExplorer extends IntegratedAgent {
     Boolean on_target = false;
     String accion; //Parametro para ejecutar 
     String estado="orientacion";
+    
+    /**
+    * Variables para el panel de control.
+    **/   
     TTYControlPanel myControlPanel;
-    //VARIABLES PARA GUARDAR LOS DATOS DE LOS SENSORES
     int width; 
     int height;
     int maxflight = 255;
-    //int compass;
+    
+    /**
+    * Variables para guardar la percepcion de los sensores.
+    **/  
     double compass;
     double angular;
     double altimeter;
@@ -48,6 +56,31 @@ public class MyWorldExplorer extends IntegratedAgent {
     }
 
     @Override
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * 
+     * Funcion donde se define como va a comportarse el drone.
+     * Primeramente, llama a la funcion loguearse. Tras esto y mientras no alcancemos
+     * el objetivo, ejecutara un bucle. Leemos las percepciones, se las pasamos al 
+     * panel de control y en funcion de la accion anterior y las percepciones anteriores
+     * se decidio que el drone entrara ahora al estado pertinente que podria ser:
+     * 1 Estado orientarse
+     * 2 Estado desplazamiento
+     * 3 Esado objetivo
+     * 4 Estado recargar
+     * 5 Estado finalizado
+     * 
+     * Las operaciones que realizamos en dichos estados (switch-case) devuelve siempre
+     * el estado siguiente del drone.
+     * 
+     * Tras esta fase de decision de accion y estado siguiente. Se entra a la funcion 
+     * ejecutar para realizar la accion pertinente. Asi hasta que el drone llegue al objetivo
+     * el estado sea finalizado y on target==true.
+     * 
+     * @return Nada. 
+     */
     public void plainExecute() {
     
     /// Dialogar con receiver para entrar en el mundo
@@ -124,7 +157,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World6";
+        String mundo = "World9";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("energy");
@@ -246,7 +279,12 @@ public class MyWorldExplorer extends IntegratedAgent {
         out.setContent(objeto.toString());
         this.sendServer(out);
     }
-
+    /**
+     * @author Adrian
+     * Funcion que se encargar de enviar un mensaje ACL con la accion que se ha
+     * decidido ejecutar.
+     * @return No devuelve nada. 
+     */
     private void ejecutar() {
         ArrayList<String> acciones = new ArrayList<String>();
         acciones.add(accion);
@@ -294,7 +332,22 @@ public class MyWorldExplorer extends IntegratedAgent {
         return json_parseado;
         
     }
-
+    /**
+     * @author Adrian
+     * Funcion que devuelve el estado siguiente en funcion de que comportamiento 
+     * precedera a la accion decidida. Comprueba los sensores compass y angular y
+     * asigna la accion y el estado del drone en funcion de estos. Si la orientacion
+     * del drone y el objetivo no es igual, las acciones seran rotaciones a derecha 
+     * o izquierda, y en este caso devuelve el estado orientacion, 
+     * hasta que llega a la ultima rotacion para llegar al angulo mas cercano del
+     * objetivo, entonces devolveria el estado desplazamiento. 
+     * Si el angulo del drone ya coincide con el del objetivo, comprueba que no 
+     * estemos encima del objetivo y llama a operacion_altura, la cual se encargara 
+     * de devolver el estado siguiente. En caso de que la distania con el objetivo si 
+     * sea 0, llamara a la operacion_objetivo, la cual se encargara de devolver 
+     * el estado siguiente
+     * @return estado. 
+     */
     private String operacion_orientarse(int angulo_aux) {
         Info("He entrado en operacion_orientarse");
         int x=(int)compass;
@@ -483,7 +536,19 @@ public class MyWorldExplorer extends IntegratedAgent {
         return estado;        
     }
     
-
+    /**
+     * @author Adrian
+     * Funcion que devuelve el estado siguiente en funcion de que comportamiento 
+     * precedera a la accion decidida. Comprueba el sensor altimeter para comprobar
+     * si el drone debe seguir bajando al suelo, accion es moveD o sin embargo si la
+     * altura es 10, realizar una accion moveD y cambiar el estado a finalizado.
+     * (El cual se encarga de aterrizar) 
+     * Tenemos en cuenta que el drone pueda ir a ras de suelo y cambie a estado objetivo,
+     * por lo que si en algun caso, cambiamos el estado a finalizado y hacemos un moveD,
+     * nos estrellariamos contra el suelo, por lo que comprobamos dicha casuistica y si 
+     * el altimeter es 0, aterrizamos y devolvemos estado finalizado.
+     * @return estado. 
+     */
     private String operacion_objetivo() {
         
         if(altimeter>=15){
@@ -529,7 +594,16 @@ public class MyWorldExplorer extends IntegratedAgent {
         }
         return estado; 
     }
-
+    /**
+     * @author Adrian
+     * 
+     * Se calcula el angulo mas cercano,  al angulo en el que se encuentra el objetivo,
+     * del rango de angulos que puede tomar el drone.
+     * 
+     * @param angulos Rango de angulos que puede tomar el drone.
+     * @param angular1 Angulo en el que se encuentra el objetivo.
+     * @return angulo_calc. 
+     */
     private int calcular_angulo_mas_cercano(ArrayList<Integer> angulos,int angular1) {
         int angulo_calc=-1;
         int menor=-1, mayor=-1;
@@ -586,6 +660,17 @@ public class MyWorldExplorer extends IntegratedAgent {
         return angulo_calc;
     }
 
+    
+    /**
+     * @author Adrian
+     * 
+     * Funcion que ordena en funcion del angulo en el que se encuentra el objetivo,
+     * el rango de angulos en los que se puede orientar el drone. Devolviendo una
+     * lista ordenada de menor a mayor distancia entre angulo en el que se moveria el drone
+     * y angulo en el que se encuentra el objetivo.
+     * 
+     * @return lista_angulos. 
+     */
     private ArrayList<Integer> calcular_lista_angulos() {
         ArrayList<Integer> angulos=new ArrayList<Integer>(Arrays.asList(-135, -90, -45, 0, 45, 90, 135, 180));
         boolean encontrado=false;
