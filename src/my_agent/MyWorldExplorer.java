@@ -64,7 +64,7 @@ public class MyWorldExplorer extends IntegratedAgent {
            read();
            in= this.blockingReceive();
            resultado = desparsearJson(in,"read");
-           myControlPanel.feedData(in, width, height);
+           myControlPanel.feedData(in, width, height, maxflight);
            myControlPanel.fancyShow();
            if("ok".equals(resultado)){
                
