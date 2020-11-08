@@ -100,20 +100,18 @@ public class MyWorldExplorer extends IntegratedAgent {
            myControlPanel.feedData(in, width, height, maxflight);
            myControlPanel.fancyShow();
            if("ok".equals(resultado)){
-               
-                //DEBE DEVOLVER EL SIGUIENTE ESTADO
                switch (estado){
                    case "orientacion":
-                       estado = operacion_orientarse(-1); //DONE
+                       estado = operacion_orientarse(-1); 
                        break;
                    case "desplazamiento":
-                       estado = operacion_altura();   //DONE
+                       estado = operacion_altura();   
                        break;
                    case "objetivo":
-                       estado = operacion_objetivo(); //DONE
+                       estado = operacion_objetivo(); 
                        break;
                    case "recargar":
-                       estado = operacion_recargar(); //DONE
+                       estado = operacion_recargar(); 
                        break;
                    case "finalizado":
                        if(altimeter==5){
@@ -123,8 +121,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                             logout();
                             on_target=true;
                        }
-                       break;
-              
+                       break;             
                }
            ejecutar();
            in = this.blockingReceive();
@@ -153,7 +150,13 @@ public class MyWorldExplorer extends IntegratedAgent {
         this.doCheckoutPlatform();
         super.takeDown();
     }
-
+    /**
+     * @author Rafael
+     * Función que prepara el mensaje para realizar el login 
+     * en el mundo que se le indica,
+     * con los sensores que hemos elegido para esta práctica y la cabecera del mensaje.
+     * @return No devuelve nada. 
+     */  
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
@@ -171,7 +174,15 @@ public class MyWorldExplorer extends IntegratedAgent {
         out.setContent(objeto.toString());
         this.sendServer(out);
     }
-
+    /**
+     * @author Rafael
+     * Función que se encarga de decodificar el mensaje que hemos recibido una 
+     * vez hemos ejecutado una acción para ver como ha evolucionado la situación
+     * del drone.
+     * @param in Mensaje a decodificar que recibimos del mundo.
+     * @param operacion Tipo de mensaje que queremos decodificar.
+     * @return resultado. 
+     */
     private String desparsearJson(ACLMessage in, String operacion) {
         String answer = in.getContent();
         String sensor;
@@ -200,18 +211,14 @@ public class MyWorldExplorer extends IntegratedAgent {
                     for(JsonValue j : vector){
                         sensor = j.asObject().get("sensor").asString();
                         if("alive".equals(sensor)){
-                            //alive = j.asObject().get("data").asInt();
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 alive = a.asInt();
                             }
                         }else if("compass".equals(sensor)){
-                            //compass = j.asObject().get("data").asInt();
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
-                                //compass = a.asInt();
                                 compass = a.asDouble();
                             }
                         }else if("altimeter".equals(sensor)){
-                           //altimeter = j.asObject().get("data").asDouble();
                            for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 altimeter = a.asDouble();
                             }
@@ -219,7 +226,6 @@ public class MyWorldExplorer extends IntegratedAgent {
                             matriz = j.asObject().get("data").asArray();
                             i=0;
                             for(JsonValue v : matriz){
-                                //matriz_bis = v.asObject().asArray();
                                 matriz_bis = v.asArray();
                                 for(JsonValue s : matriz_bis){
                                     lidar[i][zeta]=s.asInt();
@@ -229,17 +235,14 @@ public class MyWorldExplorer extends IntegratedAgent {
                                 i++;
                             }
                         }else if("distance".equals(sensor)){
-                            //distance = j.asObject().get("data").asInt();
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 distance = a.asDouble();
                             }
                         }else if("angular".equals(sensor)){
-                            //angular = j.asObject().get("data").asInt();
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 angular = a.asDouble();
                             }
                         }else if("energy".equals(sensor)){
-                            //angular = j.asObject().get("data").asInt();
                             for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                                 energy = a.asInt();
                             }
@@ -271,7 +274,12 @@ public class MyWorldExplorer extends IntegratedAgent {
         
         return resultado;
     }
-
+    /**
+     * @author Rafael
+     * Funcion que se encarga de enviar un mensaje ACL para realizar la operación
+     * de lectura de los sensores.
+     * @return No devuelve nada. 
+     */
     private void read() {
         ArrayList<String> vacio = new ArrayList<String>();
         objeto = parsearJson("read",key,vacio);
@@ -570,7 +578,12 @@ public class MyWorldExplorer extends IntegratedAgent {
         
         return estado;
     }
-
+    /**
+     * @author Rafael
+     * Función que se encarga de controlar el drone mientras este se encuentra
+     * realizando la operación de recarga de energía.
+     * @return estado. 
+     */
     private String operacion_recargar() {
         if(altimeter>5 || altimeter==5){
             accion="moveD";
@@ -587,7 +600,7 @@ public class MyWorldExplorer extends IntegratedAgent {
         return estado;
     }
 
-    private String comprobar_energia() { //DEL SABUFU
+    private String comprobar_energia() { 
         int energia = energy - 100;
         if (energia <= (int) altimeter + (altimeter/5)*8){ //si la energia restante es la justa para aterrizar, recargamos
             return "recargar";
