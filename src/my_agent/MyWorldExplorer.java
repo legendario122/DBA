@@ -47,6 +47,10 @@ public class MyWorldExplorer extends IntegratedAgent {
     int lidar[][] = new int[7][7];
     
     @Override
+        /**
+     * Funcion que se encarga de hacer el checkin en larva y en la plataforma. Tambien se encarga de inicializar el panel de
+     * control donde veremos la informacion de los sensores.
+     */
     public void setup() {
         super.setup();
         doCheckinPlatform();
@@ -145,6 +149,9 @@ public class MyWorldExplorer extends IntegratedAgent {
     
 
     @Override
+    /**
+     * Funcion que se encarga de hacer el checkout de larva y la plataforma.
+     */    
     public void takeDown() {
         this.doCheckoutLARVA();
         this.doCheckoutPlatform();
@@ -160,7 +167,7 @@ public class MyWorldExplorer extends IntegratedAgent {
     private void loguearse() {
         out.setSender(getAID());
         out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-        String mundo = "World9";
+        String mundo = "World7";
         ArrayList<String> sensores = new ArrayList<String>();
         sensores.add("alive");
         sensores.add("energy");
@@ -301,7 +308,11 @@ public class MyWorldExplorer extends IntegratedAgent {
         out.setContent(objeto.toString());
         this.sendServer(out);
     }
-
+    /**
+     * @author Samuel
+     * Funcio que manda un mensaje con el comando logout para desconectarse del mundo. Le pasamos a desparsearJson
+     * un vector vacio porque daba error con null.
+     */
     private void logout() {
         ArrayList<String> vector_vacio = new ArrayList<String>();
         out.setSender(getAID());
@@ -310,7 +321,20 @@ public class MyWorldExplorer extends IntegratedAgent {
         out.setContent(objeto.toString());
         this.send(out);
     }
-    
+    /**
+     * @author Samuel
+     * Funcion que se encarga de codificar el objeto Json dependiendo de las posibles acciones. Se le
+     * pasa un comando y dependiendo del comando que sea hacemos un switch para que haga las acciones 
+     * correspondientes dependiendo si es login le psamos el mundo y los sensores que queremos añadirle.
+     * Si es read solamente le pasamos la key. Si es execute le pasamos la key y las acciones que quiera
+     * realizar. Si es logout simplemente acaba y se desconecta del mundo.
+     * @param comando Es la accion que queremos hacer hay 4 posibles: login, read, execute, logout
+     * @param argumento1 En el caso de login este argumento es el mundo al que queremos acceder.
+     * En otros casos es la key correspondiente.
+     * @param argumento2 En el caso de login contiene en un vector de string con los sensores que 
+     * le queremos añadir al dron. En el caso de execute contiene el conjunto de acciones posibles.
+     * @return el objeto json_parseado.
+     */    
     private JsonObject parsearJson(String comando, String argumento1, ArrayList<String> argumento2) {
         JsonObject json_parseado = new JsonObject();
         json_parseado.add("command", comando);
@@ -454,7 +478,14 @@ public class MyWorldExplorer extends IntegratedAgent {
         
         return estado;
     }
-
+    /**
+     * @author Samuel
+     * Funcion que se encarga de leer el sensor compass y parsearlo que hace que si la distancia entre el dron
+     * y el objetivo es mayor que uno, compara cada posicion que le rodea la matriz del lidar donde eldron se ubica en lidar[3][3].
+     * Compara si cada posicion es mayor que cero para ver si está por encima del dron para ver si puede desplazarse a esa posicion
+     * o tiene que orientarse de nuevo.
+     * @return el estado asignado.
+     */
     private String operacion_altura() { //DEL SABUFU
         int angulo = (int)compass;
         if(distance >= 1){
@@ -465,7 +496,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }else if(angulo == 45){
                 if(lidar[2][4] >= 0){
@@ -475,7 +506,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 
                 }
             }else if(angulo == 90){
@@ -485,7 +516,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }else if(angulo == 135){
                 if(lidar[4][4] >= 0){
@@ -494,7 +525,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }else if(angulo == 180){
                 if(lidar[4][3] >= 0){
@@ -503,7 +534,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }else if(angulo == -135){
                 if(lidar[4][2] >= 0){
@@ -512,7 +543,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }else if(angulo == -90){
                 if(lidar[3][2] >= 0){
@@ -521,7 +552,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }else if(angulo == -45){
                 if(lidar[2][2] >= 0){
@@ -530,7 +561,7 @@ public class MyWorldExplorer extends IntegratedAgent {
                 }else{
                     
                     accion = "moveUP";
-                    estado = "desplazamiento";
+                    estado = "orientacion";
                 }
             }
         }else{
@@ -599,7 +630,13 @@ public class MyWorldExplorer extends IntegratedAgent {
         }
         return estado;
     }
-
+    /**
+     * @author Samuel
+     * Funcion que comprueba la energia para ver si tiene que pasar al estado recargar si la altura a la que está es la justa
+     * para aterrizar y recargar contando con el gasto que supondria bajar hasta el suelo y el consumo que tendrian los sensores 
+     * en cada movimiento.
+     * @return el estado, si no cambia el estado a recargar se mantiene el que tenía anteriormente.
+     */
     private String comprobar_energia() { 
         int energia = energy - 100;
         if (energia <= (int) altimeter + (altimeter/5)*8){ //si la energia restante es la justa para aterrizar, recargamos
@@ -782,7 +819,14 @@ public class MyWorldExplorer extends IntegratedAgent {
         }
         return lista_angulos;
     }
-    
+    /**
+     * @author Samuel
+     * Funcion a la que le vamos a pasar un array con los angulos ordenados y nos va a verificar mediante un bucle si cada angulo en cuestion
+     * respecto a la posicion del lidar esta por debajo del drone y que la altura del dron se mantenga por debajo de la altura maxima.
+     * Para devolver el angulo a mas factible al que se deberia mover el dron.
+     * @param Lista_angulo_ordenados contiene una lista con los angulos que habremos ordenado previamente con la funcion calcular_lista_angulos
+     * @return devuelve el angulo mas factible.
+     */
     int verificarAngulos(ArrayList<Integer> Lista_angulo_ordenados){ // comprueba los angulos con el lidar y devuelve el angulo mas cercano al que nos podemos mover
     boolean encontrado = false;
     int angulo_factible = -1;
