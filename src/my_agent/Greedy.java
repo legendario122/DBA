@@ -13,10 +13,7 @@ import IntegratedAgent.IntegratedAgent;
 public class Greedy extends IntegratedAgent {
     public void setup() {
         super.setup();
-        doCheckinPlatform();
-        doCheckinLARVA();
-        receiver = this.whoLarvaAgent();
-        myControlPanel = new TTYControlPanel(getAID());
+        
     }
 
     public void plainExecute() {
@@ -47,4 +44,4 @@ public class Greedy extends IntegratedAgent {
     
     }
     
-}
+

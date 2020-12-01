@@ -13,10 +13,7 @@ import IntegratedAgent.IntegratedAgent;
 public class Seeker extends IntegratedAgent {
     public void setup() {
         super.setup();
-        doCheckinPlatform();
-        doCheckinLARVA();
-        receiver = this.whoLarvaAgent();
-        myControlPanel = new TTYControlPanel(getAID());
+        
     }
 
     public void plainExecute(){

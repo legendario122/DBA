@@ -10,6 +10,7 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import YellowPages.YellowPages;
 
 public class Controlador extends IntegratedAgent {
     
@@ -24,9 +25,13 @@ public class Controlador extends IntegratedAgent {
     
     /**
     * Variables para el controlador
+    * DBAMap mapa = new DBAMap();
+        mapa.fromJson(map);
     **/
-    mapa = new DBAMap();
-    mapa.fromJson(map)
+    
+    ACLMessage in = new ACLMessage();
+    ACLMessage out = new ACLMessage();
+    YellowPages yp;
     
     @Override
         /**
