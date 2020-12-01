@@ -24,7 +24,7 @@ public class Greedy extends IntegratedAgent {
     //   Envia mensaje al drone con lista de acciones
     //2. Recibe mensaje de Goodbye
     //   Finaliza el "agente" (termina while o si es un agente mensaje cancel)
-
+    
        
     }
     

@@ -51,7 +51,7 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+           // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }      
         Info("Checkeo realizado");
@@ -63,7 +63,7 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in =this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+          //  Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }  
 
@@ -87,7 +87,7 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }      
         
@@ -141,11 +141,11 @@ public class Controlador extends IntegratedAgent {
     
     
 
-    @Override
+    
     /**
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
-     */    
-    @Override
+        
+  
     public void takeDown() {
         Info("Request closing the session with " + myServiceProvider);
         out = new ACLMessage();
@@ -161,6 +161,6 @@ public class Controlador extends IntegratedAgent {
 
         doCheckoutLARVA();
     }  
-
+    */ 
     
 }
