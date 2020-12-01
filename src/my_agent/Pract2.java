@@ -27,8 +27,9 @@ public class Pract2{
         Estado origen= new Estado(20,2,2, 90);
         Estado destino = new Estado(73,7,20,-1);
         int resultado;
-        
-        Greedy()
+        ArrayList<String> acciones = new ArrayList<String>(); 
+        Greedy ejemplo = new Greedy();
+        acciones = ejemplo.plainExecute(origen, destino, acciones);
         
         resultado = distancia(origen,destino);
         
