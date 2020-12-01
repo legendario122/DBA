@@ -4,6 +4,7 @@ package my_agent;
 import AppBoot.ConsoleBoot;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
+import java.util.ArrayList;
 import my_agent.Estado;
 
 public class Pract2{
