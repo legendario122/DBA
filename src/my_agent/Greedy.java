@@ -16,7 +16,7 @@ public class Greedy extends IntegratedAgent {
     
     Set<Estado> generados = new HashSet<Estado>();
     Queue<nodo> cola = new PriorityQueue<nodo>();
-    double mapa[][];
+    double mapa[][] = new double[7][7];
     static final double IZQUIERDA=-45;
     static final double DERECHA=45;
     public void setup() {
@@ -25,9 +25,9 @@ public class Greedy extends IntegratedAgent {
     }
 
     public Greedy(){
-        double mapa[][] = new double[7][7];
+        
         for (int i=0; i<7; i++){
-            for (int j=0; i<7; j++){
+            for (int j=0; j<7; j++){
                 mapa[i][j]=200;
             }
         }    
@@ -39,7 +39,7 @@ public class Greedy extends IntegratedAgent {
          if(orientacion==-135){
              resultado=180;
          }else{
-             resultado = orientacion - izquierda;
+             resultado = orientacion + izquierda;
          }
          return resultado;
     }
@@ -81,34 +81,67 @@ public class Greedy extends IntegratedAgent {
         if(estado.orientacion == 0){ //3 3 
             if(mapa[x-1][y] > estado.z){
                 resultado=true;
+                              
+            }else{
+                estado.x=x-1;
+                estado.y=y; 
             }
-        }else if(mapa == 45){
+        }else if(estado.orientacion == 45){
             if(mapa[x-1][y+1] > estado.z){
-                   resultado=true;    
+                   resultado=true;
+                   
+            }else{
+                estado.x=x-1;
+                estado.y=y+1; 
             }       
         }else if(estado.orientacion == 90){
             if(mapa[x][y+1] > estado.z){
                 resultado=true;
+                
+            }else{
+                estado.x=x;
+                estado.y=y+1; 
             }
         }else if(estado.orientacion == 135){
             if(mapa[x+1][y+1] > estado.z){
                 resultado=true;
+                
+            }else{
+                estado.x=x+1;
+                estado.y=y+1; 
             }
         }else if(estado.orientacion == 180){
+            
             if(mapa[x+1][y] > estado.z){
+                
                 resultado=true;
+            }else{
+                estado.x=x+1;
+                estado.y=y; 
             }
         }else if(estado.orientacion == -135){
             if(mapa[x+1][y-1] > estado.z){
                 resultado=true;
+                
+            }else{
+                estado.x=x+1;
+                estado.y=y-1; 
             }
         }else if(estado.orientacion == -90){
             if(mapa[x][y-1] > estado.z){
                  resultado=true;
+                 
+            }else{
+                estado.x=x;
+                estado.y=y-1; 
             }
         }else if(estado.orientacion == -45){
             if(mapa[x-1][y-1] > estado.z){
                 resultado=true;
+                
+            }else{
+                estado.x=x-1;
+                estado.y=y-1; 
             }
         }else{
             resultado=false;
@@ -122,26 +155,35 @@ public class Greedy extends IntegratedAgent {
     
     
     nodo actual = new nodo(origen);
+    
+    actual.setAcciones(acciones);
     actual.setDistancia(actual.distancia(actual.getSt(), destino));
     actual.acciones.clear();
     
     cola.add(actual);
 
     while(!cola.isEmpty() && (actual.st.x!=destino.x || actual.st.y!=destino.y)){
-        cola.remove();
+        
+        
+        if(!cola.isEmpty()){
+            actual = cola.poll();
+        }
+        
         generados.add(actual.st);
-
         //GENERAR DESCENDIENTES
-
-        nodo hijoTurnR = new Nodo();
-        nodo hijoTurnL = new Nodo();
-        nodo hijoMoveF= new Nodo();
-        nodo hijoMoveUp = new Nodo();
-        nodo hijoMoveD = new Nodo();
-
+        Estado aux = actual.getSt();
+        ArrayList<String> auxS = actual.getAcciones();
+        nodo hijoTurnR = new nodo(actual.getSt());
+        nodo hijoTurnL = new nodo(actual.getSt());
+        nodo hijoMoveF= new nodo(actual.getSt());
+        nodo hijoMoveUp = new nodo(actual.getSt());
+        nodo hijoMoveD = new nodo(actual.getSt());
+        
         //GIRAR DERECHA
         //nodo hijoTurnR = actual;
-        hijoTurnR = actual;
+        //hijoTurnR = actual;
+        hijoTurnR.setSt(aux);
+        hijoTurnR.setAcciones(auxS);
         hijoTurnR.st.orientacion = orientarderecha(hijoTurnR.st.orientacion, DERECHA);
         if(comparaEstado(hijoTurnR)){
             //hijoTurnR.acciones.push_back("RotateR");
@@ -153,7 +195,9 @@ public class Greedy extends IntegratedAgent {
 
         //GIRAR IZQUIERDA
         //nodo hijoTurnL = actual;
-        hijoTurnL = actual;
+        //hijoTurnL = actual;
+        hijoTurnL.setSt(aux);
+        hijoTurnL.setAcciones(auxS);
         hijoTurnL.st.orientacion = orientarizquierda(hijoTurnL.st.orientacion, IZQUIERDA);        
         if(comparaEstado(hijoTurnL)){
             //hijoTurnL.acciones.push_back("RotateL");
@@ -164,9 +208,11 @@ public class Greedy extends IntegratedAgent {
         
         //Avanzar
         //nodo hijoMoveF = actual;
-        hijoMoveF = actual;
+        //hijoMoveF = actual;
+        hijoMoveF.setSt(aux);
+        hijoMoveF.setAcciones(auxS);
         if(!hayObstaculo(hijoMoveF.st)){
-           if(comparaEstado(hijoTurnL)){
+           if(comparaEstado(hijoMoveF)){
                 //hijoMoveF.acciones.push_back("MoveF");
                 hijoMoveF.acciones.add("MoveF");
                 hijoMoveF.setDistancia(hijoMoveF.distancia(hijoMoveF.getSt(), destino));
@@ -176,20 +222,24 @@ public class Greedy extends IntegratedAgent {
 
         //Subir
         //nodo hijoMoveUp = actual;
-        hijoMoveUp = actual;
+        //hijoMoveUp = actual;
+        hijoMoveUp.setSt(aux);
+        hijoMoveUp.setAcciones(auxS);
         if(puedoSubir(hijoMoveUp.st)){
             if(comparaEstado(hijoMoveUp)){
                 //hijoMoveUp.acciones.push_back("MoveUp");
                 hijoMoveUp.acciones.add("MoveUp");
-                hijoMoveUP.setDistancia(hijoMoveUP.distancia(hijoMoveUP.getSt(), destino));
+                hijoMoveUp.setDistancia(hijoMoveUp.distancia(hijoMoveUp.getSt(), destino));
                 cola.add(hijoMoveUp);
             }     
         }
 
         //Bajar
         //nodo hijoMoveD = actual;
-        hijoMoveD = actual;
-        if(actual.st.z + 5 >= mapa[actual.st.x][actual.st.y]){
+        //hijoMoveD = actual;
+        hijoMoveD.setSt(aux);
+        hijoMoveD.setAcciones(auxS);
+        if(actual.st.z - 5 >= mapa[actual.st.x][actual.st.y]){
             if(comparaEstado(hijoMoveD)){
                 //hijoMoveD.acciones.push_back("MoveDown");
                 hijoMoveD.acciones.add("MoveDown");
@@ -200,9 +250,7 @@ public class Greedy extends IntegratedAgent {
 
 
         //TOMAR SIGUIENTE VALOR DE LA cola. 
-        if(!cola.isEmpty()){
-            actual = cola.poll();
-        }
+        
 
     }
     

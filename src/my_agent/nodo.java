@@ -5,6 +5,8 @@
  */
 package my_agent;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 import java.util.ArrayList;
 
 /**
@@ -12,15 +14,22 @@ import java.util.ArrayList;
  * @author adrian
  */
 public class nodo implements Comparable<nodo> {
-    Estado st;
-    ArrayList<String> acciones;
-    double distancia; 
+    
+    public Estado st;
+    public ArrayList<String> acciones;
+    public double distancia; 
+    
+    public nodo(Estado estado) {
+        acciones = new ArrayList<String>();
+        st = new Estado(estado.getX(), estado.getY(), estado.getZ(), estado.getOrientacion());
+    }
+    
 
     public Estado getSt() {
         return st;
     }
 
-    public Estado getDistancia() {
+    public double getDistancia() {
         return distancia;
     }
 
@@ -29,7 +38,11 @@ public class nodo implements Comparable<nodo> {
     }
 
     public void setSt(Estado st) {
-        this.st = st;
+        
+        this.st.setX(st.getX());
+        this.st.setY(st.getY());
+        this.st.setZ(st.getZ());
+        this.st.setOrientacion(st.getOrientacion());
     }
 
     public ArrayList<String> getAcciones() {
@@ -37,16 +50,17 @@ public class nodo implements Comparable<nodo> {
     }
 
     public void setAcciones(ArrayList<String> acciones) {
-        this.acciones = acciones;
+        if(acciones.size()>0)
+            for(int i=0; i<acciones.size(); i++){
+                this.acciones.add(acciones.get(i));
+            }
+       
     }
 
-    public nodo(Estado st) {
-        this.acciones = new ArrayList<String>();
-        this.st=st;
-    }
+    
 
-    public int distancia(Estado origen, Estado destino){
-        int distancia;
+    public double distancia(Estado origen, Estado destino){
+        double distancia;
         
         distancia = (int) sqrt(pow((destino.x-origen.x),2)+pow((destino.y-origen.y),2)+pow((destino.z-origen.z),2));
         
@@ -57,7 +71,7 @@ public class nodo implements Comparable<nodo> {
     public int compareTo(nodo o) {
         if (distancia < o.getDistancia()) {
             return 1;
-        } else if ((distancia > o.getDistancia()) {
+        } else if(distancia > o.getDistancia()) {
             return -1;
         } else {
             return 0;

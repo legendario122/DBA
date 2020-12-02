@@ -19,16 +19,16 @@ public class Pract2{
         _app.shutDown();
         * **/
         
-        Estado origen= new Estado(20,2,2, 90);
-        Estado destino = new Estado(73,7,20,-1);
+        Estado origen= new Estado(2,2,210, 90);
+        Estado destino = new Estado(6,7,210,90);
         int resultado;
         ArrayList<String> acciones = new ArrayList<String>(); 
         Greedy ejemplo = new Greedy();
         acciones = ejemplo.plainExecute(origen, destino, acciones);
         
-        resultado = distancia(origen,destino);
         
-        System.out.println(resultado);
+        for(int i=0; i< acciones.size(); i++)
+           System.out.println(acciones.get(i));
         
         
     }
