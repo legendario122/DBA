@@ -9,13 +9,7 @@ import my_agent.Estado;
 
 public class Pract2{
     
-    public static int distancia(Estado origen, Estado destino){
-        int distancia;
-        
-        distancia = (int) sqrt(pow((destino.x-origen.x),2)+pow((destino.y-origen.y),2)+pow((destino.z-origen.z),2));
-        
-        return distancia;
-    };
+    
     
     public static void main(String[] args) {
         /**

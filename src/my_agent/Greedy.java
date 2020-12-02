@@ -1,4 +1,4 @@
-/*
+/** 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -15,13 +15,25 @@ import java.util.*;
 public class Greedy extends IntegratedAgent {
     
     Set<Estado> generados = new HashSet<Estado>();
-    Stack<nodo> pila;
+    Queue<nodo> cola = new PriorityQueue<nodo>();
+    double mapa[][];
     static final double IZQUIERDA=-45;
     static final double DERECHA=45;
     public void setup() {
         super.setup();
         
     }
+
+    public Greedy(){
+        double mapa[][] = new double[7][7];
+        for (int i=0; i<7; i++){
+            for (int j=0; i<7; j++){
+                mapa[i][j]=200;
+            }
+        }    
+    }
+    
+
      public double orientarizquierda(double orientacion, double izquierda){
          double resultado=-1;
          if(orientacion==-135){
@@ -52,6 +64,15 @@ public class Greedy extends IntegratedAgent {
         }
         return true;
     }
+
+    public boolean puedoSubir(Estado e){
+        boolean puedo_subir = false;
+        if(e.z<250){
+            puedo_subir = true;
+        }
+        return puedo_subir;
+    }
+
     //FALTA LA VARIABLE MAPA
     public Boolean hayObstaculo(Estado estado){
         boolean resultado = false;
@@ -95,58 +116,97 @@ public class Greedy extends IntegratedAgent {
         return resultado;       
     }
 
-    public void plainExecute(Estado origen, Estado destino, ArrayList<String> acciones) {
+    public ArrayList<String> plainExecute(Estado origen, Estado destino, ArrayList<String> acciones) {
     
     acciones.clear();
     
     
     nodo actual = new nodo(origen);
+    actual.setDistancia(actual.distancia(actual.getSt(), destino));
     actual.acciones.clear();
     
-    pila.push(actual);
+    cola.add(actual);
 
-    while(!pila.empty() && (actual.st.x!=destino.x || actual.st.y!=destino.y)){
-        pila.pop();
-        generados.insert(actual.st);
+    while(!cola.isEmpty() && (actual.st.x!=destino.x || actual.st.y!=destino.y)){
+        cola.remove();
+        generados.add(actual.st);
 
         //GENERAR DESCENDIENTES
 
+        nodo hijoTurnR = new Nodo();
+        nodo hijoTurnL = new Nodo();
+        nodo hijoMoveF= new Nodo();
+        nodo hijoMoveUp = new Nodo();
+        nodo hijoMoveD = new Nodo();
+
         //GIRAR DERECHA
-        nodo hijoTurnR = actual;
+        //nodo hijoTurnR = actual;
+        hijoTurnR = actual;
         hijoTurnR.st.orientacion = orientarderecha(hijoTurnR.st.orientacion, DERECHA);
         if(comparaEstado(hijoTurnR)){
-            hijoTurnR.acciones.push_back("RotateR");
-            pila.push(hijoTurnR);
+            //hijoTurnR.acciones.push_back("RotateR");
+            hijoTurnR.acciones.add("RotateR");
+            hijoTurnR.setDistancia(hijoTurnR.distancia(hijoTurnR.getSt(), destino));
+            cola.add(hijoTurnR);
         }
 
 
         //GIRAR IZQUIERDA
-        nodo hijoTurnL = actual;
+        //nodo hijoTurnL = actual;
+        hijoTurnL = actual;
         hijoTurnL.st.orientacion = orientarizquierda(hijoTurnL.st.orientacion, IZQUIERDA);        
         if(comparaEstado(hijoTurnL)){
-            hijoTurnL.acciones.push_back("RotateL");
-            pila.push(hijoTurnL);
+            //hijoTurnL.acciones.push_back("RotateL");
+            hijoTurnL.acciones.add("RotateL");
+            hijoTurnL.setDistancia(hijoTurnL.distancia(hijoTurnL.getSt(), destino));
+            cola.add(hijoTurnL);
         }
         
         //Avanzar
-        nodo hijoMoveF = actual;
+        //nodo hijoMoveF = actual;
+        hijoMoveF = actual;
         if(!hayObstaculo(hijoMoveF.st)){
            if(comparaEstado(hijoTurnL)){
-                hijoMoveF.acciones.push_back("MoveF");
-                pila.push(hijoMoveF);
+                //hijoMoveF.acciones.push_back("MoveF");
+                hijoMoveF.acciones.add("MoveF");
+                hijoMoveF.setDistancia(hijoMoveF.distancia(hijoMoveF.getSt(), destino));
+                cola.add(hijoMoveF);
             } 
         }
 
+        //Subir
+        //nodo hijoMoveUp = actual;
+        hijoMoveUp = actual;
+        if(puedoSubir(hijoMoveUp.st)){
+            if(comparaEstado(hijoMoveUp)){
+                //hijoMoveUp.acciones.push_back("MoveUp");
+                hijoMoveUp.acciones.add("MoveUp");
+                hijoMoveUP.setDistancia(hijoMoveUP.distancia(hijoMoveUP.getSt(), destino));
+                cola.add(hijoMoveUp);
+            }     
+        }
+
+        //Bajar
+        //nodo hijoMoveD = actual;
+        hijoMoveD = actual;
+        if(actual.st.z + 5 >= mapa[actual.st.x][actual.st.y]){
+            if(comparaEstado(hijoMoveD)){
+                //hijoMoveD.acciones.push_back("MoveDown");
+                hijoMoveD.acciones.add("MoveDown");
+                hijoMoveD.setDistancia(hijoMoveD.distancia(hijoMoveD.getSt(), destino));
+                cola.add(hijoMoveD);
+            }
+        }
 
 
-
-
-
-
-        
-
+        //TOMAR SIGUIENTE VALOR DE LA cola. 
+        if(!cola.isEmpty()){
+            actual = cola.poll();
+        }
 
     }
+    
+    acciones = actual.getAcciones();
     //Se queda escuchando:
     //1. Recibe mensaje con posicion inicial y final:
     //   LLama algoritmo greedy, calcula acciones a ejecutar
@@ -154,7 +214,7 @@ public class Greedy extends IntegratedAgent {
     //2. Recibe mensaje de Goodbye
     //   Finaliza el "agente" (termina while o si es un agente mensaje cancel)
     
-       return acciones;
+    return acciones;
     }
     
     
