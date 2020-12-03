@@ -30,7 +30,10 @@ public class Greedy extends IntegratedAgent {
             for (int j=0; j<7; j++){
                 mapa[i][j]=200;
             }
-        }    
+        }
+        mapa[0][1]=220;
+        mapa[1][0]=220;
+        mapa[1][1]=220;
     }
     
 
@@ -58,7 +61,7 @@ public class Greedy extends IntegratedAgent {
         //si encuentra false
         //si no encuentra true
         for(Estado e : generados){
-            if(e.x==nodo_actual.st.x && e.y==nodo_actual.st.y && e.z==nodo_actual.st.orientacion && e.x==nodo_actual.st.orientacion){
+            if(e.x==nodo_actual.st.x && e.y==nodo_actual.st.y && e.z==nodo_actual.st.z && e.orientacion==nodo_actual.st.orientacion){
                 return false;
             }
         }
@@ -69,6 +72,7 @@ public class Greedy extends IntegratedAgent {
         boolean puedo_subir = false;
         if(e.z<250){
             puedo_subir = true;
+            e.z+=5;
         }
         return puedo_subir;
     }
