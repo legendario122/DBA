@@ -62,7 +62,7 @@ public class nodo implements Comparable<nodo> {
     public double distancia(Estado origen, Estado destino){
         double distancia;
         
-        distancia = (int) sqrt(pow((destino.x-origen.x),2)+pow((destino.y-origen.y),2)+pow((destino.z-origen.z),2));
+        distancia =  sqrt(pow((destino.x-origen.x),2)+pow((destino.y-origen.y),2)+pow((destino.z-origen.z),2));
         
         return distancia;
     };
@@ -70,9 +70,9 @@ public class nodo implements Comparable<nodo> {
     @Override
     public int compareTo(nodo o) {
         if (distancia < o.getDistancia()) {
-            return 1;
-        } else if(distancia > o.getDistancia()) {
             return -1;
+        } else if(distancia > o.getDistancia()) {
+            return 1;
         } else {
             return 0;
         }

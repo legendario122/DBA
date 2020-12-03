@@ -20,7 +20,7 @@ public class Pract2{
         * **/
         
         Estado origen= new Estado(2,2,210, 90);
-        Estado destino = new Estado(6,7,210,90);
+        Estado destino = new Estado(6,6,210,90);
         int resultado;
         ArrayList<String> acciones = new ArrayList<String>(); 
         Greedy ejemplo = new Greedy();

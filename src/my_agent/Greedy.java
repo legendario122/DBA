@@ -79,70 +79,105 @@ public class Greedy extends IntegratedAgent {
         int x = estado.x;
         int y = estado.y;
         if(estado.orientacion == 0){ //3 3 
-            if(mapa[x-1][y] > estado.z){
+            if((x-1)< 0){
                 resultado=true;
-                              
             }else{
-                estado.x=x-1;
-                estado.y=y; 
+                if(mapa[x-1][y] > estado.z){
+                    resultado=true;              
+                }else{
+                    estado.x=x-1;
+                    estado.y=y; 
+                }
             }
+            
         }else if(estado.orientacion == 45){
-            if(mapa[x-1][y+1] > estado.z){
+            if((x-1)<0 || (y+1)>6){
+                   resultado=true;
+
+            }else{
+               if(mapa[x-1][y+1] > estado.z){
                    resultado=true;
                    
-            }else{
-                estado.x=x-1;
-                estado.y=y+1; 
-            }       
+                }else{
+                    estado.x=x-1;
+                    estado.y=y+1; 
+                }  
+            }
+                  
         }else if(estado.orientacion == 90){
-            if(mapa[x][y+1] > estado.z){
+            if((y+1)>6){
                 resultado=true;
-                
             }else{
-                estado.x=x;
-                estado.y=y+1; 
-            }
-        }else if(estado.orientacion == 135){
-            if(mapa[x+1][y+1] > estado.z){
-                resultado=true;
+                if(mapa[x][y+1] > estado.z){
+                    resultado=true;
                 
-            }else{
-                estado.x=x+1;
-                estado.y=y+1; 
+                }else{
+                    estado.x=x;
+                    estado.y=y+1; 
+                }
             }
-        }else if(estado.orientacion == 180){
             
-            if(mapa[x+1][y] > estado.z){
-                
+        }else if(estado.orientacion == 135){
+            if((x+1)>6 || (y+1) >6){
                 resultado=true;
             }else{
-                estado.x=x+1;
-                estado.y=y; 
+                if(mapa[x+1][y+1] > estado.z){
+                    resultado=true;
+                
+                }else{
+                    estado.x=x+1;
+                    estado.y=y+1; 
+                }
             }
+            
+        }else if(estado.orientacion == 180){
+            if((x+1)>6){
+                resultado=true;
+            }else{
+                if(mapa[x+1][y] > estado.z){
+                    resultado=true;
+                }else{
+                    estado.x=x+1;
+                    estado.y=y; 
+                }
+            }
+            
         }else if(estado.orientacion == -135){
-            if(mapa[x+1][y-1] > estado.z){
+            if((x+1)>6 || (y-1)<0){
                 resultado=true;
-                
             }else{
-                estado.x=x+1;
-                estado.y=y-1; 
+                if(mapa[x+1][y-1] > estado.z){
+                    resultado=true;
+                }else{
+                    estado.x=x+1;
+                    estado.y=y-1; 
+                }
             }
+            
         }else if(estado.orientacion == -90){
-            if(mapa[x][y-1] > estado.z){
-                 resultado=true;
-                 
-            }else{
-                estado.x=x;
-                estado.y=y-1; 
-            }
-        }else if(estado.orientacion == -45){
-            if(mapa[x-1][y-1] > estado.z){
+            if((y-1)<0){
                 resultado=true;
-                
             }else{
-                estado.x=x-1;
-                estado.y=y-1; 
+                if(mapa[x][y-1] > estado.z){
+                    resultado=true;
+                }else{
+                    estado.x=x;
+                    estado.y=y-1; 
+                }
             }
+            
+        }else if(estado.orientacion == -45){
+            if((x-1)<0 || (y-1)<0){
+                resultado=true;
+            }else{
+                if(mapa[x-1][y-1] > estado.z){
+                    resultado=true;
+                }else{
+                    estado.x=x-1;
+                    estado.y=y-1; 
+                }
+            }
+            
         }else{
             resultado=false;
         }
