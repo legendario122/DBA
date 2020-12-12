@@ -21,7 +21,7 @@ public class Controlador extends IntegratedAgent {
     int width; 
     int height;
     int maxflight = 255;
-    String ConversationID = "";
+    static String ConversationID = "";
     
     /**
     * Variables para el controlador
@@ -40,10 +40,10 @@ public class Controlador extends IntegratedAgent {
      */
     public void setup() {
         super.setup();
-        Info("Haciendo checkin to" + _identitymanager);
+        Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager,AID.ISLOCALNAME));
+        out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
         out.setEncoding(_myCardID.getCardID());
@@ -81,7 +81,7 @@ public class Controlador extends IntegratedAgent {
         Info("Haciendo checkin to" + "myServiceProvider"); //No se como poner world manager bien
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(myServiceProvider,AID.ISLOCALNAME));  //No se como poner world manager bien
+        out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
         out.setContent("problem: 1"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -89,7 +89,7 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }      
         
@@ -150,17 +150,17 @@ public class Controlador extends IntegratedAgent {
        
   
     public void takeDown() {
-        Info("Request closing the session with " + myServiceProvider);
+        Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(myServiceProvider, AID.ISLOCALNAME));
+        out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
-        out.setConversationId(session);
+        out.setConversationId(ConversationID);
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
         in = this.blockingReceive();
-        Info(getDetailsLARVA(in));
+        //Info(getDetailsLARVA(in));
 
         Info("Request closing the session with " + _identitymanager);
         out = new ACLMessage();
@@ -168,11 +168,11 @@ public class Controlador extends IntegratedAgent {
         out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
-        out.setConversationId(session);
+        out.setConversationId(ConversationID);
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
         in = this.blockingReceive();
-        Info(getDetailsLARVA(in));
+        //Info(getDetailsLARVA(in));
 
         doCheckoutLARVA();
     }

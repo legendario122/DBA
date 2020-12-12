@@ -12,13 +12,13 @@ public class Pract2{
     
     
     public static void main(String[] args) {
-        /**
+        
         ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
-        _app.launchAgent("BB99VA", MyWorldExplorer.class);
+        _app.launchAgent("BBVAV1", MyWorldExplorer.class);
         _app.shutDown();
-        * **/
         
+        /**
         Estado origen= new Estado(0,0,210, 90);
         Estado destino = new Estado(5,6,220,90);
         int resultado;
@@ -30,7 +30,7 @@ public class Pract2{
         for(int i=0; i< acciones.size(); i++)
            System.out.println(acciones.get(i));
         
-        
+        * **/
     }
 
     

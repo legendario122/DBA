@@ -5,7 +5,10 @@
  */ 
 package my_agent;
 
+import jade.core.AID;
+import jade.lang.acl.ACLMessage;
 import IntegratedAgent.IntegratedAgent;
+import static my_agent.Controlador.ConversationID;
 /**
  *
  * @author samuel
@@ -17,10 +20,10 @@ public class Seeker extends IntegratedAgent {
 
     public void setup() {
         super.setup();
-         Info("Haciendo checkin to" + _identitymanager);
+         Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager,AID.ISLOCALNAME));
+        out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
         out.setEncoding(_myCardID.getCardID());
@@ -63,11 +66,11 @@ public class Seeker extends IntegratedAgent {
         out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
-        out.setConversationId(session);
+        out.setConversationId(ConversationID);
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
         in = this.blockingReceive();
-        Info(getDetailsLARVA(in));
+        //Info(getDetailsLARVA(in));
 
         doCheckoutLARVA();
         
