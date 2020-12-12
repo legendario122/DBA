@@ -1,5 +1,8 @@
 package my_agent;
- 
+  
+import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
+import static ACLMessageTools.ACLMessageTools.getJsonContentACLM;
+import Map2D.Map2DGrayscale;
 import ControlPanel.TTYControlPanel;
 import IntegratedAgent.IntegratedAgent;
 import com.eclipsesource.json.Json;
@@ -32,6 +35,7 @@ public class Controlador extends IntegratedAgent {
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     YellowPages yp;
+    static String AIDControlador = new String();
     
     @Override
         /**
@@ -42,6 +46,7 @@ public class Controlador extends IntegratedAgent {
         super.setup();
         Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
+        AIDControlador = getAID();
         out.setSender(getAID());
         out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
@@ -55,35 +60,19 @@ public class Controlador extends IntegratedAgent {
             abortSession();
         }      
         Info("Checkeo realizado");
-        // PAGINAS AMARILLAS
-        Info("Requiriendo paginas amarillas");
-        out = in.createReply();
-        out.setContent("");
-        out.setEncoding("");
-        out.setPerformative(ACLMessage.QUERY_REF);
-        this.send(out);
-        in =this.blockingReceive();
-        if(in.getPerformative() != ACLMessage.INFORM){
-          //  Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
-            abortSession();
-        }  
-
-        yp = new YellowPages();
-        yp.updateYellowPages(in);
-        System.out.println("\n" + yp.prettyPrint());
-        // SE ACABAN LAS PAGINAS AMARILLAS
+        
 
         myControlPanel = new TTYControlPanel(getAID());
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////CHECKING EN WORLD MANAGER///////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       
-        Info("Haciendo checkin to" + "myServiceProvider"); //No se como poner world manager bien
+        Info("Haciendo checkin to" + "BBVA"); //No se como poner world manager bien
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
-        out.setContent("problem: 1"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("problem", "1").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
@@ -93,9 +82,35 @@ public class Controlador extends IntegratedAgent {
             abortSession();
         }      
         
+        //Descarga y almacenamiento del mapa
+        //Falta guardar el mapa en matriz de enteros
+        //falta averiguar agentes/servicios de las paginas amarillas
+        System("Save map of world " + myWorld);
+        JsonObject jscontent = getJsonContentACLM(in);
+        if (jscontent.names().contains("map")) {
+	        JsonObject jsonMapFile = jscontent.get("map").asObject();
+	        String mapfilename = jsonMapFile.getString("filename", "nonamefound");
+            Info("Found map " + mapfilename);
+            myMap = new Map2DGrayscale();
+            if (myMap.fromJson(jsonMapFile)) {
+        	    Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight() + "rows ) saved on disk (project's root folder) and ready in memory");
+                Info("Sampling three random points for cross-check:");
+                int px, py;
+                for (int ntimes = 0; ntimes < 3; ntimes++) {
+                	px = (int) (Math.random() * myMap.getWidth());
+                    py = (int) (Math.random() * myMap.getHeight());
+                    Info("\tX: " + px + ", Y:" + py + " = " + myMap.getLevel(px, py));
+                }
+	        }else{
+		        Info("\t" + "There was an error processing and saving the image ");
+	        }
+        } else {
+	        Info("\t" + "There is no map found in the message");
+        }
+
         ConversationID = in.getConversationId();
         
-        Info("Checkeo realizado en World manager");
+        
     }
 
     @Override
@@ -125,7 +140,89 @@ public class Controlador extends IntegratedAgent {
      * @return Nada. 
      */
     public void plainExecute() {
+
+        Info("Haciendo Query-if a Drones"); 
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver("seeker1");  
+        out.setProtocol("");
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.REQUEST);
+        this.send(out);
+
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver("seeker2");  
+        out.setProtocol("");
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.REQUEST);
+        this.send(out);
+
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver("seeker3");  
+        out.setProtocol("");
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.REQUEST);
+        this.send(out);
+
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver("rescuer");  
+        out.setProtocol("");
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.REQUEST);
+        this.send(out);
+
+        int cont=0;
+        ArrayList<String> Bitcoins = new ArrayList<String>;
+
+        do{
+            in = this.blockingReceive();
+            if(in.getPerformative() != ACLMessage.INFORM){
+                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+                abortSession();
+            }else{
+                Bitcoins.add(in.getContent());
+                cont++;
+            }
+            
+        }while(cont<3)
         
+        // PAGINAS AMARILLAS
+
+      
+        Info("Requiriendo paginas amarillas");
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
+        out.setProtocol("ANALYTICS");
+        out.setContent("");
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.QUERY_REF);
+        this.send(out);
+        in =this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.INFORM){
+          //  Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            abortSession();
+        }  
+
+        yp = new YellowPages();
+        yp.updateYellowPages(in);
+        System.out.println("\n" + yp.prettyPrint());
+        
+
+        Info("Obtuve las paginas amarillas");
+
+        
+        if(yp.queryProvidersofService("marketplace")){
+            //FUCK
+        }
+
         //generar agente greedy (pasarle el mapa) 
         //comprar sensores y tickets de recarga
         //generar drones seeker y rescuer

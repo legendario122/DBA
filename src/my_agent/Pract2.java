@@ -1,5 +1,5 @@
 package my_agent;
-
+ 
 
 import AppBoot.ConsoleBoot;
 import static java.lang.Math.pow;
@@ -15,7 +15,7 @@ public class Pract2{
         
         ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
-        _app.launchAgent("BBVAV1", MyWorldExplorer.class);
+        _app.launchAgent("Hitler", Controlador.class);
         _app.shutDown();
         
         /**

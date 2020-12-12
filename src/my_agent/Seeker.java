@@ -17,11 +17,14 @@ public class Seeker extends IntegratedAgent {
 
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
-
+    static String AIDSeeker = new String();
+    static String ConvID = new String();
+    
     public void setup() {
         super.setup();
          Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
+        AIDSeeker = getAID();
         out.setSender(getAID());
         out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
@@ -50,7 +53,37 @@ public class Seeker extends IntegratedAgent {
         //5. Ejecuto las acciones. 
         //Fuera del bucle:
         // mensaje al controlador para decirle que ya no estoy activo.
-       
+        in = this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.REQUEST){
+            // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+             abortSession();
+         }  
+        ConvID = in.getConversationId();
+        Info("Haciendo SUSCRIBE a WorldManager"); 
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("BBVA",ConvID));    
+        out.setProtocol("REGULAR");
+        out.setContent(JsonObject().add("type", "SEEKER").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.SUSCRIBE);
+        this.send(out);
+    
+        in = this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.INFORM){
+            // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+             abortSession();
+        } 
+        Info("Enviando monedas a controlador"); 
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver("Hitler");    
+        out.setProtocol("");
+        out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.INFORM);
+        this.send(out);
+    
     }
     
     

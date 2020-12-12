@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package my_agent;
-
+ 
 /** 
  *
  * @author adrian
@@ -13,6 +13,7 @@ package my_agent;
 public class Estado {
      public int x, y, z;
      public double orientacion;
+
      
     
      public void setX(int x) {

@@ -1,7 +1,7 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * and open the template in the editor. 
  */ 
 package my_agent;
 
@@ -17,11 +17,14 @@ public class Rescuer extends IntegratedAgent {
 
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
+    static String AIDRescuer = new String();
+    static String ConvID = new String();
 
     public void setup() {
         super.setup();
          Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
+        AIDRescuer = getAID();
         out.setSender(getAID());
         out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
@@ -35,6 +38,8 @@ public class Rescuer extends IntegratedAgent {
             abortSession();
         }      
         Info("Checkeo realizado");
+
+
     }
 
     public void plainExecute() {
@@ -48,7 +53,38 @@ public class Rescuer extends IntegratedAgent {
     //comprobar energia
     //ejecuta lista de acciones}
     //mensaje a drone de adios
-    
+
+    in = this.blockingReceive();
+    if(in.getPerformative() != ACLMessage.REQUEST){
+        // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+         abortSession();
+     }  
+    ConvID = in.getConversationId();
+    Info("Haciendo SUSCRIBE a WorldManager"); 
+    out = new ACLMessage();
+    out.setSender(getAID());
+    out.addReceiver(new AID("BBVA",ConvID));    
+    out.setProtocol("REGULAR");
+    out.setContent(JsonObject().add("type", "RESCUER").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+    out.setEncoding("");
+    out.setPerformative(ACLMessage.SUSCRIBE);
+    this.send(out);
+
+    in = this.blockingReceive();
+    if(in.getPerformative() != ACLMessage.INFORM){
+        // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+         abortSession();
+    } 
+    Info("Enviando monedas a controlador"); 
+    out = new ACLMessage();
+    out.setSender(getAID());
+    out.addReceiver("Hitler");    
+    out.setProtocol("");
+    out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+    out.setEncoding("");
+    out.setPerformative(ACLMessage.INFORM);
+    this.send(out);
+
        
     }
     
