@@ -5,9 +5,10 @@
  */
 package my_agent;
 
-/**
+/** 
  *
  * @author adrian
+ 
  */
 public class Estado {
      public int x, y, z;

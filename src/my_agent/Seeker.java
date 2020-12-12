@@ -2,7 +2,7 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
+ */ 
 package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
@@ -11,9 +11,27 @@ import IntegratedAgent.IntegratedAgent;
  * @author samuel
  */
 public class Seeker extends IntegratedAgent {
+
+    ACLMessage in = new ACLMessage();
+    ACLMessage out = new ACLMessage();
+
     public void setup() {
         super.setup();
-        
+         Info("Haciendo checkin to" + _identitymanager);
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(_identitymanager,AID.ISLOCALNAME));
+        out.setProtocol("ANALYTICS");
+        out.setContent("");
+        out.setEncoding(_myCardID.getCardID());
+        out.setPerformative(ACLMessage.SUBSCRIBE);
+        this.send(out);
+        in = this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.INFORM){
+           // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            abortSession();
+        }      
+        Info("Checkeo realizado");
     }
 
     public void plainExecute(){
@@ -39,9 +57,20 @@ public class Seeker extends IntegratedAgent {
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */    
     public void takeDown() {
-        //mensaje cancel 
-        this.doCheckoutLARVA();
-        this.doCheckoutPlatform();
-        super.takeDown();
+        Info("Request closing the session with " + _identitymanager);
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
+        out.setProtocol("ANALYTICS");
+        out.setContent("");
+        out.setConversationId(session);
+        out.setPerformative(ACLMessage.CANCEL);
+        this.send(out);
+        in = this.blockingReceive();
+        Info(getDetailsLARVA(in));
+
+        doCheckoutLARVA();
+        
+        
     }
 }

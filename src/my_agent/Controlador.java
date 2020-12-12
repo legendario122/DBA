@@ -1,5 +1,5 @@
 package my_agent;
-
+ 
 import ControlPanel.TTYControlPanel;
 import IntegratedAgent.IntegratedAgent;
 import com.eclipsesource.json.Json;
@@ -55,6 +55,7 @@ public class Controlador extends IntegratedAgent {
             abortSession();
         }      
         Info("Checkeo realizado");
+        // PAGINAS AMARILLAS
         Info("Requiriendo paginas amarillas");
         out = in.createReply();
         out.setContent("");
@@ -70,29 +71,30 @@ public class Controlador extends IntegratedAgent {
         yp = new YellowPages();
         yp.updateYellowPages(in);
         System.out.println("\n" + yp.prettyPrint());
-    
+        // SE ACABAN LAS PAGINAS AMARILLAS
+
         myControlPanel = new TTYControlPanel(getAID());
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////CHECKING EN WORLD MANAGER///////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        _identitymanager = "WorldManager";
-        Info("Haciendo checkin to" + _identitymanager); //No se como poner world manager bien
+      
+        Info("Haciendo checkin to" + "myServiceProvider"); //No se como poner world manager bien
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager,AID.ISLOCALNAME));  //No se como poner world manager bien
+        out.addReceiver(new AID(myServiceProvider,AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
-        out.setContent(""); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent("problem: 1"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }      
         
         ConversationID = in.getConversationId();
-
+        
         Info("Checkeo realizado en World manager");
     }
 
@@ -144,7 +146,8 @@ public class Controlador extends IntegratedAgent {
     
     /**
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
-        
+     */ 
+       
   
     public void takeDown() {
         Info("Request closing the session with " + myServiceProvider);
@@ -159,8 +162,19 @@ public class Controlador extends IntegratedAgent {
         in = this.blockingReceive();
         Info(getDetailsLARVA(in));
 
+        Info("Request closing the session with " + _identitymanager);
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
+        out.setProtocol("ANALYTICS");
+        out.setContent("");
+        out.setConversationId(session);
+        out.setPerformative(ACLMessage.CANCEL);
+        this.send(out);
+        in = this.blockingReceive();
+        Info(getDetailsLARVA(in));
+
         doCheckoutLARVA();
-    }  
-    */ 
-    
-}
+    }
+
+}    
