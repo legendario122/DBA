@@ -35,7 +35,7 @@ public class Controlador extends IntegratedAgent {
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     YellowPages yp;
-    static String AIDControlador = new String();
+    
     
     @Override
         /**
@@ -46,7 +46,7 @@ public class Controlador extends IntegratedAgent {
         super.setup();
         Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
-        AIDControlador = getAID();
+        
         out.setSender(getAID());
         out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
@@ -179,7 +179,7 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
 
         int cont=0;
-        ArrayList<String> Bitcoins = new ArrayList<String>;
+        ArrayList<String> Bitcoins = new ArrayList<String>();
 
         do{
             in = this.blockingReceive();
@@ -191,7 +191,7 @@ public class Controlador extends IntegratedAgent {
                 cont++;
             }
             
-        }while(cont<3)
+        }while(cont<3);
         
         // PAGINAS AMARILLAS
 

@@ -17,14 +17,14 @@ public class Rescuer extends IntegratedAgent {
 
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
-    static String AIDRescuer = new String();
+    
     static String ConvID = new String();
 
     public void setup() {
         super.setup();
          Info("Haciendo checkin to" + "Sphinx");
         out = new ACLMessage();
-        AIDRescuer = getAID();
+        
         out.setSender(getAID());
         out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
