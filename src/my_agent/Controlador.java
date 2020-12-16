@@ -46,7 +46,7 @@ public class Controlador extends IntegratedAgent {
      */
     public void setup() {
         super.setup();
-        Info("Haciendo checkin to" + "Sphinx");
+        Info("Haciendo checkin to" + "Sphinx" +" controlador");
         out = new ACLMessage();
         
         out.setSender(getAID());
@@ -93,12 +93,9 @@ public class Controlador extends IntegratedAgent {
 	        JsonObject jsonMapFile = jscontent.get("map").asObject();
 	        String mapfilename = jsonMapFile.getString("filename", "nonamefound");
             Info("Found map " + mapfilename);
-<<<<<<< Updated upstream
-            myMap = new Map2DGrayscale();
+            
             //myMap.loadMap(mapfilename);
-=======
-            Map2DGrayscale myMap = new Map2DGrayscale();
->>>>>>> Stashed changes
+            myMap = new Map2DGrayscale();
             if (myMap.fromJson(jsonMapFile)) {
         	    Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight() + "rows ) saved on disk (project's root folder) and ready in memory");
                 Info("Sampling three random points for cross-check:");

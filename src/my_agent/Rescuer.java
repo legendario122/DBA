@@ -26,7 +26,7 @@ public class Rescuer extends IntegratedAgent {
 
     public void setup() {
         super.setup();
-         Info("Haciendo checkin to" + "Sphinx");
+         Info("Haciendo checkin to" + "Sphinx" + "rescuer");
         out = new ACLMessage();
         
         out.setSender(getAID());

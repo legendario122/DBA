@@ -16,6 +16,10 @@ public class Pract2{
         ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
         _app.launchAgent("Hitler", Controlador.class);
+        _app.launchAgent("seeker1", Controlador.class);
+        _app.launchAgent("seeker2", Controlador.class);
+        _app.launchAgent("seeker3", Controlador.class);
+        _app.launchAgent("rescuer", Controlador.class);
         _app.shutDown();
         
         /**

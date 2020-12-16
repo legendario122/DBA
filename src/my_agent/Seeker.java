@@ -27,7 +27,7 @@ public class Seeker extends IntegratedAgent {
     
     public void setup() {
         super.setup();
-         Info("Haciendo checkin to" + "Sphinx");
+         Info("Haciendo checkin to" + "Sphinx" + " seeker");
         out = new ACLMessage();
         
         out.setSender(getAID());
