@@ -65,6 +65,31 @@ public class Controlador extends IntegratedAgent {
         
 
         myControlPanel = new TTYControlPanel(getAID());
+        
+        
+         Info("Requiriendo paginas amarillas");
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
+        out.setProtocol("ANALYTICS");
+        out.setContent("");
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.QUERY_REF);
+        this.send(out);
+        in =this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.INFORM){
+          //  Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            abortSession();
+        }  
+
+        yp = new YellowPages();
+        yp.updateYellowPages(in);
+        System.out.println("\n" + yp.prettyPrint());
+        
+        ArrayList<String> pepe = new ArrayList(yp.queryProvidersofService("Analytics groupid 13"));
+        for(int i=0; i<pepe.size(); i++){
+           Info(pepe.get(i));
+        }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////CHECKING EN WORLD MANAGER///////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,15 +97,16 @@ public class Controlador extends IntegratedAgent {
         Info("Haciendo checkin to" + "BBVA"); //No se como poner world manager bien
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));  //No se como poner world manager bien
+        out.addReceiver(new AID(pepe.get(0),AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
-        out.setContent(new JsonObject().add("problem", "1").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("problem", "World1").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to ");//+ getDetailsLarva(in));
+            Info(in.getContent());
             abortSession();
         }      
         
