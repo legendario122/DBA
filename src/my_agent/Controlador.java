@@ -25,6 +25,8 @@ public class Controlador extends IntegratedAgent {
     int height;
     int maxflight = 255;
     static String ConversationID = "";
+    Map2DGrayscale myMap;
+    String myWorld = "problem1";
     
     /**
     * Variables para el controlador
@@ -92,14 +94,15 @@ public class Controlador extends IntegratedAgent {
 	        String mapfilename = jsonMapFile.getString("filename", "nonamefound");
             Info("Found map " + mapfilename);
             myMap = new Map2DGrayscale();
+            //myMap.loadMap(mapfilename);
             if (myMap.fromJson(jsonMapFile)) {
         	    Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight() + "rows ) saved on disk (project's root folder) and ready in memory");
                 Info("Sampling three random points for cross-check:");
                 int px, py;
                 for (int ntimes = 0; ntimes < 3; ntimes++) {
                 	px = (int) (Math.random() * myMap.getWidth());
-                    py = (int) (Math.random() * myMap.getHeight());
-                    Info("\tX: " + px + ", Y:" + py + " = " + myMap.getLevel(px, py));
+                        py = (int) (Math.random() * myMap.getHeight());
+                        Info("\tX: " + px + ", Y:" + py + " = " + myMap.getLevel(px, py));
                 }
 	        }else{
 		        Info("\t" + "There was an error processing and saving the image ");
