@@ -87,14 +87,18 @@ public class Controlador extends IntegratedAgent {
         //Descarga y almacenamiento del mapa
         //Falta guardar el mapa en matriz de enteros
         //falta averiguar agentes/servicios de las paginas amarillas
-        System("Save map of world " + myWorld);
+        System("Save map of world ");
         JsonObject jscontent = getJsonContentACLM(in);
         if (jscontent.names().contains("map")) {
 	        JsonObject jsonMapFile = jscontent.get("map").asObject();
 	        String mapfilename = jsonMapFile.getString("filename", "nonamefound");
             Info("Found map " + mapfilename);
+<<<<<<< Updated upstream
             myMap = new Map2DGrayscale();
             //myMap.loadMap(mapfilename);
+=======
+            Map2DGrayscale myMap = new Map2DGrayscale();
+>>>>>>> Stashed changes
             if (myMap.fromJson(jsonMapFile)) {
         	    Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight() + "rows ) saved on disk (project's root folder) and ready in memory");
                 Info("Sampling three random points for cross-check:");
@@ -147,7 +151,7 @@ public class Controlador extends IntegratedAgent {
         Info("Haciendo Query-if a Drones"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver("seeker1");  
+        out.addReceiver(new AID("seeker1",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -156,7 +160,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver("seeker2");  
+        out.addReceiver(new AID("seeker2",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -165,7 +169,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver("seeker3");  
+        out.addReceiver(new AID("seeker3",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -174,7 +178,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver("rescuer");  
+        out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -221,10 +225,12 @@ public class Controlador extends IntegratedAgent {
 
         Info("Obtuve las paginas amarillas");
 
-        
-        if(yp.queryProvidersofService("marketplace")){
+        //Buscar tiendas por CONVID
+        //regular seeker 
+        //
+        //if(yp.queryProvidersofService("marketplace")){
             //FUCK
-        }
+        //}
 
         //generar agente greedy (pasarle el mapa) 
         //comprar sensores y tickets de recarga

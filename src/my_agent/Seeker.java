@@ -9,6 +9,11 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import IntegratedAgent.IntegratedAgent;
 import static my_agent.Controlador.ConversationID;
+import static my_agent.Rescuer.ConvID;
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 /**
  *
  * @author samuel
@@ -62,11 +67,12 @@ public class Seeker extends IntegratedAgent {
         Info("Haciendo SUSCRIBE a WorldManager"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("BBVA",ConvID));    
+        out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));   
+        out.setConversationId(ConvID);
         out.setProtocol("REGULAR");
-        out.setContent(JsonObject().add("type", "SEEKER").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("type", "SEEKER").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
-        out.setPerformative(ACLMessage.SUSCRIBE);
+        out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
     
         in = this.blockingReceive();
@@ -77,7 +83,7 @@ public class Seeker extends IntegratedAgent {
         Info("Enviando monedas a controlador"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver("Hitler");    
+        out.addReceiver(new AID("Hitler",AID.ISLOCALNAME));    
         out.setProtocol("");
         out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
