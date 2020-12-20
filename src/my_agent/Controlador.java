@@ -99,7 +99,7 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID(pepe.get(0),AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
-        out.setContent(new JsonObject().add("problem", "World1").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("problem", "Playground1").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
@@ -139,7 +139,7 @@ public class Controlador extends IntegratedAgent {
         }
 
         ConversationID = in.getConversationId();
-        
+        Info(ConversationID);
         
     }
 
@@ -174,7 +174,7 @@ public class Controlador extends IntegratedAgent {
         Info("Haciendo Query-if a Drones"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("seeker1",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("seek1",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -183,7 +183,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("seeker2",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("seek2",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -192,7 +192,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("seeker3",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("seek3",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -201,7 +201,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("resc",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -217,11 +217,12 @@ public class Controlador extends IntegratedAgent {
                 //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
             }else{
+                Info(in.getContent());
                 Bitcoins.add(in.getContent());
                 cont++;
             }
             
-        }while(cont<3);
+        }while(cont<4);
         
         // PAGINAS AMARILLAS
 
@@ -247,7 +248,34 @@ public class Controlador extends IntegratedAgent {
         
 
         Info("Obtuve las paginas amarillas");
-
+        
+        ArrayList<String> Tiendas = new ArrayList<String>(yp.queryProvidersofService("shop@"+ConversationID));
+        
+        for(int i=0; i<Tiendas.size(); i++){
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID(Tiendas.get(i),AID.ISLOCALNAME));
+            out.setProtocol("REGULAR");
+            out.setContent("{}");
+            out.setEncoding("");
+            out.setConversationId(ConversationID);
+            out.setPerformative(ACLMessage.QUERY_REF);
+            this.send(out);
+        }
+        cont=0;
+        do{
+            in = this.blockingReceive();
+            if(in.getPerformative() != ACLMessage.INFORM){
+                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+                abortSession();
+            }else{
+                Info(in.getContent());
+                //guardar lista de objetos
+                cont++;
+            }
+            
+        }while(cont<Tiendas.size());
+        Info("Obtuve los productos");
         //Buscar tiendas por CONVID
         //regular seeker 
         //

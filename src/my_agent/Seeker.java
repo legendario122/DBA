@@ -63,12 +63,12 @@ public class Seeker extends IntegratedAgent {
             // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
              abortSession();
          }  
-        ConvID = in.getConversationId();
-        Info("Haciendo SUSCRIBE a WorldManager"); 
+        //ConvID = in.getConversationId(); El conversation ID viene en el content del mensaje que nos llega y hay que desparsearlo
+        Info("Haciendo SUSCRIBE a WorldManager en seeker"); 
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));   
-        out.setConversationId(ConvID);
+        out.setConversationId(ConversationID);
         out.setProtocol("REGULAR");
         out.setContent(new JsonObject().add("type", "SEEKER").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -83,12 +83,15 @@ public class Seeker extends IntegratedAgent {
         Info("Enviando monedas a controlador"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("Hitler",AID.ISLOCALNAME));    
+        out.addReceiver(new AID("control",AID.ISLOCALNAME));    
         out.setProtocol("");
         out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.INFORM);
         this.send(out);
+        
+        in = this.blockingReceive();
+
     
     }
     
