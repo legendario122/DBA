@@ -273,7 +273,7 @@ public class Controlador extends IntegratedAgent {
                 //guardar lista de objetos
                 cont++;
             }
-            
+           //PEPE
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
         //Buscar tiendas por CONVID
