@@ -28,6 +28,7 @@ public class Controlador extends IntegratedAgent {
     Map2DGrayscale myMap;
     String myWorld = "problem1";
     ArrayList<producto> lista_productos;
+    ArrayList<producto> lista_compra;
     ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> billetes;
     
@@ -302,7 +303,29 @@ public class Controlador extends IntegratedAgent {
     }
     
     
-
+    void seleccionar_productos(ArrayList<producto> lista_ordenada){ //devuelvo un array con rescuer un gps y energy, seeker thermal y energy; 4 energy, 3 thermal y 1 gps;
+        //lista_compra
+        String[] partes;
+        int gps = 0, energy = 0, thermal = 0;
+        boolean lotenemos = false;
+        for (int i = 0; i < lista_ordenada.size() && lotenemos != true; i++){
+            partes = lista_ordenada.get(i).getReferencia().split("#");
+            
+            if(partes[0].equals("GPS") && gps != 1){
+                lista_compra.add(lista_ordenada.get(i));
+                gps++;
+            }else if(partes[0].equals("ENERGY") && energy != 4){
+                lista_compra.add(lista_ordenada.get(i));
+                energy++;
+            }else if(partes[0].equals("THERMAL") && thermal != 3){
+                lista_compra.add(lista_ordenada.get(i));
+                thermal++;
+            }
+            
+            if(gps == 1 && energy ==4 && thermal == 3)
+                lotenemos = true;
+        }    
+    }
     
     
     public ArrayList<producto> ordenar_productos(ArrayList<producto> lista){
@@ -330,6 +353,8 @@ public class Controlador extends IntegratedAgent {
     /**
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */ 
+       
+  
     public void takeDown() {
         Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();
@@ -357,5 +382,7 @@ public class Controlador extends IntegratedAgent {
 
         doCheckoutLARVA();
     }
+    
+   
 
 }    

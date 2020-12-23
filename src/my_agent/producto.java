@@ -37,5 +37,6 @@ public class producto {
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-    
+    int precio;
+    String referencia;
 }
