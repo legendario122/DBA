@@ -31,6 +31,7 @@ public class Controlador extends IntegratedAgent {
     ArrayList<producto> lista_compra;
     ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> billetes;
+    int dinero = 0;
     
     /**
     * Variables para el controlador
@@ -305,6 +306,7 @@ public class Controlador extends IntegratedAgent {
     
     void seleccionar_productos(ArrayList<producto> lista_ordenada){ //devuelvo un array con rescuer un gps y energy, seeker thermal y energy; 4 energy, 3 thermal y 1 gps;
         //lista_compra
+        dinero = billetes.size();
         String[] partes;
         int gps = 0, energy = 0, thermal = 0;
         boolean lotenemos = false;
@@ -314,17 +316,29 @@ public class Controlador extends IntegratedAgent {
             if(partes[0].equals("GPS") && gps != 1){
                 lista_compra.add(lista_ordenada.get(i));
                 gps++;
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
             }else if(partes[0].equals("ENERGY") && energy != 4){
                 lista_compra.add(lista_ordenada.get(i));
                 energy++;
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
             }else if(partes[0].equals("THERMAL") && thermal != 3){
                 lista_compra.add(lista_ordenada.get(i));
                 thermal++;
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
             }
             
             if(gps == 1 && energy ==4 && thermal == 3)
                 lotenemos = true;
-        }    
+        }
+        
+        for (int i = 0; i < lista_ordenada.size() && dinero > 0; i++){
+            partes = lista_ordenada.get(i).getReferencia().split("#");
+            
+            if(partes[0].equals("CHARGE") && dinero > lista_ordenada.get(i).getPrecio()){
+                lista_compra.add(lista_ordenada.get(i));
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
+            }
+        }
     }
     
     
