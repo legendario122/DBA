@@ -316,7 +316,7 @@ public class Controlador extends IntegratedAgent {
 
                 //FALTA DESPARSEO DE LA REFERENCIA
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
-                String referencia = desparseo(in.getContent());
+                //String referencia = desparseo(in.getContent());
                 String partes[];
                 partes = referencia.split("#");
                 if(partes[0].equals("CHARGE")){
