@@ -27,6 +27,8 @@ public class Controlador extends IntegratedAgent {
     static String ConversationID = "";
     Map2DGrayscale myMap;
     String myWorld = "problem1";
+    ArrayList<producto> lista_productos;
+    ArrayList<String> billetes;
     
     /**
     * Variables para el controlador
