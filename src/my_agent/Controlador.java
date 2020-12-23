@@ -28,7 +28,7 @@ public class Controlador extends IntegratedAgent {
     Map2DGrayscale myMap;
     String myWorld = "problem1";
     ArrayList<producto> lista_productos;
-    ArrayList<String> billetes;
+    ArrayList<String> billetes = new ArrayList<String>();
     
     /**
     * Variables para el controlador
@@ -120,8 +120,7 @@ public class Controlador extends IntegratedAgent {
         if (jscontent.names().contains("map")) {
 	        JsonObject jsonMapFile = jscontent.get("map").asObject();
 	        String mapfilename = jsonMapFile.getString("filename", "nonamefound");
-            Info("Found map " + mapfilename);
-            
+            Info("Found map " + mapfilename);            
             //myMap.loadMap(mapfilename);
             myMap = new Map2DGrayscale();
             if (myMap.fromJson(jsonMapFile)) {
@@ -334,6 +333,52 @@ public class Controlador extends IntegratedAgent {
         //Info(getDetailsLARVA(in));
 
         doCheckoutLARVA();
+    }
+    
+    public void desparsearMonedas(ACLMessage in){
+        String answer = in.getContent();
+        JsonObject objeto = new JsonObject();
+        String variable;
+        objeto = Json.parse(answer).asObject();
+        String resultado = objeto.get("result").asString();
+        if("ok".equals(resultado)){
+            for(JsonValue j : objeto.get("coins").asArray()){
+                variable = j.asString();
+                billetes.add(variable);
+            }
+        }
+    }
+    
+    public void desparsearProductos(ACLMessage in){
+        String answer = in.getContent();
+        JsonObject objeto = new JsonObject();
+        producto p = new producto(); 
+        int precio = 0;
+        int serie = 0;
+        String referencia;
+        objeto = Json.parse(answer).asObject();
+        JsonArray vector = objeto.get("products").asArray();
+        for(JsonValue j : vector){
+            referencia = j.asObject().get("reference").asString();
+            serie = j.asObject().get("serie").asInt();
+            precio = j.asObject().get("price").asInt();
+            p.setPrecio(precio);
+            p.setReferencia(referencia);
+            p.setSerie(serie);
+            lista_productos.add(p);
+        }
+        //AID nombre = in.getSender();
+        //getSender
+    }
+    
+    public void desparsearConvID(ACLMessage in){
+        String answer = in.getContent();
+        JsonObject objeto = new JsonObject();
+        objeto = Json.parse(answer).asObject();
+        String resultado = objeto.get("result").asString();
+        if("ok".equals(resultado)){
+            ConversationID = in.getConversationId();
+        }
     }
 
 }    
