@@ -11,7 +11,9 @@ package my_agent;
  */
 public class producto {
     int serie;
-
+    int precio;
+    String referencia;
+    
     public int getSerie() {
         return serie;
     }
@@ -35,6 +37,5 @@ public class producto {
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-    int precio;
-    String referencia;
+    
 }

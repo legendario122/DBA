@@ -28,6 +28,7 @@ public class Controlador extends IntegratedAgent {
     Map2DGrayscale myMap;
     String myWorld = "problem1";
     ArrayList<producto> lista_productos;
+    ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> billetes;
     
     /**
@@ -303,11 +304,32 @@ public class Controlador extends IntegratedAgent {
     
 
     
+    
+    public ArrayList<producto> ordenar_productos(ArrayList<producto> lista){
+        int tam = lista.size();
+        int a=0, b=0;
+        producto aux;
+        for(int i=0; i<lista.size();i++){
+            a=0;
+            b=1;
+            for(int j=0; j<tam-1; j++){
+                if(lista.get(a).getPrecio()>lista.get(b).getPrecio()){
+                    aux=lista.get(a);
+                    lista.set(a, lista.get(b));
+                    lista.set(b, aux);
+                }
+                a++;
+                b++;
+            }
+        }
+        
+        return lista;
+    }
+    
+    
     /**
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */ 
-       
-  
     public void takeDown() {
         Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();

@@ -35,6 +35,8 @@ public class Pract2{
            System.out.println(acciones.get(i));
         
         * **/
+        
+       
     }
 
     
