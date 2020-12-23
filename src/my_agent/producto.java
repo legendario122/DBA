@@ -11,7 +11,18 @@ package my_agent;
  */
 public class producto {
     int serie;
+    int precio;
+    String referencia;
+    String Tienda;
 
+    public String getTienda() {
+        return Tienda;
+    }
+
+    public void setTienda(String Tienda) {
+        this.Tienda = Tienda;
+    }
+    
     public int getSerie() {
         return serie;
     }
@@ -35,6 +46,5 @@ public class producto {
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-    int precio;
-    String referencia;
+
 }

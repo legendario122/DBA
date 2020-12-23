@@ -28,8 +28,12 @@ public class Controlador extends IntegratedAgent {
     Map2DGrayscale myMap;
     String myWorld = "problem1";
     ArrayList<producto> lista_productos;
+    ArrayList<producto> lista_compra;
+    ArrayList<producto> lista_productos_ordenada;
+    ArrayList<String> referencias_sensores;
+    ArrayList<String> referencias_tickets;
+    int dinero = 0;
     ArrayList<String> billetes = new ArrayList<String>();
-    
     /**
     * Variables para el controlador
     * DBAMap mapa = new DBAMap();
@@ -277,6 +281,56 @@ public class Controlador extends IntegratedAgent {
            //PEPE
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
+        
+        //RAFITA DESPARSEA Y METE PRODUCTOS EN LISTA_PRODUCTOS
+        
+        lista_productos_ordenada = ordenar_productos(lista_productos);
+        
+        seleccionar_productos(lista_productos_ordenada); //AHORA TENEMOS EN LISTA_COMPRA LOS SENSORES A COMPRAR FALTAN TICKETS.
+        
+        //COMPRAR SENSORES
+        for(int i=0; i<lista_compra.size(); i++){
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID(lista_compra.get(i).getTienda(),AID.ISLOCALNAME));
+            out.setProtocol("REGULAR");
+            JsonArray pago = new JsonArray();
+            for(int j=0; i<lista_compra.get(j).getPrecio(); j++){
+                pago.add(billetes.get(j));
+                billetes.remove(j);
+            }
+            out.setContent(new JsonObject().add("operation", "buy").toString() +","+new JsonObject().add("reference", lista_compra.get(i).getReferencia()).toString()+","+new JsonObject().add("payment", pago).toString());
+            out.setEncoding("");
+            out.setConversationId(ConversationID);
+            out.setPerformative(ACLMessage.REQUEST);
+            this.send(out);
+            
+            in = this.blockingReceive();
+            if(in.getPerformative() != ACLMessage.INFORM){
+                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+                abortSession();
+            }else{
+                Info(in.getContent());
+                referencias_sensores = new ArrayList<String>();                
+                referencias_tickets = new ArrayList<String>();
+
+                //FALTA DESPARSEO DE LA REFERENCIA
+                //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
+                String referencia = desparseo(in.getContent());
+                String partes[];
+                partes = referencia.split("#");
+                if(partes[0].equals("CHARGE")){
+                    referencias_tickets.add(referencia);
+                }else{
+                    referencias_sensores.add(in.getContent());
+                }
+                
+                
+            }
+            
+        }
+        
+        
         //Buscar tiendas por CONVID
         //regular seeker 
         //
@@ -300,7 +354,65 @@ public class Controlador extends IntegratedAgent {
     }
     
     
-
+    void seleccionar_productos(ArrayList<producto> lista_ordenada){ //devuelvo un array con rescuer un gps y energy, seeker thermal y energy; 4 energy, 3 thermal y 1 gps;
+        //lista_compra
+        dinero = billetes.size();
+        String[] partes;
+        int gps = 0, energy = 0, thermal = 0;
+        boolean lotenemos = false;
+        for (int i = 0; i < lista_ordenada.size() && lotenemos != true; i++){
+            partes = lista_ordenada.get(i).getReferencia().split("#");
+            
+            if(partes[0].equals("GPS") && gps != 1){
+                lista_compra.add(lista_ordenada.get(i));
+                gps++;
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
+            }else if(partes[0].equals("ENERGY") && energy != 4){
+                lista_compra.add(lista_ordenada.get(i));
+                energy++;
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
+            }else if(partes[0].equals("THERMAL") && thermal != 3){
+                lista_compra.add(lista_ordenada.get(i));
+                thermal++;
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
+            }
+            
+            if(gps == 1 && energy ==4 && thermal == 3)
+                lotenemos = true;
+        }
+        
+        for (int i = 0; i < lista_ordenada.size() && dinero > 0; i++){
+            partes = lista_ordenada.get(i).getReferencia().split("#");
+            
+            if(partes[0].equals("CHARGE") && dinero > lista_ordenada.get(i).getPrecio()){
+                lista_compra.add(lista_ordenada.get(i));
+                dinero = dinero - lista_ordenada.get(i).getPrecio();
+            }
+        }
+    }
+    
+    
+    public ArrayList<producto> ordenar_productos(ArrayList<producto> lista){
+        int tam = lista.size();
+        int a=0, b=0;
+        producto aux;
+        for(int i=0; i<lista.size();i++){
+            a=0;
+            b=1;
+            for(int j=0; j<tam-1; j++){
+                if(lista.get(a).getPrecio()>lista.get(b).getPrecio()){
+                    aux=lista.get(a);
+                    lista.set(a, lista.get(b));
+                    lista.set(b, aux);
+                }
+                a++;
+                b++;
+            }
+        }
+        
+        return lista;
+    }
+    
     
     /**
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
