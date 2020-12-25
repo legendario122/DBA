@@ -278,10 +278,6 @@ public class Controlador extends IntegratedAgent {
             }else{
                 Info(in.getContent());
                 desparsearProductos(in);
-                Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
-                for(int i=0; i<lista_productos.size();i++){
-                    Info(lista_productos.get(i).getReferencia());
-                }
                 //guardar lista de objetos
                 cont++;
             }
@@ -290,7 +286,6 @@ public class Controlador extends IntegratedAgent {
         Info("Obtuve los productos");
         
         Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
-        //RAFITA DESPARSEA Y METE PRODUCTOS EN LISTA_PRODUCTOS
         
         
         lista_productos_ordenada = ordenar_productos(lista_productos);
@@ -481,7 +476,6 @@ public class Controlador extends IntegratedAgent {
         AID tienda = in.getSender();
         objeto = Json.parse(answer).asObject();
         JsonArray vector = objeto.get("products").asArray();
-        JsonArray array = new JsonArray();
         for(JsonValue j : vector){
             precio = 0;
             serie = 0;
