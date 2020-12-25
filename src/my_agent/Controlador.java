@@ -27,7 +27,7 @@ public class Controlador extends IntegratedAgent {
     static String ConversationID = "";
     Map2DGrayscale myMap;
     String myWorld = "problem1";
-    ArrayList<producto> lista_productos;
+    ArrayList<producto> lista_productos = new ArrayList<producto>();
     ArrayList<producto> lista_compra;
     ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> referencias_sensores;
@@ -143,7 +143,8 @@ public class Controlador extends IntegratedAgent {
 	        Info("\t" + "There is no map found in the message");
         }
 
-        ConversationID = in.getConversationId();
+        //ConversationID = in.getConversationId();
+        desparsearConvID(in);
         Info(ConversationID);
         
     }
@@ -223,6 +224,7 @@ public class Controlador extends IntegratedAgent {
                 abortSession();
             }else{
                 Info(in.getContent());
+                desparsearMonedas(in);
                 Bitcoins.add(in.getContent());
                 cont++;
             }
@@ -275,6 +277,11 @@ public class Controlador extends IntegratedAgent {
                 abortSession();
             }else{
                 Info(in.getContent());
+                desparsearProductos(in);
+                Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
+                for(int i=0; i<lista_productos.size();i++){
+                    Info(lista_productos.get(i).getReferencia());
+                }
                 //guardar lista de objetos
                 cont++;
             }
@@ -282,7 +289,9 @@ public class Controlador extends IntegratedAgent {
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
         
+        Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
         //RAFITA DESPARSEA Y METE PRODUCTOS EN LISTA_PRODUCTOS
+        
         
         lista_productos_ordenada = ordenar_productos(lista_productos);
         
@@ -292,7 +301,8 @@ public class Controlador extends IntegratedAgent {
         for(int i=0; i<lista_compra.size(); i++){
             out = new ACLMessage();
             out.setSender(getAID());
-            out.addReceiver(new AID(lista_compra.get(i).getTienda(),AID.ISLOCALNAME));
+            //out.addReceiver(new AID(lista_compra.get(i).getTienda(),AID.ISLOCALNAME));
+            out.addReceiver(lista_compra.get(i).getTienda());
             out.setProtocol("REGULAR");
             JsonArray pago = new JsonArray();
             for(int j=0; i<lista_compra.get(j).getPrecio(); j++){
@@ -316,14 +326,14 @@ public class Controlador extends IntegratedAgent {
 
                 //FALTA DESPARSEO DE LA REFERENCIA
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
-                String referencia = desparseo(in.getContent());
+                //String referencia = desparseo(in.getContent());
                 String partes[];
-                partes = referencia.split("#");
-                if(partes[0].equals("CHARGE")){
-                    referencias_tickets.add(referencia);
-                }else{
-                    referencias_sensores.add(in.getContent());
-                }
+                //partes = referencia.split("#");
+                //if(partes[0].equals("CHARGE")){
+                    //referencias_tickets.add(referencia);
+                //}else{
+                //    referencias_sensores.add(in.getContent());
+                //}
                 
                 
             }
@@ -464,23 +474,28 @@ public class Controlador extends IntegratedAgent {
     public void desparsearProductos(ACLMessage in){
         String answer = in.getContent();
         JsonObject objeto = new JsonObject();
-        producto p = new producto(); 
-        int precio = 0;
-        int serie = 0;
+        producto p; 
+        int precio;
+        int serie;
         String referencia;
+        AID tienda = in.getSender();
         objeto = Json.parse(answer).asObject();
         JsonArray vector = objeto.get("products").asArray();
+        JsonArray array = new JsonArray();
         for(JsonValue j : vector){
+            precio = 0;
+            serie = 0;
+            referencia = "";
+            p = new producto();
             referencia = j.asObject().get("reference").asString();
             serie = j.asObject().get("serie").asInt();
             precio = j.asObject().get("price").asInt();
             p.setPrecio(precio);
             p.setReferencia(referencia);
             p.setSerie(serie);
+            p.setTienda(tienda);
             lista_productos.add(p);
         }
-        //AID nombre = in.getSender();
-        //getSender
     }
     
     public void desparsearConvID(ACLMessage in){
