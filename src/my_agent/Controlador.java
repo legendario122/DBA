@@ -28,7 +28,7 @@ public class Controlador extends IntegratedAgent {
     Map2DGrayscale myMap;
     String myWorld = "problem1";
     ArrayList<producto> lista_productos = new ArrayList<producto>();
-    ArrayList<producto> lista_compra;
+    ArrayList<producto> lista_compra = new ArrayList<producto>();
     ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> referencias_sensores;
     ArrayList<String> referencias_tickets;
