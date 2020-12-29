@@ -20,6 +20,7 @@ public class Pract2{
         _app.launchAgent("seek2", Seeker.class);
         _app.launchAgent("seek3", Seeker.class);
         _app.launchAgent("resc", Rescuer.class);
+        _app.launchAgent("greedy", Greedy.class);
         _app.shutDown();
         
         /**

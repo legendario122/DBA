@@ -6,7 +6,11 @@
 package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
+import Map2D.Map2DGrayscale;
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,25 +20,36 @@ public class Greedy extends IntegratedAgent {
     
     Set<Estado> generados = new HashSet<Estado>();
     Queue<nodo> cola = new PriorityQueue<nodo>();
-    double mapa[][] = new double[7][7];
+    //double mapa[][] = new double[7][7];
+    Map2DGrayscale mapa = new Map2DGrayscale();
     static final double IZQUIERDA=-45;
     static final double DERECHA=45;
     public void setup() {
         super.setup();
-        
+        String nombre_mapa = "Playground1.png";
+        try {
+            mapa = mapa.loadMap(nombre_mapa);
+        } catch (IOException ex) {
+            Logger.getLogger(Greedy.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Info("He pasado la carga del mapa");
+        for (int ntimes = 0; ntimes < 3; ntimes++) {
+            int px = (int) (Math.random() * mapa.getWidth());
+            int py = (int) (Math.random() * mapa.getHeight());
+            Info("\tX: " + px + ", Y:" + py + " = " + mapa.getLevel(px, py));
+        }
+        Info("He cargado y leido correctamente el archivo con el mapa");
     }
 
-    public Greedy(){
-
-        
-        for (int i=0; i<7; i++){
+    public Greedy(){        
+        /*for (int i=0; i<7; i++){
             for (int j=0; j<7; j++){
                 mapa[i][j]=200;
             }
         }
         mapa[0][1]=220;
         mapa[1][0]=220;
-        mapa[1][1]=220;
+        mapa[1][1]=220;*/
     }
     
 
@@ -87,7 +102,8 @@ public class Greedy extends IntegratedAgent {
             if((x-1)< 0){
                 resultado=true;
             }else{
-                if(mapa[x-1][y] > estado.z){
+                //if(mapa[x-1][y] > estado.z){
+                if(mapa.getLevel(x-1, y) > estado.z){
                     resultado=true;              
                 }else{
                     estado.x=x-1;
@@ -100,7 +116,8 @@ public class Greedy extends IntegratedAgent {
                    resultado=true;
 
             }else{
-               if(mapa[x-1][y+1] > estado.z){
+                //if(mapa[x-1][y+1] > estado.z){
+                if(mapa.getLevel(x-1, y-1) > estado.z){    
                    resultado=true;
                    
                 }else{
@@ -113,7 +130,8 @@ public class Greedy extends IntegratedAgent {
             if((y+1)>6){
                 resultado=true;
             }else{
-                if(mapa[x][y+1] > estado.z){
+                //if(mapa[x][y+1] > estado.z){
+                if(mapa.getLevel(x, y+1) > estado.z){
                     resultado=true;
                 
                 }else{
@@ -126,7 +144,8 @@ public class Greedy extends IntegratedAgent {
             if((x+1)>6 || (y+1) >6){
                 resultado=true;
             }else{
-                if(mapa[x+1][y+1] > estado.z){
+                //if(mapa[x+1][y+1] > estado.z){
+                if(mapa.getLevel(x+1, y+1) > estado.z){
                     resultado=true;
                 
                 }else{
@@ -139,7 +158,8 @@ public class Greedy extends IntegratedAgent {
             if((x+1)>6){
                 resultado=true;
             }else{
-                if(mapa[x+1][y] > estado.z){
+                //if(mapa[x+1][y] > estado.z){
+                if(mapa.getLevel(x+1, y) > estado.z){
                     resultado=true;
                 }else{
                     estado.x=x+1;
@@ -151,7 +171,8 @@ public class Greedy extends IntegratedAgent {
             if((x+1)>6 || (y-1)<0){
                 resultado=true;
             }else{
-                if(mapa[x+1][y-1] > estado.z){
+                //if(mapa[x+1][y-1] > estado.z){
+                if(mapa.getLevel(x+1, y-1) > estado.z){
                     resultado=true;
                 }else{
                     estado.x=x+1;
@@ -163,7 +184,8 @@ public class Greedy extends IntegratedAgent {
             if((y-1)<0){
                 resultado=true;
             }else{
-                if(mapa[x][y-1] > estado.z){
+                //if(mapa[x][y-1] > estado.z){
+                if(mapa.getLevel(x, y-1) > estado.z){
                     resultado=true;
                 }else{
                     estado.x=x;
@@ -175,7 +197,8 @@ public class Greedy extends IntegratedAgent {
             if((x-1)<0 || (y-1)<0){
                 resultado=true;
             }else{
-                if(mapa[x-1][y-1] > estado.z){
+                //if(mapa[x-1][y-1] > estado.z){
+                if(mapa.getLevel(x-1, y-1) > estado.z){
                     resultado=true;
                 }else{
                     estado.x=x-1;
