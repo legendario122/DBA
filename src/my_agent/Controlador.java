@@ -351,8 +351,9 @@ public class Controlador extends IntegratedAgent {
                 
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
                 String referencia = desparsearReferencia(in);
-                partes = referencia.split("#");
                 String partes[];
+                partes = referencia.split("#");
+                
                 if(partes[0].equals("CHARGE")){
                     referencias_tickets.add(referencia);
                 }else{
