@@ -96,7 +96,7 @@ public class Rescuer extends IntegratedAgent {
     int mensj_recibidos = 0;
     ArrayList<String> sensores = new ArrayList<String>();
     while(mensj_recibidos != 2){
-    in = this.blockingReceive();
+        in = this.blockingReceive();
     
         if(in.getPerformative() != ACLMessage.INFORM){
             //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
@@ -132,6 +132,9 @@ public class Rescuer extends IntegratedAgent {
     out.setEncoding("");
     out.setPerformative(ACLMessage.REQUEST);
     this.send(out);
+    
+    
+    
     in =this.blockingReceive();
 
        

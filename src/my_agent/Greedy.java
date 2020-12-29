@@ -7,6 +7,7 @@ package my_agent;
 
 import IntegratedAgent.IntegratedAgent;
 import Map2D.Map2DGrayscale;
+import jade.lang.acl.ACLMessage;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -212,7 +213,7 @@ public class Greedy extends IntegratedAgent {
         return resultado;       
     }
 
-    public ArrayList<String> plainExecute(Estado origen, Estado destino, ArrayList<String> acciones) {
+    public void plainExecute(Estado origen, Estado destino, ArrayList<String> acciones) {
     
     acciones.clear();
     
@@ -325,7 +326,9 @@ public class Greedy extends IntegratedAgent {
     //2. Recibe mensaje de Goodbye
     //   Finaliza el "agente" (termina while o si es un agente mensaje cancel)
     
-    return acciones;
+    //return acciones;
+    ACLMessage in = new ACLMessage();
+    in = this.blockingReceive();
     }
     
     
@@ -335,8 +338,7 @@ public class Greedy extends IntegratedAgent {
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */    
     public void takeDown() {
-        this.doCheckoutLARVA();
-        this.doCheckoutPlatform();
+        
         super.takeDown();
     }
     

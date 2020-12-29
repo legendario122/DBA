@@ -91,28 +91,32 @@ public class Seeker extends IntegratedAgent {
         out.setPerformative(ACLMessage.INFORM);
         this.send(out);
         
-        in = this.blockingReceive();
+        //in = this.blockingReceive();
         
-            Info("Recibiendo sensores de controlador y enviandoselas a sphinx");
-    int mensj_recibidos = 0;
-    ArrayList<String> sensores = new ArrayList<String>();
-    while(mensj_recibidos != 2){
-    in = this.blockingReceive();
-    
-        if(in.getPerformative() != ACLMessage.INFORM){
-            //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
-            abortSession();
-        }else{
-            Info(in.getContent());
+        Info("Recibiendo sensores de controlador y enviandoselas a sphinx");
+        int mensj_recibidos = 0;
+        ArrayList<String> sensores = new ArrayList<String>();
+        while(mensj_recibidos != 2){
+        in = this.blockingReceive();
+
+            if(in.getPerformative() != ACLMessage.INFORM){
+                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+                abortSession();
+            }else{
+                Info(in.getContent());
 
 
-            sensores.add(in.getContent());
-            mensj_recibidos++;
+                sensores.add(in.getContent());
+                mensj_recibidos++;
 
 
-        }
+            }
     
     }
+        
+    //mensaje con trayectorias    
+    in =this.blockingReceive();
+        
     JsonArray vector = new JsonArray();
     for(int i = 0; i < sensores.size(); i++)
         vector.add(sensores.get(i));
@@ -128,12 +132,12 @@ public class Seeker extends IntegratedAgent {
     out = new ACLMessage();
     out.setSender(getAID());
     out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
-    out.setProtocol("");   
+    out.setProtocol("REGULAR");   
     out.setContent(objeto.toString());
     out.setEncoding("");
     out.setPerformative(ACLMessage.REQUEST);
     this.send(out);
-    in =this.blockingReceive();
+    
 
 
     
