@@ -421,6 +421,43 @@ public class Controlador extends IntegratedAgent {
         Info("EL numero de tickets de recarga es: " + referencias_tickets.size());
         Info("EL numero de sensores es: " +referencias_sensores.size());
         
+    String[] partes;
+    int gps = 0, energy = 0;  
+    boolean lotenemos = false;
+    for(int i = 0; i < referencias_sensores.size() && lotenemos != true; i++){  
+        partes = referencias_sensores.get(i).split("#");
+        if(partes[0].equals("GPS") && gps != 1){
+        
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID("resc",AID.ISLOCALNAME));    
+            out.setProtocol("");
+            out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+            out.setEncoding("");
+            out.setPerformative(ACLMessage.INFORM);
+            this.send(out);
+            referencias_sensores.remove(i);
+            gps++;
+        }else if (partes[0].equals("ENERGY") && energy != 1){
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID("resc",AID.ISLOCALNAME));    
+            out.setProtocol("");
+            out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+            out.setEncoding("");
+            out.setPerformative(ACLMessage.INFORM);
+            this.send(out);
+            referencias_sensores.remove(i);
+            energy++;
+        }
+        
+                    
+        if(gps == 1 && energy == 1)
+            lotenemos = true;
+    }
+    
+
+    
         //Buscar tiendas por CONVID
         //regular seeker 
         //

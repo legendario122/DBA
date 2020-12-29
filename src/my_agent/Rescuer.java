@@ -12,6 +12,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import java.util.ArrayList;
 import static my_agent.Controlador.ConversationID;
 /**
  *
@@ -91,8 +92,47 @@ public class Rescuer extends IntegratedAgent {
     out.setPerformative(ACLMessage.INFORM);
     this.send(out);
     
+    Info("Recibiendo sensores de controlador y enviandoselas a sphinx");
+    int mensj_recibidos = 0;
+    ArrayList<String> sensores = new ArrayList<String>();
+    while(mensj_recibidos != 2){
     in = this.blockingReceive();
     
+        if(in.getPerformative() != ACLMessage.INFORM){
+            //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+            abortSession();
+        }else{
+            Info(in.getContent());
+
+
+            sensores.add(in.getContent());
+            mensj_recibidos++;
+
+
+        }
+    
+    }
+    JsonArray vector = new JsonArray();
+    for(int i = 0; i < sensores.size(); i++)
+        vector.add(sensores.get(i));
+
+    
+    JsonObject objeto = new JsonObject();
+    objeto.add("operation", "login");
+    objeto.add("attach", vector);
+    objeto.add("posx", 0);
+    objeto.add("posy", 0);
+    
+ 
+    out = new ACLMessage();
+    out.setSender(getAID());
+    out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
+    out.setProtocol("");   
+    out.setContent(objeto.toString());
+    out.setEncoding("");
+    out.setPerformative(ACLMessage.REQUEST);
+    this.send(out);
+    in =this.blockingReceive();
 
        
     }
