@@ -30,8 +30,8 @@ public class Controlador extends IntegratedAgent {
     ArrayList<producto> lista_productos = new ArrayList<producto>();
     ArrayList<producto> lista_compra = new ArrayList<producto>();
     ArrayList<producto> lista_productos_ordenada;
-    ArrayList<String> referencias_sensores;
-    ArrayList<String> referencias_tickets;
+    ArrayList<String> referencias_sensores = new ArrayList<String>();
+    ArrayList<String> referencias_tickets = new ArrayList<String>();
     int dinero = 0;
     ArrayList<String> billetes = new ArrayList<String>();
     /**
@@ -328,25 +328,24 @@ public class Controlador extends IntegratedAgent {
                 abortSession();
             }else{
                 Info(in.getContent());
-                referencias_sensores = new ArrayList<String>();                
-                referencias_tickets = new ArrayList<String>();
-
-                //FALTA DESPARSEO DE LA REFERENCIA
+                
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
-                //String referencia = desparseo(in.getContent());
+                String referencia = desparsearReferencia(in);
                 String partes[];
-                //partes = referencia.split("#");
-                //if(partes[0].equals("CHARGE")){
-                    //referencias_tickets.add(referencia);
-                //}else{
-                //    referencias_sensores.add(in.getContent());
-                //}
+                partes = referencia.split("#");
+                if(partes[0].equals("CHARGE")){
+                    referencias_tickets.add(referencia);
+                }else{
+                    referencias_sensores.add(referencia);
+                }
                 
                 
             }
             
         }
         
+        Info("EL numero de tickets de recarga es: " + referencias_tickets.size());
+        Info("EL numero de sensores es: " +referencias_sensores.size());
         
         //Buscar tiendas por CONVID
         //regular seeker 
@@ -512,6 +511,18 @@ public class Controlador extends IntegratedAgent {
         if("ok".equals(resultado)){
             ConversationID = in.getConversationId();
         }
+    }
+    
+    public String desparsearReferencia(ACLMessage in){
+        String reference="";
+        String answer = in.getContent();
+        JsonObject objeto = new JsonObject();
+        objeto = Json.parse(answer).asObject();
+        String resultado = objeto.get("result").asString();
+        if("ok".equals(resultado)){
+            reference = objeto.get("reference").asString();
+        }
+        return reference;
     }
 
 }    
