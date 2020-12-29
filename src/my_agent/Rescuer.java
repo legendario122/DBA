@@ -126,8 +126,9 @@ public class Rescuer extends IntegratedAgent {
  
     out = new ACLMessage();
     out.setSender(getAID());
-    out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
-    out.setProtocol("");   
+    out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
+    out.setProtocol("REGULAR"); 
+    out.setConversationId(ConversationID);
     out.setContent(objeto.toString());
     out.setEncoding("");
     out.setPerformative(ACLMessage.REQUEST);

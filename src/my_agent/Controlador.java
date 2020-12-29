@@ -34,33 +34,46 @@ public class Controlador extends IntegratedAgent {
     ArrayList<String> referencias_tickets = new ArrayList<String>();
     ArrayList<String> seekers;
     int dinero = 0;
+    String World = "BasePlayground1";
     ArrayList<String> billetes = new ArrayList<String>();
     /**
     * Variables para el controlador
     * DBAMap mapa = new DBAMap();
         mapa.fromJson(map);
     **/
-    ArrayList<posicion> Trayectoria_BasePlayground1_seek1 = new ArrayList<posicion>();
-    ArrayList<posicion> Trayectoria_BasePlayground1_seek2 = new ArrayList<posicion>();
-    ArrayList<posicion> Trayectoria_BasePlayground1_seek3 = new ArrayList<posicion>();
+    static ArrayList<posicion> Trayectoria_BasePlayground1_seek1 = new ArrayList<posicion>();
+    static ArrayList<posicion> Trayectoria_BasePlayground1_seek2 = new ArrayList<posicion>();
+    static ArrayList<posicion> Trayectoria_BasePlayground1_seek3 = new ArrayList<posicion>();
     
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     YellowPages yp;
+    public static ArrayList<posicion> get_trayectoria(String world, String nombre){
+        if(world.equals("BasePlayground1")){
+            if(nombre.equals("seek1")){
+                return Trayectoria_BasePlayground1_seek1;
+            }else if(nombre.equals("seek2")){
+                return Trayectoria_BasePlayground1_seek2;
+            }else if(nombre.equals("seek3")){
+                return Trayectoria_BasePlayground1_seek3;
+            }
+        }
+        return null;
+    }
     
     void inicializar_trayectorias(){
         //BASEPLAYGROUNd1:
         
-        for(int i=15; i<3; i+=30){
+        for(int i=15; i<100; i+=30){
             posicion aux = new posicion(15,i);
             Trayectoria_BasePlayground1_seek1.add(aux);
         }
         
-        for(int i=15; i<3; i+=30){
+        for(int i=15; i<100; i+=30){
             posicion aux = new posicion(45,i);
             Trayectoria_BasePlayground1_seek2.add(aux);
         }
-        for(int i=15; i<3; i+=30){
+        for(int i=15; i<100; i+=30){
             posicion aux = new posicion(75,i);
             Trayectoria_BasePlayground1_seek3.add(aux);
         }
@@ -88,7 +101,7 @@ public class Controlador extends IntegratedAgent {
             abortSession();
         }      
         Info("Checkeo realizado");
-        
+        inicializar_trayectorias();
 
         myControlPanel = new TTYControlPanel(getAID());
         
@@ -400,39 +413,20 @@ public class Controlador extends IntegratedAgent {
                 }
                 
             }
+            
             //AQUI HABRIA QUE CAMBIAR LA ASIGNACION DE TRAYECTORIAS AL CAMBIAR DE MUNDO
             ArrayList<posicion> aux = new ArrayList<posicion>();
-            if(seekers.get(j)=="seek1"){
+            
                 out = new ACLMessage();
                 out.setSender(getAID());
                 out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
                 out.setProtocol("");
-                out.setContent(Trayectoria_BasePlayground1_seek1.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                out.setContent(World); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
                 Info(out.getContent());
                 out.setEncoding("");
                 out.setPerformative(ACLMessage.INFORM);
                 this.send(out);
-            }else if(seekers.get(j)=="seek2"){
-                out = new ACLMessage();
-                out.setSender(getAID());
-                out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
-                out.setProtocol("");
-                out.setContent(Trayectoria_BasePlayground1_seek2.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
-                Info(out.getContent());
-                out.setEncoding("");
-                out.setPerformative(ACLMessage.INFORM);
-                this.send(out);
-            }else if(seekers.get(j)=="seek3"){
-                out = new ACLMessage();
-                out.setSender(getAID());
-                out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
-                out.setProtocol("");
-                out.setContent(Trayectoria_BasePlayground1_seek3.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
-                Info(out.getContent());
-                out.setEncoding("");
-                out.setPerformative(ACLMessage.INFORM);
-                this.send(out);
-            }
+            
             
         }
         

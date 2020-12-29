@@ -113,32 +113,53 @@ public class Seeker extends IntegratedAgent {
             }
     
     }
-        
+    ArrayList<posicion> trayectoria = null;
     //mensaje con trayectorias    
     in =this.blockingReceive();
+    if(in.getPerformative() != ACLMessage.INFORM){
+        abortSession();
+    }else{
+        Info(in.getContent());
+        String world = in.getContent();
+        AID pepe = new AID();
+        pepe = getAID();
         
+        trayectoria = new ArrayList<posicion>(Controlador.get_trayectoria(world,pepe.getLocalName() ));
+    }
+    
     JsonArray vector = new JsonArray();
     for(int i = 0; i < sensores.size(); i++)
         vector.add(sensores.get(i));
-
+    
+    System.out.print(trayectoria.get(0).getX());
     
     JsonObject objeto = new JsonObject();
     objeto.add("operation", "login");
     objeto.add("attach", vector);
-    objeto.add("posx", 0);
-    objeto.add("posy", 0);
+    objeto.add("posx", trayectoria.get(0).getX());
+    objeto.add("posy", trayectoria.get(0).getY());
     
  
     out = new ACLMessage();
     out.setSender(getAID());
-    out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
+    out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
     out.setProtocol("REGULAR");   
     out.setContent(objeto.toString());
     out.setEncoding("");
+    out.setConversationId(ConversationID);
     out.setPerformative(ACLMessage.REQUEST);
     this.send(out);
     
+    in =this.blockingReceive();
+    if(in.getPerformative() != ACLMessage.INFORM){
+        abortSession();
+    }else{
+        Info(in.getContent());
+        
+    }
 
+    in =this.blockingReceive();
+    
 
     
     }
