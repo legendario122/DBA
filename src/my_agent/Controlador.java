@@ -278,18 +278,24 @@ public class Controlador extends IntegratedAgent {
             }else{
                 Info(in.getContent());
                 desparsearProductos(in);
-                //guardar lista de objetos
+                //guardar lista de objetos            
                 cont++;
             }
            //PEPE
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
-        
+        Info("Tenemos estas monedas: "+billetes.size());
+
         Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
         
         
         lista_productos_ordenada = ordenar_productos(lista_productos);
-        
+        for(int i = 0; i < lista_productos.size(); i++){
+            
+            Info(lista_productos.get(i).getReferencia());
+            System.out.print(lista_productos.get(i).getPrecio()+"\n");
+
+        }
         seleccionar_productos(lista_productos_ordenada); //AHORA TENEMOS EN LISTA_COMPRA LOS SENSORES A COMPRAR FALTAN TICKETS.
         
         //COMPRAR SENSORES
@@ -300,17 +306,23 @@ public class Controlador extends IntegratedAgent {
             out.addReceiver(lista_compra.get(i).getTienda());
             out.setProtocol("REGULAR");
             JsonArray pago = new JsonArray();
-            for(int j=0; i<lista_compra.get(j).getPrecio(); j++){
+            for(int j=0; j<lista_compra.get(i).getPrecio(); j++){
                 pago.add(billetes.get(j));
                 billetes.remove(j);
             }
-            out.setContent(new JsonObject().add("operation", "buy").toString() +","+new JsonObject().add("reference", lista_compra.get(i).getReferencia()).toString()+","+new JsonObject().add("payment", pago).toString());
+            JsonObject objeto = new JsonObject();
+            objeto.add("operation", "buy");
+            objeto.add("reference", lista_compra.get(i).getReferencia());
+            objeto.add("payment", pago);
+            out.setContent(objeto.toString());
+            
             out.setEncoding("");
             out.setConversationId(ConversationID);
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
-            
+            Info(out.getContent());
             in = this.blockingReceive();
+            Info(in.getContent());
             if(in.getPerformative() != ACLMessage.INFORM){
                 //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
@@ -376,7 +388,7 @@ public class Controlador extends IntegratedAgent {
                 lista_compra.add(lista_ordenada.get(i));
                 energy++;
                 dinero = dinero - lista_ordenada.get(i).getPrecio();
-            }else if(partes[0].equals("THERMAL") && thermal != 3){
+            }else if(partes[0].equals("THERMALDELUX") && thermal != 3){
                 lista_compra.add(lista_ordenada.get(i));
                 thermal++;
                 dinero = dinero - lista_ordenada.get(i).getPrecio();
