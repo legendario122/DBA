@@ -32,6 +32,7 @@ public class Controlador extends IntegratedAgent {
     ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> referencias_sensores = new ArrayList<String>();
     ArrayList<String> referencias_tickets = new ArrayList<String>();
+    ArrayList<String> seekers;
     int dinero = 0;
     ArrayList<String> billetes = new ArrayList<String>();
     /**
@@ -39,12 +40,31 @@ public class Controlador extends IntegratedAgent {
     * DBAMap mapa = new DBAMap();
         mapa.fromJson(map);
     **/
+    ArrayList<posicion> Trayectoria_BasePlayground1_seek1 = new ArrayList<posicion>();
+    ArrayList<posicion> Trayectoria_BasePlayground1_seek2 = new ArrayList<posicion>();
+    ArrayList<posicion> Trayectoria_BasePlayground1_seek3 = new ArrayList<posicion>();
     
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     YellowPages yp;
     
-    
+    void inicializar_trayectorias(){
+        //BASEPLAYGROUNd1:
+        
+        for(int i=15; i<3; i+=30){
+            posicion aux = new posicion(15,i);
+            Trayectoria_BasePlayground1_seek1.add(aux);
+        }
+        
+        for(int i=15; i<3; i+=30){
+            posicion aux = new posicion(45,i);
+            Trayectoria_BasePlayground1_seek2.add(aux);
+        }
+        for(int i=15; i<3; i+=30){
+            posicion aux = new posicion(75,i);
+            Trayectoria_BasePlayground1_seek3.add(aux);
+        }
+    }
     @Override
         /**
      * Funcion que se encarga de hacer el checkin en larva y en la plataforma. Tambien se encarga de inicializar el panel de
@@ -331,8 +351,8 @@ public class Controlador extends IntegratedAgent {
                 
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
                 String referencia = desparsearReferencia(in);
-                String partes[];
                 partes = referencia.split("#");
+                String partes[];
                 if(partes[0].equals("CHARGE")){
                     referencias_tickets.add(referencia);
                 }else{
@@ -342,6 +362,59 @@ public class Controlador extends IntegratedAgent {
                 
             }
             
+        }
+        seekers = new ArrayList<String>();
+        seekers.add("seek1");
+        seekers.add("seek2");
+        seekers.add("seek3");
+        int cont1, cont2;
+        for(int j=0; j< seekers.size(); j++){
+            cont1=0;
+            cont2=0;
+            for(int i=0; i<referencias_sensores.size(); i++){
+                String partes[];
+                partes = referencias_sensores.get(i).split("#");
+                if(partes[0].equals("thermal") && cont1 < 1){
+                    out = new ACLMessage();
+                    out.setSender(getAID());
+                    out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
+                    out.setProtocol("");
+                    out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                    out.setEncoding("");
+                    out.setPerformative(ACLMessage.INFORM);
+                    cont1++;
+                    referencias_sensores.remove(i);
+                    this.send(out);
+                }else if(partes[0].equals("energy") && cont2 <1){                    
+                    out = new ACLMessage();
+                    out.setSender(getAID());
+                    out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
+                    out.setProtocol("");
+                    out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                    out.setEncoding("");
+                    out.setPerformative(ACLMessage.INFORM);
+                    cont2++;
+                    referencias_sensores.remove(i);
+                }
+                
+            }
+            //AQUI HABRIA QUE CAMBIAR LA ASIGNACION DE TRAYECTORIAS AL CAMBIAR DE MUNDO
+            ArrayList<posicion> aux = new ArrayList<posicion>();
+            if(seekers.get(j)=="seek1"){
+                aux=Trayectoria_BasePlayground1_seek1;
+            }else if(seekers.get(j)=="seek2"){
+                aux=Trayectoria_BasePlayground1_seek2;
+            }else if(seekers.get(j)=="seek3"){
+                aux=Trayectoria_BasePlayground1_seek3;
+            }
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
+            out.setProtocol("");
+            out.setContent(aux.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+            out.setEncoding("");
+            out.setPerformative(ACLMessage.INFORM);
+            this.send(out);
         }
         
         Info("EL numero de tickets de recarga es: " + referencias_tickets.size());

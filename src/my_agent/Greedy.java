@@ -302,7 +302,7 @@ public class Greedy extends IntegratedAgent {
         //hijoMoveD = actual;
         hijoMoveD.setSt(aux);
         hijoMoveD.setAcciones(auxS);
-        if(actual.st.z - 5 >= mapa[actual.st.x][actual.st.y]){
+        if(actual.st.z - 5 >= mapa.getLevel(actual.st.x,actual.st.y)){
             if(comparaEstado(hijoMoveD)){
                 //hijoMoveD.acciones.push_back("MoveDown");
                 hijoMoveD.acciones.add("MoveDown");
