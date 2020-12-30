@@ -152,6 +152,7 @@ public class Seeker extends IntegratedAgent {
     
     in =this.blockingReceive();
     if(in.getPerformative() != ACLMessage.INFORM){
+         Info(in.getContent());
         abortSession();
     }else{
         Info(in.getContent());

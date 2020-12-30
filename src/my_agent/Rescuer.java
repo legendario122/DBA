@@ -137,6 +137,15 @@ public class Rescuer extends IntegratedAgent {
     
     
     in =this.blockingReceive();
+    if(in.getPerformative() != ACLMessage.INFORM){
+        Info(in.getContent());
+        abortSession();
+    }else{
+        Info(in.getContent());
+        
+    }
+
+    in =this.blockingReceive();
 
        
     }

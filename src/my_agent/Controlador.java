@@ -436,7 +436,8 @@ public class Controlador extends IntegratedAgent {
     String[] partes;
     int gps = 0, energy = 0;  
     boolean lotenemos = false;
-    for(int i = 0; i < referencias_sensores.size() && lotenemos != true; i++){  
+    int tam = referencias_sensores.size();
+    for(int i = 0; i < tam && lotenemos != true; i++){  
         partes = referencias_sensores.get(i).split("#");
         if(partes[0].equals("GPS") && gps != 1){
         
@@ -448,7 +449,7 @@ public class Controlador extends IntegratedAgent {
             out.setEncoding("");
             out.setPerformative(ACLMessage.INFORM);
             this.send(out);
-            referencias_sensores.remove(i);
+            
             gps++;
         }else if (partes[0].equals("ENERGY") && energy != 1){
             out = new ACLMessage();
@@ -459,7 +460,7 @@ public class Controlador extends IntegratedAgent {
             out.setEncoding("");
             out.setPerformative(ACLMessage.INFORM);
             this.send(out);
-            referencias_sensores.remove(i);
+            
             energy++;
         }
         
