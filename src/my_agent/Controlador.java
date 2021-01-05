@@ -468,16 +468,55 @@ public class Controlador extends IntegratedAgent {
         if(gps == 1 && energy == 1)
             lotenemos = true;
     }
+    //si es INFORM es un aleman encontrado
+    //se recibe JSON con la posicion x e y del aleman
+    //mandamos un mensaje a rescuer con la posicion del aleman
+    //el mensaje que tenga el protocolo INFORM tambien
+    //si es un REQUEST es una peticion de ticket de recarga de algun dron
+    //se manda el mensaje con el ticket de recarga al dron con un INFORM
+    int count=0;
+    while(count<4){
+        in = this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.INFORM){
+            String mensaje = in.getContent();
+            if("Adios".equals(mensaje)){
+                count++;
+            }else{
+                out = new ACLMessage();
+                out.setSender(getAID());
+                out.addReceiver(new AID("resc",AID.ISLOCALNAME));    
+                out.setProtocol("");
+                out.setContent(in.getContent());
+                out.setEncoding("");
+                out.setPerformative(ACLMessage.INFORM);
+                this.send(out);
+            }
+        }else if(in.getPerformative() != ACLMessage.REQUEST && "ticketRecarga".equals(in.getContent())){
+            out = new ACLMessage();
+            out = in.createReply();
+            if(!referencias_tickets.isEmpty()){
+                String ticket = referencias_tickets.get(0);
+                out.setContent(ticket);
+                out.setPerformative(ACLMessage.INFORM);
+                this.send(out);
+                referencias_tickets.remove(0);
+            }else{
+                out.setContent("Vacio");
+                this.send(out);
+            }
+        }
+    }
     
-
-    
-        //Buscar tiendas por CONVID
-        //regular seeker 
-        //
-        //if(yp.queryProvidersofService("marketplace")){
-            //FUCK
-        //}
-
+    //DECIR ADIOS AL AGENTE GREEDY
+    //una vez han terminado y se han despedido le resto de drones
+    out = new ACLMessage();
+    out.setSender(getAID());
+    out.addReceiver(new AID("greedy",AID.ISLOCALNAME));    
+    out.setProtocol("");
+    out.setContent("Fin");
+    out.setEncoding("");
+    out.setPerformative(ACLMessage.INFORM);
+    this.send(out);
         //generar agente greedy (pasarle el mapa) 
         //comprar sensores y tickets de recarga
         //generar drones seeker y rescuer
