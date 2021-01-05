@@ -328,7 +328,7 @@ public class Controlador extends IntegratedAgent {
         for(int i=0; i<lista_compra.size(); i++){
             out = new ACLMessage();
             out.setSender(getAID());
-            out.addReceiver(new AID(lista_compra.get(i).getTienda(),AID.ISLOCALNAME));
+            out.addReceiver(lista_compra.get(i).getTienda());
             out.setProtocol("REGULAR");
             JsonArray pago = new JsonArray();
             for(int j=0; i<lista_compra.get(j).getPrecio(); j++){
@@ -352,7 +352,7 @@ public class Controlador extends IntegratedAgent {
 
                 //FALTA DESPARSEO DE LA REFERENCIA
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
-                String referencia = desparseo(in.getContent());
+                String referencia = desparsearReferencia(in);
                 String partes[];
                 partes = referencia.split("#");
                 if(partes[0].equals("CHARGE")){

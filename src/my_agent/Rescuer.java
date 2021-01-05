@@ -197,7 +197,7 @@ public class Rescuer extends IntegratedAgent {
             JsonObject posfinal = new JsonObject();
             posfinal.add("x", alemanes.get(n_aleman).getX());
             posfinal.add("y", alemanes.get(n_aleman).getY());
-            posfinal.add("z", Greedy.obtenerAltura(alemanes.get(n_aleman).getX()), posfinal.add("y", alemanes.get(n_aleman).getY());
+            posfinal.add("z", Greedy.obtenerAltura(alemanes.get(n_aleman).getX(), alemanes.get(n_aleman).getY()));
 
             JsonArray posiciones = new JsonArray();
             posiciones.add(posini);

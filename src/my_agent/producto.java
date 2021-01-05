@@ -15,13 +15,13 @@ public class producto {
     int serie;
     int precio;
     String referencia;
-    String Tienda;
+    AID Tienda;
 
-    public String getTienda() {
+    public AID getTienda() {
         return Tienda;
     }
 
-    public void setTienda(String Tienda) {
+    public void setTienda(AID Tienda) {
         this.Tienda = Tienda;
     }
     
