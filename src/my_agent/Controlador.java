@@ -65,16 +65,16 @@ public class Controlador extends IntegratedAgent {
         //BASEPLAYGROUNd1:
         
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(15,i);
+            posicion aux = new posicion(15,i,0,90);
             Trayectoria_BasePlayground1_seek1.add(aux);
         }
         
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(45,i);
+            posicion aux = new posicion(45,i,256,90);
             Trayectoria_BasePlayground1_seek2.add(aux);
         }
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(75,i);
+            posicion aux = new posicion(75,i,256,90);
             Trayectoria_BasePlayground1_seek3.add(aux);
         }
     }
