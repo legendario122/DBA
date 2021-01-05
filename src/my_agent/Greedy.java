@@ -208,7 +208,7 @@ public class Greedy extends IntegratedAgent {
     ArrayList<String> acciones = new ArrayList<String>();
     ACLMessage in = new ACLMessage();
     in = this.blockingReceive();
-    
+    Info(in.getContent());
     //while(siga_recibiendo_mensajes){
     while(in.getPerformative() == ACLMessage.REQUEST){
         String answer = in.getContent();
@@ -302,6 +302,7 @@ public class Greedy extends IntegratedAgent {
             }
         }
         acciones = actual.getAcciones();
+        Info("ha calculado el caminoOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         //metemos array de acciones y se las mandamos al solicitante
         JsonObject obj = new JsonObject();
         ACLMessage out = in.createReply();

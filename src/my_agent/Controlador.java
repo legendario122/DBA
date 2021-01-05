@@ -23,7 +23,7 @@ public class Controlador extends IntegratedAgent {
     TTYControlPanel myControlPanel;
     int width; 
     int height;
-    int maxflight = 255;
+    int maxflight = 256;
     static String ConversationID = "";
     Map2DGrayscale myMap;
     String myWorld = "problem1";
@@ -65,18 +65,20 @@ public class Controlador extends IntegratedAgent {
         //BASEPLAYGROUNd1:
         
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(15,i,0,90);
+            posicion aux = new posicion(15,i,256,90);
             Trayectoria_BasePlayground1_seek1.add(aux);
         }
-        
+        Trayectoria_BasePlayground1_seek1.get(0).setZ(0);
         for(int i=15; i<100; i+=30){
             posicion aux = new posicion(45,i,256,90);
             Trayectoria_BasePlayground1_seek2.add(aux);
         }
+        Trayectoria_BasePlayground1_seek2.get(0).setZ(0);
         for(int i=15; i<100; i+=30){
             posicion aux = new posicion(75,i,256,90);
             Trayectoria_BasePlayground1_seek3.add(aux);
         }
+        Trayectoria_BasePlayground1_seek3.get(0).setZ(0);
     }
     @Override
         /**
@@ -123,11 +125,11 @@ public class Controlador extends IntegratedAgent {
 
         yp = new YellowPages();
         yp.updateYellowPages(in);
-        System.out.println("\n" + yp.prettyPrint());
+        //System.out.println("\n" + yp.prettyPrint());
         
         ArrayList<String> pepe = new ArrayList(yp.queryProvidersofService("Analytics groupid 13"));
         for(int i=0; i<pepe.size(); i++){
-           Info(pepe.get(i));
+           //Info(pepe.get(i));
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////CHECKING EN WORLD MANAGER///////////////////////////////////////////////////////////////////////////////////////////
@@ -284,7 +286,7 @@ public class Controlador extends IntegratedAgent {
 
         yp = new YellowPages();
         yp.updateYellowPages(in);
-        System.out.println("\n" + yp.prettyPrint());
+        //System.out.println("\n" + yp.prettyPrint());
         
 
         Info("Obtuve las paginas amarillas");
@@ -318,61 +320,7 @@ public class Controlador extends IntegratedAgent {
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
         
-        //RAFITA DESPARSEA Y METE PRODUCTOS EN LISTA_PRODUCTOS
         
-        lista_productos_ordenada = ordenar_productos(lista_productos);
-        
-        seleccionar_productos(lista_productos_ordenada); //AHORA TENEMOS EN LISTA_COMPRA LOS SENSORES A COMPRAR FALTAN TICKETS.
-        
-        //COMPRAR SENSORES
-        for(int i=0; i<lista_compra.size(); i++){
-            out = new ACLMessage();
-            out.setSender(getAID());
-            out.addReceiver(lista_compra.get(i).getTienda());
-            out.setProtocol("REGULAR");
-            JsonArray pago = new JsonArray();
-            for(int j=0; i<lista_compra.get(j).getPrecio(); j++){
-                pago.add(billetes.get(j));
-                billetes.remove(j);
-            }
-            out.setContent(new JsonObject().add("operation", "buy").toString() +","+new JsonObject().add("reference", lista_compra.get(i).getReferencia()).toString()+","+new JsonObject().add("payment", pago).toString());
-            out.setEncoding("");
-            out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.REQUEST);
-            this.send(out);
-            
-            in = this.blockingReceive();
-            if(in.getPerformative() != ACLMessage.INFORM){
-                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
-                abortSession();
-            }else{
-                Info(in.getContent());
-                referencias_sensores = new ArrayList<String>();                
-                referencias_tickets = new ArrayList<String>();
-
-                //FALTA DESPARSEO DE LA REFERENCIA
-                //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
-                String referencia = desparsearReferencia(in);
-                String partes[];
-                partes = referencia.split("#");
-                if(partes[0].equals("CHARGE")){
-                    referencias_tickets.add(referencia);
-                }else{
-                    referencias_sensores.add(in.getContent());
-                }
-                
-                
-            }
-            
-        }
-        
-        
-        //Buscar tiendas por CONVID
-        //regular seeker 
-        //
-        //if(yp.queryProvidersofService("marketplace")){
-            //FUCK
-        //}
 
         Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
         
@@ -415,7 +363,7 @@ public class Controlador extends IntegratedAgent {
                 //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
             }else{
-                Info(in.getContent());
+                //Info(in.getContent());
                 
                 //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
                 String referencia = desparsearReferencia(in);
@@ -532,7 +480,7 @@ public class Controlador extends IntegratedAgent {
     int count=0;
     while(count<4){
         in = this.blockingReceive();
-        if(in.getPerformative() != ACLMessage.INFORM){
+        if(in.getPerformative() == ACLMessage.INFORM){
             String mensaje = in.getContent();
             if("Adios".equals(mensaje)){
                 count++;
@@ -543,10 +491,10 @@ public class Controlador extends IntegratedAgent {
                 out.setProtocol("");
                 out.setContent(in.getContent());
                 out.setEncoding("");
-                out.setPerformative(ACLMessage.INFORM);
+                out.setPerformative(ACLMessage.REQUEST);
                 this.send(out);
             }
-        }else if(in.getPerformative() != ACLMessage.REQUEST && "ticketRecarga".equals(in.getContent())){
+        }else if(in.getPerformative() == ACLMessage.REQUEST && "ticketRecarga".equals(in.getContent())){
             out = new ACLMessage();
             out = in.createReply();
             if(!referencias_tickets.isEmpty()){
@@ -561,7 +509,7 @@ public class Controlador extends IntegratedAgent {
             }
         }
     }
-    
+    Info("ESTO ES MUY RARO OSTIA YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
     //DECIR ADIOS AL AGENTE GREEDY
     //una vez han terminado y se han despedido le resto de drones
     out = new ACLMessage();
@@ -654,7 +602,7 @@ public class Controlador extends IntegratedAgent {
        
   
     public void takeDown() {
-        Info("Request closing the session with " + "BBVA");
+        Info("Request closing the session with " + "BBA");
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
@@ -669,7 +617,7 @@ public class Controlador extends IntegratedAgent {
         Info("Request closing the session with " + _identitymanager);
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
+        out.addReceiver(new AID("Sphinx", AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
         out.setConversationId(ConversationID);

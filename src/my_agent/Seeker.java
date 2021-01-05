@@ -14,6 +14,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
 import java.util.ArrayList;
 /**
  *
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 public class Seeker extends IntegratedAgent {
     int energia;
     Boolean recarga;
-    int thermal[][] = new int[31][31];
+    double thermal[][] = new double[31][31];
     int contador_UP=0;
     posicion actual, encontrado;
     ArrayList<posicion> trayectoria = null;
@@ -158,7 +159,7 @@ public class Seeker extends IntegratedAgent {
     
     in =this.blockingReceive();
     if(in.getPerformative() != ACLMessage.INFORM){
-         Info(in.getContent());
+        Info(in.getContent());
         abortSession();
     }else{
         Info(in.getContent());
@@ -190,9 +191,16 @@ public class Seeker extends IntegratedAgent {
             }
         }else{
             recargar();
-        }
-        
+        }/*
+        for(int i=0; i<31; i++){
+            for(int j=0; j<31; j++){
+               System.out.print(thermal[i][j]+" ");
+            }
+            System.out.print("\n");
+        }*/
+        System.out.print(energia);
         if(hay_aleman()){
+            System.out.print("CONFIRMACION" + encontrado.getX()+ " " + encontrado.getY());
             out = new ACLMessage();
             JsonObject aux = new JsonObject();
             aux.add("x",encontrado.getX());
@@ -211,6 +219,7 @@ public class Seeker extends IntegratedAgent {
         
         if(pos_actual!=trayectoria.size()-1){
             pos_actual++;
+            Info("pillado");
             out = new ACLMessage();
             JsonObject aux = new JsonObject();
             aux.add("x1",actual.getX());
@@ -230,7 +239,8 @@ public class Seeker extends IntegratedAgent {
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
             
-            in =this.blockingReceive();
+            in = this.blockingReceive();
+            Info("recibo respuesta de greedy");
             if(in.getPerformative() != ACLMessage.INFORM){
                Info(in.getContent());
                abortSession();
@@ -325,6 +335,7 @@ public class Seeker extends IntegratedAgent {
         }
         
         if(encontrado_b==true){
+            encontrado = new posicion(-1,-1,-1,-1);
             encontrado.setOrientacion(90);
             if(indice_i<16){
                 encontrado.setX(actual.getX()-indice_i);
@@ -365,8 +376,12 @@ public class Seeker extends IntegratedAgent {
     
     
     public void desparsearSensores(ACLMessage in){
-        JsonObject json = new JsonObject();
-        JsonArray vector = new JsonArray();
+        JsonObject json = new JsonObject();        
+        JsonObject json1 = new JsonObject();
+
+        JsonArray vector = new JsonArray();        
+        JsonArray vector2 = new JsonArray();
+
         JsonArray prueba = new JsonArray();
         JsonArray matriz = new JsonArray();
         JsonArray matriz_bis = new JsonArray();
@@ -377,20 +392,21 @@ public class Seeker extends IntegratedAgent {
         String answer = in.getContent();
         json = Json.parse(answer).asObject();
         
-        vector = json.get("result").asArray();
-        for(JsonValue j : vector){
+        json1 = json.get("details").asObject();
+        vector2 = json1.get("perceptions").asArray();
+        for(JsonValue j : vector2){
             sensor = j.asObject().get("sensor").asString();
             if("energy".equals(sensor)){
                 for(JsonValue a : prueba = j.asObject().get("data").asArray()){
                     energia = a.asInt();
                 }
-            }else if("thermaldelux".equals(sensor)){
+            }else if("thermal".equals(sensor)){
                 matriz = j.asObject().get("data").asArray();
                 i=0;
                 for(JsonValue v : matriz){
                     matriz_bis = v.asArray();
                     for(JsonValue s : matriz_bis){
-                        thermal[i][zeta]=s.asInt();
+                        thermal[i][zeta]=s.asDouble();
                         zeta++;
                     }
                     zeta=0;

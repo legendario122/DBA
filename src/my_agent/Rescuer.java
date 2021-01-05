@@ -132,7 +132,9 @@ public class Rescuer extends IntegratedAgent {
         objeto.add("attach", vector);
         objeto.add("posx", 0);
         objeto.add("posy", 0);
-
+        x=0;
+        y=0;
+        z=Greedy.obtenerAltura(x, y);
 
         out = new ACLMessage();
         out.setSender(getAID());
@@ -145,7 +147,8 @@ public class Rescuer extends IntegratedAgent {
         this.send(out);
 
 
-
+        ACLMessage prueba = new ACLMessage();
+        
         in =this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
             Info(in.getContent());
@@ -155,10 +158,11 @@ public class Rescuer extends IntegratedAgent {
 
         }
 
-        in =this.blockingReceive();
-        in.getContent();
+        in = this.blockingReceive();
+        Info(in.getContent() +": ALEMAAAAAAAAAAAAAAAAAAAAN");
         alemanes.add(desparsearPosicion(in));
         while(hay_tickets && !alemanes.isEmpty() ){
+            //FALTA INICIALIZAR X, Y y Z
             
             if(recarga){
                 altura = z - Greedy.obtenerAltura(x, y);
@@ -180,14 +184,24 @@ public class Rescuer extends IntegratedAgent {
             out.setConversationId(ConversationID);
             out.setPerformative(ACLMessage.QUERY_REF);
             this.send(out);
-            in = this.blockingReceive();
+            
+            do{
+                in = this.blockingReceive();
+                if(in.getPerformative()==ACLMessage.REQUEST){
+                    alemanes.add(desparsearPosicion(in));
+                }
+            }while(in.getPerformative()!= ACLMessage.INFORM);
 
             if(in.getPerformative() != ACLMessage.INFORM){
                 Info(in.getContent());
                 abortSession();
+            }else{
+                
+                Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                Info(in.getContent() + " " + in.getSender());
+                desparsearRead(in);  
             }
-            Info(in.getContent());
-            desparsearRead(in);  
+            
 
             JsonObject posini = new JsonObject();
             posini.add("x", x);
@@ -219,6 +233,7 @@ public class Rescuer extends IntegratedAgent {
             }
 
             ArrayList<String> movimientos = new ArrayList<String>();
+            
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
             //AQUI VAMOS A DESPARSEAR LA LISTA DE MOOVIMIENTOS QUE AUN NO HE PENSADO COMO 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +249,7 @@ public class Rescuer extends IntegratedAgent {
             out.setContent(read.toString());
             out.setConversationId(ConversationID);
             out.setPerformative(ACLMessage.QUERY_REF);
-            this.send(out);
+            this.send(out);    
             in = this.blockingReceive();
 
             if(in.getPerformative() != ACLMessage.INFORM){
@@ -288,10 +303,10 @@ public class Rescuer extends IntegratedAgent {
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */    
     public void takeDown() {
-        Info("Request closing the session with " + _identitymanager);
+        Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
+        out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
         out.setConversationId(ConversationID);
@@ -304,15 +319,17 @@ public class Rescuer extends IntegratedAgent {
     }
     
     public posicion desparsearPosicion(ACLMessage in){
-        posicion pos = null;
+        
         String answer = in.getContent();
         JsonObject objeto = new JsonObject();
         objeto = Json.parse(answer).asObject();
         int x = objeto.get("x").asInt();
         int y = objeto.get("y").asInt();
+        int z = objeto.get("z").asInt();
+        int orientacion = objeto.get("orientacion").asInt();
         
-        pos.setX(x);
-        pos.setY(y);
+        posicion pos = new posicion(x,y,z,orientacion);
+        
         
         return pos;
     }
@@ -350,50 +367,38 @@ public class Rescuer extends IntegratedAgent {
             abortSession();
         }else{
             ticket = in.getContent();
+            if(!ticket.equals("Vacio")){
+                JsonObject rech = new JsonObject();
+                rech.add("operation", "recharge");
+                rech.add("recharge", ticket);
 
-            JsonObject rech = new JsonObject();
-            rech.add("operation", "recharge");
-            rech.add("recharge", ticket);
 
+                out = new ACLMessage();
+                out.setSender(getAID());
+                out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                out.setProtocol("REGULAR");
+                out.setContent(rech.toString());
+                out.setConversationId(ConversationID);
+                out.setPerformative(ACLMessage.REQUEST);
+                this.send(out);
+                in = this.blockingReceive();
 
-            out = new ACLMessage();
-            out.setSender(getAID());
-            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
-            out.setProtocol("REGULAR");
-            out.setContent(rech.toString());
-            out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.REQUEST);
-            this.send(out);
-            in = this.blockingReceive();
-
-            if(in.getPerformative() != ACLMessage.INFORM){
-                Info(in.getContent());
-                abortSession();
+                if(in.getPerformative() != ACLMessage.INFORM){
+                    Info(in.getContent());
+                    abortSession();
+                }
+            }else{
+                hay_tickets=false;
             }
+            
         }            
     }
     
         public void prerecarga() {
-            JsonObject read = new JsonObject();
-            out = new ACLMessage();
-            out.setSender(getAID());
-            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
-            out.setProtocol("REGULAR");
-            out.setContent(read.toString());
-            out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.QUERY_REF);
-            this.send(out);
-            in = this.blockingReceive();
 
-            if(in.getPerformative() != ACLMessage.INFORM){
-                Info(in.getContent());
-                abortSession();
-            }
-            desparsearRead(in);
-            
-            String accion = null;
+            String accion = "";
             JsonObject movimiento = new JsonObject();
-            int altura = z - Greedy.obtenerAltura(x, y);
+            altura = z - Greedy.obtenerAltura(x, y);
             
             if(altura>5){
                 accion="moveD";
@@ -412,10 +417,18 @@ public class Rescuer extends IntegratedAgent {
             out.setConversationId(ConversationID);
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
+            
+            in = this.blockingReceive();
+            
+            if(in.getPerformative() != ACLMessage.INFORM){
+                Info(in.getContent());
+                abortSession();
+            }
         }
     
     private void desparsearRead(ACLMessage in){
         String answer = in.getContent();
+        Info(in.getContent());
         String sensor;
         int i;
         int cont=0;
@@ -424,7 +437,7 @@ public class Rescuer extends IntegratedAgent {
         JsonArray prueba1 = new JsonArray();
         JsonObject json = new JsonObject();
         json = Json.parse(answer).asObject();
-        String resultado = json.get("result").asString();
+        //String resultado = json.get("result").asString();
 
         vector = json.get("details").asObject().get("perceptions").asArray();
         for(JsonValue j : vector){
