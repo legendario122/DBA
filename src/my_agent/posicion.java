@@ -12,11 +12,34 @@ package my_agent;
 public class posicion {
     int x;
     int y;
+    int z;
+    
+    public double orientacion;
 
-    public posicion(int x, int y) {
+    public posicion(int x, int y, int z, double orientacion) {
         this.x = x;
         this.y = y;
+        this.z = z;
+        this.orientacion = orientacion;
     }
+
+    public int getZ() {
+        return z;
+    }
+
+    public void setZ(int z) {
+        this.z = z;
+    }
+
+    public double getOrientacion() {
+        return orientacion;
+    }
+
+    public void setOrientacion(double orientacion) {
+        this.orientacion = orientacion;
+    }
+    
+    
     
     public int getX() {
         return x;
