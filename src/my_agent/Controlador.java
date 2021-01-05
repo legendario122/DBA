@@ -30,12 +30,12 @@ public class Controlador extends IntegratedAgent {
     ArrayList<producto> lista_productos = new ArrayList<producto>();
     ArrayList<producto> lista_compra = new ArrayList<producto>();
     ArrayList<producto> lista_productos_ordenada;
-    ArrayList<String> referencias_sensores = new ArrayList<String>();
-    ArrayList<String> referencias_tickets = new ArrayList<String>();
-    ArrayList<String> seekers;
-    int dinero = 0;
-    String World = "BasePlayground1";
     ArrayList<String> billetes = new ArrayList<String>();
+    String World = "BasePlayground1";
+    ArrayList<String> seekers;
+    ArrayList<String> referencias_tickets = new ArrayList<String>();
+    ArrayList<String> referencias_sensores = new ArrayList<String>();
+    int dinero = 0;
     /**
     * Variables para el controlador
     * DBAMap mapa = new DBAMap();
@@ -317,7 +317,62 @@ public class Controlador extends IntegratedAgent {
            //PEPE
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
-        Info("Tenemos estas monedas: "+billetes.size());
+        
+        //RAFITA DESPARSEA Y METE PRODUCTOS EN LISTA_PRODUCTOS
+        
+        lista_productos_ordenada = ordenar_productos(lista_productos);
+        
+        seleccionar_productos(lista_productos_ordenada); //AHORA TENEMOS EN LISTA_COMPRA LOS SENSORES A COMPRAR FALTAN TICKETS.
+        
+        //COMPRAR SENSORES
+        for(int i=0; i<lista_compra.size(); i++){
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID(lista_compra.get(i).getTienda(),AID.ISLOCALNAME));
+            out.setProtocol("REGULAR");
+            JsonArray pago = new JsonArray();
+            for(int j=0; i<lista_compra.get(j).getPrecio(); j++){
+                pago.add(billetes.get(j));
+                billetes.remove(j);
+            }
+            out.setContent(new JsonObject().add("operation", "buy").toString() +","+new JsonObject().add("reference", lista_compra.get(i).getReferencia()).toString()+","+new JsonObject().add("payment", pago).toString());
+            out.setEncoding("");
+            out.setConversationId(ConversationID);
+            out.setPerformative(ACLMessage.REQUEST);
+            this.send(out);
+            
+            in = this.blockingReceive();
+            if(in.getPerformative() != ACLMessage.INFORM){
+                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
+                abortSession();
+            }else{
+                Info(in.getContent());
+                referencias_sensores = new ArrayList<String>();                
+                referencias_tickets = new ArrayList<String>();
+
+                //FALTA DESPARSEO DE LA REFERENCIA
+                //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
+                String referencia = desparseo(in.getContent());
+                String partes[];
+                partes = referencia.split("#");
+                if(partes[0].equals("CHARGE")){
+                    referencias_tickets.add(referencia);
+                }else{
+                    referencias_sensores.add(in.getContent());
+                }
+                
+                
+            }
+            
+        }
+        
+        
+        //Buscar tiendas por CONVID
+        //regular seeker 
+        //
+        //if(yp.queryProvidersofService("marketplace")){
+            //FUCK
+        //}
 
         Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
         
