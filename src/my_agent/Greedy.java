@@ -34,6 +34,7 @@ public class Greedy extends IntegratedAgent {
         String world = "World1.png";
         try {
             mapa = mapa.loadMap(playground);
+            
             Info("HE LEIDO CORRECTAMENTE EL MAPA");
         } catch (IOException ex) {
             Logger.getLogger(Greedy.class.getName()).log(Level.SEVERE, null, ex);
@@ -102,7 +103,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == 45){
-            if((x-1)<0 || (y+1)>6){
+            if((x-1)<0 || (y+1)>mapa.getHeight()){
                    resultado=true;
 
             }else{
@@ -117,7 +118,7 @@ public class Greedy extends IntegratedAgent {
             }
                   
         }else if(estado.orientacion == 90){
-            if((y+1)>6){
+            if((y+1)>mapa.getHeight()){
                 resultado=true;
             }else{
                 //if(mapa[x][y+1] > estado.z){
@@ -131,7 +132,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == 135){
-            if((x+1)>6 || (y+1) >6){
+            if((x+1)>mapa.getWidth() || (y+1) >mapa.getHeight()){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y+1] > estado.z){
@@ -145,7 +146,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == 180){
-            if((x+1)>6){
+            if((x+1)>mapa.getWidth()){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y] > estado.z){
@@ -158,7 +159,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == -135){
-            if((x+1)>6 || (y-1)<0){
+            if((x+1)>mapa.getWidth() || (y-1)<0){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y-1] > estado.z){
@@ -204,25 +205,29 @@ public class Greedy extends IntegratedAgent {
 
     //public void plainExecute(Estado origen, Estado destino, ArrayList<String> acciones) {
     public void plainExecute() {
-    
+    int x1, x2, y1, y2, z1, z2;
+    double orientacion1, orientacion2;
     ArrayList<String> acciones = new ArrayList<String>();
     ACLMessage in = new ACLMessage();
+    String answer;
+    JsonObject objeto = new JsonObject();
     in = this.blockingReceive();
     Info(in.getContent());
     //while(siga_recibiendo_mensajes){
     while(in.getPerformative() == ACLMessage.REQUEST){
-        String answer = in.getContent();
-        JsonObject objeto = new JsonObject();
+                
+        answer = in.getContent();
+        
         objeto = Json.parse(answer).asObject();
-        int x1 = objeto.get("x1").asInt();
-        int y1 = objeto.get("y1").asInt();
-        int z1 = objeto.get("z1").asInt();
-        double orientacion1 = objeto.get("orientacion1").asDouble();
+        x1 = objeto.get("x1").asInt();
+        y1 = objeto.get("y1").asInt();
+        z1 = objeto.get("z1").asInt();
+        orientacion1 = objeto.get("orientacion1").asDouble();
         Estado origen = new Estado(x1,y1,z1,orientacion1);
-        int x2 = objeto.get("x2").asInt();
-        int y2 = objeto.get("y2").asInt();
-        int z2 = objeto.get("z2").asInt();
-        double orientacion2 = objeto.get("orientacion2").asDouble();
+        x2 = objeto.get("x2").asInt();
+        y2 = objeto.get("y2").asInt();
+        z2 = objeto.get("z2").asInt();
+        orientacion2 = objeto.get("orientacion2").asDouble();
         Estado destino = new Estado(x2,y2,z2,orientacion2);
         
         //comienzo del algoritmo greedy
@@ -231,6 +236,8 @@ public class Greedy extends IntegratedAgent {
         actual.setAcciones(acciones);
         actual.setDistancia(actual.distancia(actual.getSt(), destino));
         actual.acciones.clear();
+        cola.clear();
+        generados.clear();
         cola.add(actual);
         
         while(!cola.isEmpty() && (actual.st.x!=destino.x || actual.st.y!=destino.y)){
@@ -253,7 +260,7 @@ public class Greedy extends IntegratedAgent {
             hijoTurnR.setAcciones(auxS);
             hijoTurnR.st.orientacion = orientarderecha(hijoTurnR.st.orientacion, DERECHA);
             if(comparaEstado(hijoTurnR)){
-                hijoTurnR.acciones.add("RotateR");
+                hijoTurnR.acciones.add("rotateR");
                 hijoTurnR.setDistancia(hijoTurnR.distancia(hijoTurnR.getSt(), destino));
                 cola.add(hijoTurnR);
             }
@@ -263,7 +270,7 @@ public class Greedy extends IntegratedAgent {
             hijoTurnL.setAcciones(auxS);
             hijoTurnL.st.orientacion = orientarizquierda(hijoTurnL.st.orientacion, IZQUIERDA);        
             if(comparaEstado(hijoTurnL)){
-                hijoTurnL.acciones.add("RotateL");
+                hijoTurnL.acciones.add("rotateL");
                 hijoTurnL.setDistancia(hijoTurnL.distancia(hijoTurnL.getSt(), destino));
                 cola.add(hijoTurnL);
             }
@@ -273,7 +280,7 @@ public class Greedy extends IntegratedAgent {
             hijoMoveF.setAcciones(auxS);
             if(!hayObstaculo(hijoMoveF.st)){
                if(comparaEstado(hijoMoveF)){
-                    hijoMoveF.acciones.add("MoveF");
+                    hijoMoveF.acciones.add("moveF");
                     hijoMoveF.setDistancia(hijoMoveF.distancia(hijoMoveF.getSt(), destino));
                     cola.add(hijoMoveF);
                 } 
@@ -284,7 +291,7 @@ public class Greedy extends IntegratedAgent {
             hijoMoveUp.setAcciones(auxS);
             if(puedoSubir(hijoMoveUp.st)){
                 if(comparaEstado(hijoMoveUp)){
-                    hijoMoveUp.acciones.add("MoveUp");
+                    hijoMoveUp.acciones.add("moveUP");
                     hijoMoveUp.setDistancia(hijoMoveUp.distancia(hijoMoveUp.getSt(), destino));
                     cola.add(hijoMoveUp);
                 }     
@@ -295,7 +302,7 @@ public class Greedy extends IntegratedAgent {
             hijoMoveD.setAcciones(auxS);
             if(actual.st.z - 5 >= mapa.getLevel(actual.st.x,actual.st.y)){
                 if(comparaEstado(hijoMoveD)){
-                    hijoMoveD.acciones.add("MoveDown");
+                    hijoMoveD.acciones.add("moveD");
                     hijoMoveD.setDistancia(hijoMoveD.distancia(hijoMoveD.getSt(), destino));
                     cola.add(hijoMoveD);
                 }
@@ -311,6 +318,7 @@ public class Greedy extends IntegratedAgent {
             vector.add(acciones.get(i));
         obj.add("movimientos", vector);
         out.setContent(obj.toString());
+        out.setPerformative(ACLMessage.INFORM);
         this.send(out);
         //esperamos al siguiente mensaje
         in = this.blockingReceive();

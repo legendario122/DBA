@@ -480,6 +480,8 @@ public class Controlador extends IntegratedAgent {
     int count=0;
     while(count<4){
         in = this.blockingReceive();
+        Info("MENSAJES DE CONTROLADOR");
+        Info(in.getContent());
         if(in.getPerformative() == ACLMessage.INFORM){
             String mensaje = in.getContent();
             if("Adios".equals(mensaje)){

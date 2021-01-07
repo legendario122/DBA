@@ -145,7 +145,7 @@ public class Seeker extends IntegratedAgent {
     objeto.add("attach", vector);
     objeto.add("posx", trayectoria.get(0).getX());
     objeto.add("posy", trayectoria.get(0).getY());
-    
+    trayectoria.get(0).setZ(Greedy.obtenerAltura(trayectoria.get(0).getX(), trayectoria.get(0).getY()));
  
     out = new ACLMessage();
     out.setSender(getAID());
@@ -238,7 +238,8 @@ public class Seeker extends IntegratedAgent {
             out.setEncoding("");
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
-            
+            Info("SEEKER ESPERANDO A GREEDY");
+
             in = this.blockingReceive();
             Info("recibo respuesta de greedy");
             if(in.getPerformative() != ACLMessage.INFORM){
@@ -250,6 +251,13 @@ public class Seeker extends IntegratedAgent {
         
             }
             
+            int cost = coste_movimientos();
+            System.out.print("COOOOOOOOOOOOOOOOSTE de lista movimientos" + cost);
+            if(!hay_energia(cost)){
+                Info("ENTRO EN RECARGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR");
+                recargar();
+            }
+            
             actual.setX(trayectoria.get(pos_actual).getX());
             actual.setY(trayectoria.get(pos_actual).getY());
             actual.setZ(trayectoria.get(pos_actual).getZ());
@@ -258,13 +266,12 @@ public class Seeker extends IntegratedAgent {
         }
         
         //CALCULAR COSTE PARA LLEGAR A LA SIGUIENTE POSICION.
-        int cost = coste_movimientos();
-        
-        if(!hay_energia(cost)){
-            recargar();
-        }
+       
         int iterator=0;
+        System.out.print("TAAAAAAAAAAAAAAAAAAAAMAÑO" + movimientos.size());
         while(!movimientos.isEmpty()){
+            Info("ENTRANDO EN REALIZAR MOVIMIENTOS SEEKER");
+            Info(movimientos.get(iterator));
             out = new ACLMessage();
             out.setSender(getAID());
             out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
@@ -278,8 +285,12 @@ public class Seeker extends IntegratedAgent {
             this.send(out);
 
             in =this.blockingReceive();
+            
             if(in.getPerformative() != ACLMessage.INFORM){
-                 Info(in.getContent());
+                Info("EJECUTANDO ACCIONES EN SEEKER");
+                Info(out.getConversationId());
+                Info(in.getConversationId());
+                Info(in.getContent());
                 abortSession();
             }else{
                 movimientos.remove(iterator);
@@ -306,11 +317,12 @@ public class Seeker extends IntegratedAgent {
     public int coste_movimientos(){
         int coste=0;
         String move;
+        System.out.print("TAMAÑO LISTA DE MOVIMIENTOS: "+ movimientos.size());
         for(int i=0; i<movimientos.size(); i++){
             move=movimientos.get(i);
             if(move.equals("moveF") || move.equals("rotateL") || move.equals("rotateR")){
                 coste++;
-            }else if(move.equals("moveD") || move.equals("moveU")){
+            }else if(move.equals("moveD") || move.equals("moveUP")){
                 coste+=5;
             }
         }
@@ -418,7 +430,7 @@ public class Seeker extends IntegratedAgent {
     }
     //Calcular moveUP para saber cuanto hay que bajar para recargar.
     public void recargar(){
-        String ticket = null;
+        String ticket = "";
         if(actual.getX()==trayectoria.get(0).getX() && actual.getY()==trayectoria.get(0).getY()){
             out = new ACLMessage();
             out.setSender(getAID());
@@ -449,7 +461,7 @@ public class Seeker extends IntegratedAgent {
             out.setContent(aux.toString());
             out.setEncoding("");
             out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.QUERY_REF);
+            out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
             
             in =this.blockingReceive();
@@ -465,7 +477,10 @@ public class Seeker extends IntegratedAgent {
             //FUNCION QUE DEVUELVE EL GREEDY
             if(actual.getZ()!=Greedy.obtenerAltura(actual.getX(),actual.getY())){
                 while(actual.getZ()>Greedy.obtenerAltura(actual.getX(),actual.getY())){
-                    out = in.createReply();
+                    out = new ACLMessage();
+                    out.setSender(getAID());
+                    out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
+                    out.setProtocol("REGULAR"); 
                     out.setContent(new JsonObject().add("operation", "moveD").toString());
                     out.setEncoding("");
                     out.setConversationId(ConversationID);
@@ -479,7 +494,10 @@ public class Seeker extends IntegratedAgent {
                     }else{
                        Info(in.getContent()); //PERCIBO.
                        if(actual.getZ()== Greedy.obtenerAltura(actual.getX(),actual.getY())){
-                            out = in.createReply();
+                            out = new ACLMessage();
+                            out.setSender(getAID());
+                            out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
+                            out.setProtocol("REGULAR"); 
                             out.setContent(new JsonObject().add("operation", "touchD").toString());
                             out.setEncoding("");
                             out.setConversationId(ConversationID);
@@ -510,7 +528,7 @@ public class Seeker extends IntegratedAgent {
                                     Info(in.getContent()); 
                                     ticket = in.getContent(); 
 
-                                    if(!ticket.equals("vacio")){
+                                    if(!ticket.equals("Vacio")){
 
                                         out = new ACLMessage();
                                         out.setSender(getAID());
@@ -522,7 +540,7 @@ public class Seeker extends IntegratedAgent {
                                         out.setContent(aux.toString());
                                         out.setEncoding("");
                                         out.setConversationId(ConversationID);
-                                        out.setPerformative(ACLMessage.QUERY_REF);
+                                        out.setPerformative(ACLMessage.REQUEST);
                                         this.send(out);
 
                                         in =this.blockingReceive();
@@ -578,18 +596,18 @@ public class Seeker extends IntegratedAgent {
         this.send(out);
 */
         out = new ACLMessage();
-    out.setSender(getAID());
-    out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
-    out.setProtocol("ANALYTICS");  
-    out.setContent("");
-    out.setEncoding("");
-    out.setConversationId(ConversationID);
-    out.setPerformative(ACLMessage.CANCEL);
-    this.send(out);
+        out.setSender(getAID());
+        out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
+        out.setProtocol("ANALYTICS");  
+        out.setContent("");
+        out.setEncoding("");
+        out.setConversationId(ConversationID);
+        out.setPerformative(ACLMessage.CANCEL);
+        this.send(out);
         in = this.blockingReceive();
         //Info(getDetailsLARVA(in));
 
-        doCheckoutLARVA();
+        //doCheckoutLARVA();
         
         
     }
