@@ -181,6 +181,16 @@ public class Controlador extends IntegratedAgent {
         //ConversationID = in.getConversationId();
         desparsearConvID(in);
         Info(ConversationID);
+
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("AWACS",AID.ISLOCALNAME));
+        out.setProtocol("");
+        out.setContent("");
+        out.setConversationId(ConversationID);
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.QUERY_IF);
+        this.send(out);
         
     }
 
