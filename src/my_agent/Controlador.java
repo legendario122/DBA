@@ -64,18 +64,18 @@ public class Controlador extends IntegratedAgent {
     void inicializar_trayectorias(){
         //BASEPLAYGROUNd1:
         
-        for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(15,i,255,90);
+        for(int i=16; i<100; i+=30){
+            posicion aux = new posicion(16,i,255,90);
             Trayectoria_BasePlayground1_seek1.add(aux);
         }
         Trayectoria_BasePlayground1_seek1.get(0).setZ(0);
-        for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(45,i,255,90);
+        for(int i=16; i<100; i+=30){
+            posicion aux = new posicion(46,i,255,90);
             Trayectoria_BasePlayground1_seek2.add(aux);
         }
         Trayectoria_BasePlayground1_seek2.get(0).setZ(0);
-        for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(75,i,255,90);
+        for(int i=16; i<100; i+=30){
+            posicion aux = new posicion(76,i,255,90);
             Trayectoria_BasePlayground1_seek3.add(aux);
         }
         Trayectoria_BasePlayground1_seek3.get(0).setZ(0);
@@ -138,7 +138,7 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID(pepe.get(0),AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
-        out.setContent(new JsonObject().add("problem", "Playground1").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("problem", "Playground2").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
@@ -495,6 +495,7 @@ public class Controlador extends IntegratedAgent {
             String mensaje = in.getContent();
             if("Adios".equals(mensaje)){
                 count++;
+                System.out.println("CONTADOR DE ADIOS"+ count);
             }else{
                 out = new ACLMessage();
                 out.setSender(getAID());

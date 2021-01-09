@@ -28,11 +28,11 @@ public class Greedy extends IntegratedAgent {
     static Map2DGrayscale mapa = new Map2DGrayscale();
     static final double IZQUIERDA=-45;
     static final double DERECHA=45;
-    static final double GIRAR=0.75;
+    static final double GIRAR=0.25;
     static final double AVANZAR=1;
     public void setup() {
         super.setup();
-        String playground = "Playground1.png";
+        String playground = "Playground2.png";
         String world = "World1.png";
         try {
             mapa = mapa.loadMap(playground);
@@ -264,7 +264,7 @@ public class Greedy extends IntegratedAgent {
             if(comparaEstado(hijoTurnR)){
                 hijoTurnR.acciones.add("rotateR");
                 hijoTurnR.setDistancia(hijoTurnR.distancia(hijoTurnR.getSt(), destino));
-                
+                hijoTurnR.añadirValor(-GIRAR);
                 cola.add(hijoTurnR);
             }
 
@@ -276,6 +276,7 @@ public class Greedy extends IntegratedAgent {
                 hijoTurnL.acciones.add("rotateL");
                 
                 hijoTurnL.setDistancia(hijoTurnL.distancia(hijoTurnL.getSt(), destino));
+                hijoTurnL.añadirValor(-GIRAR);
                 cola.add(hijoTurnL);
             }
         
@@ -287,7 +288,7 @@ public class Greedy extends IntegratedAgent {
                     hijoMoveF.acciones.add("moveF");
                     
                     hijoMoveF.setDistancia(hijoMoveF.distancia(hijoMoveF.getSt(), destino));
-                    hijoMoveF.añadirValor(AVANZAR);
+                    
                     cola.add(hijoMoveF);
                 } 
             }

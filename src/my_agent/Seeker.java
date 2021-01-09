@@ -14,6 +14,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import static java.lang.Math.abs;
 
 import java.util.ArrayList;
 /**
@@ -22,10 +23,12 @@ import java.util.ArrayList;
  */
 public class Seeker extends IntegratedAgent {
     int energia;
+    boolean salir=false;
     Boolean recarga;
     double thermal[][] = new double[31][31];
     int contador_UP=0;
     posicion actual, encontrado;
+    ArrayList<posicion> lista_encontrados = new ArrayList<posicion>();
     ArrayList<posicion> trayectoria = null;
     ArrayList<String> movimientos = null;
     ACLMessage in = new ACLMessage();
@@ -176,7 +179,9 @@ public class Seeker extends IntegratedAgent {
     actual= new posicion(trayectoria.get(pos_actual).getX(),trayectoria.get(pos_actual).getY(), trayectoria.get(pos_actual).getZ(), trayectoria.get(pos_actual).getOrientacion());
     energia=10;
     int coste_percibir=9;
-    while(recarga!=false && actual!= trayectoria.get(trayectoria.size()-1)){
+    
+    
+    while((recarga!=false) && (salir!=true)){
         if(hay_energia(coste_percibir)){
             out = in.createReply();
             out.setContent(new JsonObject().add("operation", "read").toString());
@@ -196,29 +201,36 @@ public class Seeker extends IntegratedAgent {
             }
         }else{
             recargar();
-        }/*
+        }
         for(int i=0; i<31; i++){
             for(int j=0; j<31; j++){
-               System.out.print(thermal[i][j]+" ");
+               int aux = (int) thermal[i][j];
+               System.out.print(aux+" ");
             }
-            System.out.print("\n");
-        }*/
+            System.out.println("");
+        }
         System.out.print(energia);
         if(hay_aleman()){
-            System.out.print("CONFIRMACION" + encontrado.getX()+ " " + encontrado.getY());
-            out = new ACLMessage();
-            JsonObject aux = new JsonObject();
-            aux.add("x",encontrado.getX());
-            aux.add("y",encontrado.getY());
-            aux.add("z",encontrado.getZ());
-            aux.add("orientacion",encontrado.getOrientacion());
-            out.setSender(getAID());
-            out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
-            out.setProtocol("");
-            out.setContent(aux.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
-            out.setEncoding("");
-            out.setPerformative(ACLMessage.INFORM);
-            this.send(out);
+            
+            
+            for(int i=0; i<lista_encontrados.size(); i++){
+                System.out.print("CONFIRMACION" + lista_encontrados.get(i).getX()+ " " + lista_encontrados.get(i).getY());
+                out = new ACLMessage();
+                JsonObject aux = new JsonObject();
+                aux.add("x",lista_encontrados.get(i).getX()+1);
+                aux.add("y",lista_encontrados.get(i).getY()+1);
+                aux.add("z",lista_encontrados.get(i).getZ());
+                aux.add("orientacion",lista_encontrados.get(i).getOrientacion());
+                out.setSender(getAID());
+                out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
+                out.setProtocol("");
+                out.setContent(aux.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                out.setEncoding("");
+                out.setPerformative(ACLMessage.INFORM);
+                this.send(out);
+            }
+            lista_encontrados.clear();
+            
         
         }
         
@@ -272,6 +284,8 @@ public class Seeker extends IntegratedAgent {
             actual.setZ(trayectoria.get(pos_actual).getZ());
             actual.setOrientacion(trayectoria.get(pos_actual).getOrientacion());
             
+        }else{
+            salir=true;
         }
         
         //CALCULAR COSTE PARA LLEGAR A LA SIGUIENTE POSICION.
@@ -314,7 +328,7 @@ public class Seeker extends IntegratedAgent {
     out.setSender(getAID());
     out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
     out.setProtocol("");  
-    out.setContent("adios");
+    out.setContent("Adios");
     out.setEncoding("");
     out.setPerformative(ACLMessage.INFORM);
     this.send(out);
@@ -345,38 +359,46 @@ public class Seeker extends IntegratedAgent {
         boolean encontrado_b=false;
         int i=0, j=0;
         int indice_i=-1, indice_j=-1;
+        int distancia_i=-1, distancia_j=-1;
+        lista_encontrados = new ArrayList<posicion>();
         
         for(i=0; i<31; i++){
             for(j=0; j<31; j++){
                 if(thermal[i][j]==0){
+                    distancia_i=abs(i-16);
+                    distancia_j=abs(j-16);
                     indice_i=i;
                     indice_j=j;
                     encontrado_b=true;
+                    
+                    if(encontrado_b==true){
+                        encontrado = new posicion(-1,-1,-1,-1);
+                        encontrado.setOrientacion(90);
+                        if(indice_i<16){
+                            encontrado.setX(actual.getX()-distancia_i);
+                        }else if(indice_i>16){
+                            encontrado.setX(actual.getX()+distancia_i);
+                        }else{
+                            encontrado.setX(actual.getX());
+                        }
+
+                        if(indice_j<16){
+                            encontrado.setY(actual.getY()-distancia_j);
+                        }else if(indice_j>16){
+                            encontrado.setY(actual.getY()+distancia_j);
+                        }else{
+                            encontrado.setY(actual.getY());
+                        }
+
+                        encontrado.setZ(Greedy.obtenerAltura(actual.getX(),actual.getY()));
+                    }
+                    
+                    lista_encontrados.add(encontrado);
                 }
             }
         }
         
-        if(encontrado_b==true){
-            encontrado = new posicion(-1,-1,-1,-1);
-            encontrado.setOrientacion(90);
-            if(indice_i<16){
-                encontrado.setX(actual.getX()-indice_i);
-            }else if(indice_i>16){
-                encontrado.setX(actual.getX()+indice_i);
-            }else{
-                encontrado.setX(actual.getX());
-            }
-            
-            if(indice_j<16){
-                encontrado.setY(actual.getY()-indice_j);
-            }else if(indice_j>16){
-                encontrado.setY(actual.getY()+indice_j);
-            }else{
-                encontrado.setY(actual.getY());
-            }
-            
-            encontrado.setZ(Greedy.obtenerAltura(actual.getX(),actual.getY()));
-        }
+        
         
         
         return encontrado_b;
@@ -615,7 +637,7 @@ public class Seeker extends IntegratedAgent {
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
         in = this.blockingReceive();
-        //Info(getDetailsLARVA(in));
+        Info(in.getContent());
 
         //doCheckoutLARVA();
         

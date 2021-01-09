@@ -162,6 +162,7 @@ public class Rescuer extends IntegratedAgent {
         in = this.blockingReceive();
         Info(in.getContent() +": ALEMAAAAAAAAAAAAAAAAAAAAN");
         alemanes.add(desparsearPosicion(in));
+        
         while(hay_tickets && !alemanes.isEmpty() ){
             //FALTA INICIALIZAR X, Y y Z
             
