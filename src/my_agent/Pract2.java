@@ -16,7 +16,7 @@ public class Pract2{
         ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
         _app.launchAgent("AWACS", awacs.Awacs.class);
-        _app.launchAgent("control", Controlador.class);
+        _app.launchAgent("controlador", Controlador.class);
         _app.launchAgent("seek1", Seeker.class);
         _app.launchAgent("seek2", Seeker.class);
         _app.launchAgent("seek3", Seeker.class);

@@ -91,7 +91,7 @@ public class Seeker extends IntegratedAgent {
         Info("Enviando monedas a controlador"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("control",AID.ISLOCALNAME));    
+        out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
         out.setProtocol("");
         out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -213,7 +213,7 @@ public class Seeker extends IntegratedAgent {
             aux.add("z",encontrado.getZ());
             aux.add("orientacion",encontrado.getOrientacion());
             out.setSender(getAID());
-            out.addReceiver(new AID("control",AID.ISLOCALNAME));    
+            out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
             out.setProtocol("");
             out.setContent(aux.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
             out.setEncoding("");
@@ -312,7 +312,7 @@ public class Seeker extends IntegratedAgent {
     }
     out = new ACLMessage();
     out.setSender(getAID());
-    out.addReceiver(new AID("control",AID.ISLOCALNAME));
+    out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
     out.setProtocol("");  
     out.setContent("adios");
     out.setEncoding("");
@@ -444,7 +444,7 @@ public class Seeker extends IntegratedAgent {
         if(actual.getX()==trayectoria.get(0).getX() && actual.getY()==trayectoria.get(0).getY()){
             out = new ACLMessage();
             out.setSender(getAID());
-            out.addReceiver(new AID("control",AID.ISLOCALNAME));    
+            out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
             out.setProtocol("");
             out.setContent("ticketRecarga"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
             out.setEncoding("");
@@ -523,7 +523,7 @@ public class Seeker extends IntegratedAgent {
                                
                                 out = new ACLMessage();
                                 out.setSender(getAID());
-                                out.addReceiver(new AID("control",AID.ISLOCALNAME));    
+                                out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
                                 out.setProtocol("");
                                 out.setContent("ticketRecarga"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
                                 out.setEncoding("");

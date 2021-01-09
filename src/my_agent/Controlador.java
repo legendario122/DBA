@@ -519,6 +519,8 @@ public class Controlador extends IntegratedAgent {
                 out.setPerformative(ACLMessage.INFORM);
                 this.send(out);
             }
+        }else{
+            Info(in.getContent());
         }
     }
     
