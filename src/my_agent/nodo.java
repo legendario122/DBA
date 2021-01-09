@@ -36,6 +36,10 @@ public class nodo implements Comparable<nodo> {
     public void setDistancia(double distancia) {
         this.distancia = distancia;
     }
+    
+    public void añadirValor(double valor){
+        this.distancia+=valor;
+    }
 
     public void setSt(Estado st) {
         

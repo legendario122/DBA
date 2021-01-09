@@ -28,6 +28,8 @@ public class Greedy extends IntegratedAgent {
     static Map2DGrayscale mapa = new Map2DGrayscale();
     static final double IZQUIERDA=-45;
     static final double DERECHA=45;
+    static final double GIRAR=0.75;
+    static final double AVANZAR=1;
     public void setup() {
         super.setup();
         String playground = "Playground1.png";
@@ -77,7 +79,7 @@ public class Greedy extends IntegratedAgent {
 
     public boolean puedoSubir(Estado e){
         boolean puedo_subir = false;
-        if(e.z<250){
+        if(e.z<255){
             puedo_subir = true;
             e.z+=5;
         }
@@ -90,110 +92,110 @@ public class Greedy extends IntegratedAgent {
         int x = estado.x;
         int y = estado.y;
         if(estado.orientacion == 0){ //3 3 
-            if((x-1)< 0){
+            if((y-1)< 0){
                 resultado=true;
             }else{
                 //if(mapa[x-1][y] > estado.z){
-                if(mapa.getLevel(x-1, y) > estado.z){
+                if(mapa.getLevel(y-1, x) > estado.z){
                     resultado=true;              
                 }else{
-                    estado.x=x-1;
-                    estado.y=y; 
+                    estado.y=y-1;
+                    estado.x=x; 
                 }
             }
             
         }else if(estado.orientacion == 45){
-            if((x-1)<0 || (y+1)>mapa.getHeight()){
+            if((y-1)<0 || (x+1)>mapa.getHeight()){
                    resultado=true;
 
             }else{
                 //if(mapa[x-1][y+1] > estado.z){
-                if(mapa.getLevel(x-1, y-1) > estado.z){    
+                if(mapa.getLevel(y-1, x-1) > estado.z){    
                    resultado=true;
                    
                 }else{
-                    estado.x=x-1;
-                    estado.y=y+1; 
+                    estado.y=y-1;
+                    estado.x=x+1; 
                 }  
             }
                   
         }else if(estado.orientacion == 90){
-            if((y+1)>mapa.getHeight()){
+            if((x+1)>mapa.getHeight()){
                 resultado=true;
             }else{
                 //if(mapa[x][y+1] > estado.z){
-                if(mapa.getLevel(x, y+1) > estado.z){
+                if(mapa.getLevel(y, x+1) > estado.z){
                     resultado=true;
                 
                 }else{
-                    estado.x=x;
-                    estado.y=y+1; 
+                    estado.y=y;
+                    estado.x=x+1; 
                 }
             }
             
         }else if(estado.orientacion == 135){
-            if((x+1)>mapa.getWidth() || (y+1) >mapa.getHeight()){
+            if((y+1)>mapa.getWidth() || (x+1) >mapa.getHeight()){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y+1] > estado.z){
-                if(mapa.getLevel(x+1, y+1) > estado.z){
+                if(mapa.getLevel(y+1, x+1) > estado.z){
                     resultado=true;
                 
                 }else{
-                    estado.x=x+1;
-                    estado.y=y+1; 
+                    estado.y=y+1;
+                    estado.x=x+1; 
                 }
             }
             
         }else if(estado.orientacion == 180){
-            if((x+1)>mapa.getWidth()){
+            if((y+1)>mapa.getWidth()){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y] > estado.z){
-                if(mapa.getLevel(x+1, y) > estado.z){
+                if(mapa.getLevel(y+1, x) > estado.z){
                     resultado=true;
                 }else{
-                    estado.x=x+1;
-                    estado.y=y; 
+                    estado.y=y+1;
+                    estado.x=x; 
                 }
             }
             
         }else if(estado.orientacion == -135){
-            if((x+1)>mapa.getWidth() || (y-1)<0){
+            if((y+1)>mapa.getWidth() || (x-1)<0){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y-1] > estado.z){
-                if(mapa.getLevel(x+1, y-1) > estado.z){
+                if(mapa.getLevel(y+1, x-1) > estado.z){
                     resultado=true;
                 }else{
-                    estado.x=x+1;
-                    estado.y=y-1; 
+                    estado.y=y+1;
+                    estado.x=x-1; 
                 }
             }
             
         }else if(estado.orientacion == -90){
-            if((y-1)<0){
+            if((x-1)<0){
                 resultado=true;
             }else{
                 //if(mapa[x][y-1] > estado.z){
-                if(mapa.getLevel(x, y-1) > estado.z){
+                if(mapa.getLevel(y, x-1) > estado.z){
                     resultado=true;
                 }else{
-                    estado.x=x;
-                    estado.y=y-1; 
+                    estado.y=y;
+                    estado.x=x-1; 
                 }
             }
             
         }else if(estado.orientacion == -45){
-            if((x-1)<0 || (y-1)<0){
+            if((y-1)<0 || (x-1)<0){
                 resultado=true;
             }else{
                 //if(mapa[x-1][y-1] > estado.z){
-                if(mapa.getLevel(x-1, y-1) > estado.z){
+                if(mapa.getLevel(y-1, x-1) > estado.z){
                     resultado=true;
                 }else{
-                    estado.x=x-1;
-                    estado.y=y-1; 
+                    estado.y=y-1;
+                    estado.x=x-1; 
                 }
             }
             
@@ -262,6 +264,7 @@ public class Greedy extends IntegratedAgent {
             if(comparaEstado(hijoTurnR)){
                 hijoTurnR.acciones.add("rotateR");
                 hijoTurnR.setDistancia(hijoTurnR.distancia(hijoTurnR.getSt(), destino));
+                
                 cola.add(hijoTurnR);
             }
 
@@ -271,6 +274,7 @@ public class Greedy extends IntegratedAgent {
             hijoTurnL.st.orientacion = orientarizquierda(hijoTurnL.st.orientacion, IZQUIERDA);        
             if(comparaEstado(hijoTurnL)){
                 hijoTurnL.acciones.add("rotateL");
+                
                 hijoTurnL.setDistancia(hijoTurnL.distancia(hijoTurnL.getSt(), destino));
                 cola.add(hijoTurnL);
             }
@@ -281,7 +285,9 @@ public class Greedy extends IntegratedAgent {
             if(!hayObstaculo(hijoMoveF.st)){
                if(comparaEstado(hijoMoveF)){
                     hijoMoveF.acciones.add("moveF");
+                    
                     hijoMoveF.setDistancia(hijoMoveF.distancia(hijoMoveF.getSt(), destino));
+                    hijoMoveF.añadirValor(AVANZAR);
                     cola.add(hijoMoveF);
                 } 
             }
@@ -309,7 +315,11 @@ public class Greedy extends IntegratedAgent {
             }
         }
         acciones = actual.getAcciones();
-        Info("ha calculado el caminoOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+        Info("ha calculado el caminoOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PARA IR DE AHI A ALLI");
+        Info(in.getContent());
+        //for(int i=0; i<acciones.size(); i++){
+        //    Info(acciones.get(i));
+        //}
         //metemos array de acciones y se las mandamos al solicitante
         JsonObject obj = new JsonObject();
         ACLMessage out = in.createReply();

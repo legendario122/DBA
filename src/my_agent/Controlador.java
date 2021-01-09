@@ -65,17 +65,17 @@ public class Controlador extends IntegratedAgent {
         //BASEPLAYGROUNd1:
         
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(15,i,256,90);
+            posicion aux = new posicion(15,i,255,90);
             Trayectoria_BasePlayground1_seek1.add(aux);
         }
         Trayectoria_BasePlayground1_seek1.get(0).setZ(0);
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(45,i,256,90);
+            posicion aux = new posicion(45,i,255,90);
             Trayectoria_BasePlayground1_seek2.add(aux);
         }
         Trayectoria_BasePlayground1_seek2.get(0).setZ(0);
         for(int i=15; i<100; i+=30){
-            posicion aux = new posicion(75,i,256,90);
+            posicion aux = new posicion(75,i,255,90);
             Trayectoria_BasePlayground1_seek3.add(aux);
         }
         Trayectoria_BasePlayground1_seek3.get(0).setZ(0);
@@ -128,9 +128,7 @@ public class Controlador extends IntegratedAgent {
         //System.out.println("\n" + yp.prettyPrint());
         
         ArrayList<String> pepe = new ArrayList(yp.queryProvidersofService("Analytics groupid 13"));
-        for(int i=0; i<pepe.size(); i++){
-           //Info(pepe.get(i));
-        }
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////CHECKING EN WORLD MANAGER///////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +143,7 @@ public class Controlador extends IntegratedAgent {
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
         in = this.blockingReceive();
+        
         if(in.getPerformative() != ACLMessage.INFORM){
             Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to ");//+ getDetailsLarva(in));
             Info(in.getContent());
@@ -507,7 +506,7 @@ public class Controlador extends IntegratedAgent {
                 this.send(out);
             }
         }else if(in.getPerformative() == ACLMessage.REQUEST && "ticketRecarga".equals(in.getContent())){
-            out = new ACLMessage();
+
             out = in.createReply();
             if(!referencias_tickets.isEmpty()){
                 String ticket = referencias_tickets.get(0);
@@ -517,11 +516,12 @@ public class Controlador extends IntegratedAgent {
                 referencias_tickets.remove(0);
             }else{
                 out.setContent("Vacio");
+                out.setPerformative(ACLMessage.INFORM);
                 this.send(out);
             }
         }
     }
-    Info("ESTO ES MUY RARO OSTIA YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
+    
     //DECIR ADIOS AL AGENTE GREEDY
     //una vez han terminado y se han despedido le resto de drones
     out = new ACLMessage();
@@ -638,7 +638,7 @@ public class Controlador extends IntegratedAgent {
         in = this.blockingReceive();
         //Info(getDetailsLARVA(in));
 
-        doCheckoutLARVA();
+//        doCheckoutLARVA();
     }
     
     public void desparsearMonedas(ACLMessage in){

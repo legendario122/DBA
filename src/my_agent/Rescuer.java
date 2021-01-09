@@ -75,7 +75,7 @@ public class Rescuer extends IntegratedAgent {
             // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
              abortSession();
          }  
-        //ConvID = in.getConversationId(); El conversation ID viene en el content del mensaje que nos llega y hay que desparsearlo
+        //ConvID = in.get(); El conversation ID viene en el content del mensaje que nos llega y hay que desparsearlo
 
         Info("Haciendo SUSCRIBE a WorldManager en rescuer"); 
         out = new ACLMessage();
@@ -248,7 +248,7 @@ public class Rescuer extends IntegratedAgent {
 
             }
 
-            
+            System.out.print("TAMAÑO MOVIMIENTOS: "+movimientos.size());
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
             //AQUI VAMOS A DESPARSEAR LA LISTA DE MOOVIMIENTOS QUE AUN NO HE PENSADO COMO 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +263,8 @@ public class Rescuer extends IntegratedAgent {
                 
 
                 movimiento.add("operation", movimientos.get(i));
-
+                Info("MOVIMIENTOS RESCUER");
+                Info(movimientos.get(i));
                 out = new ACLMessage();
                 out.setSender(getAID());
                 out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
@@ -366,7 +367,7 @@ public class Rescuer extends IntegratedAgent {
     public void rescatar(){
             JsonObject objeto = new JsonObject();
             objeto.add("operation", "rescue");
-
+            Info("RESCATANDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             out = new ACLMessage();
             out.setSender(getAID());
             out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));

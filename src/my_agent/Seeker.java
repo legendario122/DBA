@@ -155,6 +155,11 @@ public class Seeker extends IntegratedAgent {
     out.setEncoding("");
     out.setConversationId(ConversationID);
     out.setPerformative(ACLMessage.REQUEST);
+    
+    try{
+        Thread.sleep(2000);
+    }catch(Exception ex){};
+    
     this.send(out);
     
     in =this.blockingReceive();
@@ -231,6 +236,10 @@ public class Seeker extends IntegratedAgent {
             aux.add("z2",trayectoria.get(pos_actual).getZ());
             aux.add("orientacion2",trayectoria.get(pos_actual).getOrientacion());
             
+            Info("EL SEEKER TIENE QUE MOVERSE HACIA: ");
+            System.out.print(trayectoria.get(pos_actual).getX() + trayectoria.get(pos_actual).getY() + trayectoria.get(pos_actual).getZ());
+            
+            
             out.setSender(getAID());
             out.addReceiver(new AID("greedy",AID.ISLOCALNAME));    
             out.setProtocol("");
@@ -277,6 +286,7 @@ public class Seeker extends IntegratedAgent {
             out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
             out.setProtocol("REGULAR");  
             objeto = new JsonObject();
+            
             objeto.add("operation", movimientos.get(iterator));
             out.setContent(objeto.toString());
             out.setEncoding("");
