@@ -217,8 +217,8 @@ public class Seeker extends IntegratedAgent {
                 System.out.print("CONFIRMACION" + lista_encontrados.get(i).getX()+ " " + lista_encontrados.get(i).getY());
                 out = new ACLMessage();
                 JsonObject aux = new JsonObject();
-                aux.add("x",lista_encontrados.get(i).getX()+1);
-                aux.add("y",lista_encontrados.get(i).getY()+1);
+                aux.add("x",lista_encontrados.get(i).getX());
+                aux.add("y",lista_encontrados.get(i).getY());
                 aux.add("z",lista_encontrados.get(i).getZ());
                 aux.add("orientacion",lista_encontrados.get(i).getOrientacion());
                 out.setSender(getAID());
@@ -324,6 +324,8 @@ public class Seeker extends IntegratedAgent {
         }
         
     }
+    in=this.blockingReceive();
+    
     out = new ACLMessage();
     out.setSender(getAID());
     out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
@@ -365,27 +367,40 @@ public class Seeker extends IntegratedAgent {
         for(i=0; i<31; i++){
             for(j=0; j<31; j++){
                 if(thermal[i][j]==0){
-                    distancia_i=abs(i-16);
-                    distancia_j=abs(j-16);
+                    distancia_i=abs(i-15);
+                    distancia_j=abs(j-15);
                     indice_i=i;
                     indice_j=j;
                     encontrado_b=true;
-                    
+                    Info("He encontrado un ALEMAAAAAAAAAN");
                     if(encontrado_b==true){
                         encontrado = new posicion(-1,-1,-1,-1);
                         encontrado.setOrientacion(90);
-                        if(indice_i<16){
-                            encontrado.setX(actual.getX()-distancia_i);
-                        }else if(indice_i>16){
-                            encontrado.setX(actual.getX()+distancia_i);
+                        if(indice_j<15){
+                            System.out.println("EL INDICE DE j es menor: " + indice_j);
+                            System.out.println("DISTANCIA j: " + distancia_j);
+                            System.out.println("ACTUAL POSICION ES: " + actual.getX());
+                            
+                            encontrado.setX(actual.getX()-distancia_j);
+                        }else if(indice_j>15){
+                            System.out.println("EL INDICE DE j es mayor: " + indice_j);
+                            System.out.println("DISTANCIA J: " + distancia_j);
+                            System.out.println("ACTUAL POSICION ES: " + actual.getX());
+                            encontrado.setX(actual.getX()+distancia_j);
                         }else{
                             encontrado.setX(actual.getX());
                         }
 
-                        if(indice_j<16){
-                            encontrado.setY(actual.getY()-distancia_j);
-                        }else if(indice_j>16){
-                            encontrado.setY(actual.getY()+distancia_j);
+                        if(indice_i<15){
+                            System.out.println("EL INDICE DE i es menor: " + indice_i);
+                            System.out.println("DISTANCIA i: " + distancia_i);
+                            System.out.println("ACTUAL POSICION  Y ES: " + actual.getY());
+                            encontrado.setY(actual.getY()-distancia_i);
+                        }else if(indice_i>15){
+                            System.out.println("EL INDICE DE i es mayor: " + indice_i);
+                            System.out.println("DISTANCIA i: " + distancia_i);
+                            System.out.println("ACTUAL POSICION  Y ES: " + actual.getY());
+                            encontrado.setY(actual.getY()+distancia_i);
                         }else{
                             encontrado.setY(actual.getY());
                         }

@@ -64,21 +64,33 @@ public class Controlador extends IntegratedAgent {
     void inicializar_trayectorias(){
         //BASEPLAYGROUNd1:
         
-        for(int i=16; i<100; i+=30){
-            posicion aux = new posicion(16,i,255,90);
+        for(int i=15; i<100; i+=30){
+            posicion aux = new posicion(15,i,255,90);
             Trayectoria_BasePlayground1_seek1.add(aux);
         }
         Trayectoria_BasePlayground1_seek1.get(0).setZ(0);
-        for(int i=16; i<100; i+=30){
-            posicion aux = new posicion(46,i,255,90);
+        posicion aux = new posicion(15,85,255,90);
+        Trayectoria_BasePlayground1_seek1.add(aux);
+        for(int i=15; i<100; i+=30){
+             aux = new posicion(45,i,255,90);
             Trayectoria_BasePlayground1_seek2.add(aux);
         }
         Trayectoria_BasePlayground1_seek2.get(0).setZ(0);
-        for(int i=16; i<100; i+=30){
-            posicion aux = new posicion(76,i,255,90);
+        aux = new posicion(45,85,255,90);
+        Trayectoria_BasePlayground1_seek2.add(aux);
+        for(int i=15; i<100; i+=30){
+             aux = new posicion(75,i,255,90);
             Trayectoria_BasePlayground1_seek3.add(aux);
         }
         Trayectoria_BasePlayground1_seek3.get(0).setZ(0);
+        aux = new posicion(75,85,255,90);
+        Trayectoria_BasePlayground1_seek3.add(aux);
+        for(int i=85; i>0; i-=30){
+             aux = new posicion(85,i,255,90);
+            Trayectoria_BasePlayground1_seek3.add(aux);
+        }
+        aux = new posicion(85,15,255,90);
+        Trayectoria_BasePlayground1_seek3.add(aux);
     }
     @Override
         /**

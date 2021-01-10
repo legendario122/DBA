@@ -105,7 +105,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == 45){
-            if((y-1)<0 || (x+1)>mapa.getHeight()){
+            if((y-1)<0 || (x+1)>mapa.getHeight()-1){
                    resultado=true;
 
             }else{
@@ -120,7 +120,7 @@ public class Greedy extends IntegratedAgent {
             }
                   
         }else if(estado.orientacion == 90){
-            if((x+1)>mapa.getHeight()){
+            if((x+1)>mapa.getHeight()-1){
                 resultado=true;
             }else{
                 //if(mapa[x][y+1] > estado.z){
@@ -134,7 +134,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == 135){
-            if((y+1)>mapa.getWidth() || (x+1) >mapa.getHeight()){
+            if((y+1)>mapa.getWidth()-1 || (x+1) >mapa.getHeight()-1){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y+1] > estado.z){
@@ -148,7 +148,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == 180){
-            if((y+1)>mapa.getWidth()){
+            if((y+1)>mapa.getWidth()-1){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y] > estado.z){
@@ -161,7 +161,7 @@ public class Greedy extends IntegratedAgent {
             }
             
         }else if(estado.orientacion == -135){
-            if((y+1)>mapa.getWidth() || (x-1)<0){
+            if((y+1)>mapa.getWidth()-1 || (x-1)<0){
                 resultado=true;
             }else{
                 //if(mapa[x+1][y-1] > estado.z){
@@ -242,7 +242,7 @@ public class Greedy extends IntegratedAgent {
         generados.clear();
         cola.add(actual);
         
-        while(!cola.isEmpty() && (actual.st.x!=destino.x || actual.st.y!=destino.y)){
+        while(!cola.isEmpty() && (actual.st.x!=destino.x || actual.st.y!=destino.y || actual.st.orientacion!=destino.orientacion)){
             if(!cola.isEmpty()){
                 actual = cola.poll();
             }

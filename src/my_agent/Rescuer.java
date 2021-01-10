@@ -12,6 +12,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import static my_agent.Controlador.ConversationID;
 /**
@@ -30,7 +31,7 @@ public class Rescuer extends IntegratedAgent {
     int y;
     int orientacion;
     int z;
-    int energy;
+    int energy=10;
     int n_aleman = 0;
     boolean recarga = true;
     boolean hay_tickets = true;
@@ -163,49 +164,50 @@ public class Rescuer extends IntegratedAgent {
         Info(in.getContent() +": ALEMAAAAAAAAAAAAAAAAAAAAN");
         alemanes.add(desparsearPosicion(in));
         
-        while(hay_tickets && !alemanes.isEmpty() ){
+        while(hay_tickets && n_aleman!=10 ){
             //FALTA INICIALIZAR X, Y y Z
             
-            if(recarga){
+            
+            if(hay_energia(2)){
+                JsonObject read = new JsonObject();
+                read.add("operation", "read");
+
+                out = new ACLMessage();
+                out.setSender(getAID());
+                out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                out.setProtocol("REGULAR");
+                out.setContent(read.toString());
+                out.setConversationId(ConversationID);
+                out.setPerformative(ACLMessage.QUERY_REF);
+                this.send(out);
+
+                do{
+                    in = this.blockingReceive();
+                    if(in.getPerformative()==ACLMessage.REQUEST){
+                        alemanes.add(desparsearPosicion(in));
+                    }
+                }while(in.getPerformative()!= ACLMessage.INFORM);
+
+                if(in.getPerformative() != ACLMessage.INFORM){
+                    Info(in.getContent());
+                    abortSession();
+                }else{
+
+                    Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                    Info(in.getContent() + " " + in.getSender());
+                    desparsearRead(in);  
+                }
+            
+            }else{
                 altura = z - Greedy.obtenerAltura(x, y);
                 System.out.print("ALTURA DEL RESCUER es" + altura);
        
-                while(altura > 0)
+                while(altura > 0){
                     prerecarga();
-                
+                    altura = z - Greedy.obtenerAltura(x, y);
+                }
                 Info("RECARGUEMOSSSSSSSSSSS");
                 recargar();
-                
-            }
-            recarga = false;
-
-            JsonObject read = new JsonObject();
-            read.add("operation", "read");
-
-            out = new ACLMessage();
-            out.setSender(getAID());
-            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
-            out.setProtocol("REGULAR");
-            out.setContent(read.toString());
-            out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.QUERY_REF);
-            this.send(out);
-            
-            do{
-                in = this.blockingReceive();
-                if(in.getPerformative()==ACLMessage.REQUEST){
-                    alemanes.add(desparsearPosicion(in));
-                }
-            }while(in.getPerformative()!= ACLMessage.INFORM);
-
-            if(in.getPerformative() != ACLMessage.INFORM){
-                Info(in.getContent());
-                abortSession();
-            }else{
-                
-                Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-                Info(in.getContent() + " " + in.getSender());
-                desparsearRead(in);  
             }
             
             orientacion = 90;
@@ -253,18 +255,32 @@ public class Rescuer extends IntegratedAgent {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////
             //AQUI VAMOS A DESPARSEAR LA LISTA DE MOOVIMIENTOS QUE AUN NO HE PENSADO COMO 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////
-            int estimacion_energia = (z - Greedy.obtenerAltura(x, y))*4;
-            JsonObject movimiento = new JsonObject();
+            int estimacion_energia = abs((z - Greedy.obtenerAltura(alemanes.get(n_aleman).getX(), alemanes.get(n_aleman).getY()))*4);
+            int estimacion_energia2 = coste_movimientos();
             
-            for(int i = 0; i < movimientos.size() && !recarga; i++){
-
-                estimacion_energia = ((z - Greedy.obtenerAltura(x, y))*4) + 8;
-                if(energy <= estimacion_energia)
-                    recarga = true;
+            JsonObject movimiento = new JsonObject();
+            if(!hay_energia(estimacion_energia + estimacion_energia2 )){
+                altura = z - Greedy.obtenerAltura(x, y);
+                System.out.print("ALTURA DEL RESCUER es" + altura);
+       
+                while(altura > 0){
+                    prerecarga();
+                    altura = z - Greedy.obtenerAltura(x, y);
+                }
                 
+                Info("RECARGUEMOSSSSSSSSSSS");
+                recargar();
+            }
+            
+            for(int i = 0; i < movimientos.size(); i++){
+
+                                
 
                 movimiento.add("operation", movimientos.get(i));
                 Info("MOVIMIENTOS RESCUER");
+                if(movimientos.get(i).equals("moveUP")){
+                    z+=5;
+                }
                 Info(movimientos.get(i));
                 out = new ACLMessage();
                 out.setSender(getAID());
@@ -291,6 +307,14 @@ public class Rescuer extends IntegratedAgent {
 
             }
             if(movimientos.isEmpty()){
+                x = alemanes.get(n_aleman).getX();
+                y = alemanes.get(n_aleman).getY();
+                altura = z - Greedy.obtenerAltura(x, y);
+                while(altura > 0){
+                    prerecarga();
+                    altura = z - Greedy.obtenerAltura(x, y);
+                }
+                
                 rescatar();
                 
                 
@@ -298,6 +322,9 @@ public class Rescuer extends IntegratedAgent {
                     in = this.blockingReceive();
                     if(in.getPerformative()==ACLMessage.REQUEST){
                         alemanes.add(desparsearPosicion(in));
+                    }
+                    if(in.getPerformative()==ACLMessage.FAILURE){
+                        Info(in.getContent());
                     }
                 }while(in.getPerformative()!= ACLMessage.INFORM);
                 
@@ -311,6 +338,94 @@ public class Rescuer extends IntegratedAgent {
             }
             
         }
+        orientacion = 90;
+        JsonObject posini = new JsonObject();
+        posini.add("x1", x);
+        posini.add("y1", y);
+        posini.add("z1", z);
+        posini.add("orientacion1", orientacion);
+        posini.add("x2", 0);
+        posini.add("y2", 0);
+        posini.add("z2", Greedy.obtenerAltura(0, 0));
+        posini.add("orientacion2", 90);
+
+            
+
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("greedy",AID.ISLOCALNAME));
+        out.setProtocol("");
+        out.setContent(posini.toString());
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.REQUEST);
+        this.send(out);
+        
+        in = this.blockingReceive();
+        
+        if(in.getPerformative() != ACLMessage.INFORM){
+            Info(in.getContent());
+            abortSession();
+        }else{
+            movimientos = new ArrayList<String>();
+            desparsearMovimientos(in);
+        }  
+        
+        int estimacion_energia = abs((z - Greedy.obtenerAltura(0, 0))*4);
+        int estimacion_energia2 = coste_movimientos();
+            
+        JsonObject movimiento = new JsonObject();
+        if(!hay_energia(estimacion_energia + estimacion_energia2 )){
+            altura = z - Greedy.obtenerAltura(x, y);
+            System.out.print("ALTURA DEL RESCUER es" + altura);
+       
+            while(altura > 0){
+                prerecarga();
+                altura = z - Greedy.obtenerAltura(x, y);
+            }
+                
+            Info("RECARGUEMOSSSSSSSSSSS");
+            recargar();
+        }
+            
+        for(int i = 0; i < movimientos.size(); i++){
+
+                                
+
+            movimiento.add("operation", movimientos.get(i));
+            Info("MOVIMIENTOS RESCUER");
+            if(movimientos.get(i).equals("moveUP")){
+                z+=5;
+            }
+            Info(movimientos.get(i));
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+            out.setProtocol("REGULAR");
+            out.setContent(movimiento.toString());
+            out.setConversationId(ConversationID);
+            out.setPerformative(ACLMessage.REQUEST);
+            this.send(out);
+                 
+            in = this.blockingReceive();
+                    
+                
+                
+            if(in.getPerformative() != ACLMessage.INFORM){
+                Info(in.getContent());
+                abortSession();
+            }                
+
+        }
+        
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
+        out.setProtocol("");  
+        out.setContent("Adios");
+        out.setEncoding("");
+        out.setPerformative(ACLMessage.INFORM);
+        this.send(out);
+        
 
     }
     
@@ -439,12 +554,17 @@ public class Rescuer extends IntegratedAgent {
 
             String accion = "";
             JsonObject movimiento = new JsonObject();
-            altura = z - Greedy.obtenerAltura(x, y);
+            
             
             if(altura>5){
                 accion="moveD";
+                z-=5;
             }else if(altura>0 && altura<5){
                 accion="touchD";
+                z-=5;
+            }else{
+                z-=5;
+                accion="moveD";
             }
             
             
@@ -471,6 +591,30 @@ public class Rescuer extends IntegratedAgent {
                 abortSession();
             }
         }
+        
+    public boolean hay_energia(int coste){
+        Boolean resultado = false;
+        if(energy>coste){
+            resultado=true;
+        }
+        
+        return resultado;
+    }
+    
+    public int coste_movimientos(){
+        int coste=0;
+        String move;
+        System.out.print("TAMAÑO LISTA DE MOVIMIENTOS: "+ movimientos.size());
+        for(int i=0; i<movimientos.size(); i++){
+            move=movimientos.get(i);
+            if(move.equals("moveF") || move.equals("rotateL") || move.equals("rotateR")){
+                coste+=4;
+            }else if(move.equals("moveD") || move.equals("moveUP")){
+                coste+=(5*4);
+            }
+        }
+        return coste;
+    }
     
     private void desparsearRead(ACLMessage in){
         String answer = in.getContent();
