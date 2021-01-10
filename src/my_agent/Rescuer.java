@@ -166,7 +166,15 @@ public class Rescuer extends IntegratedAgent {
         
         while(hay_tickets && n_aleman!=10 ){
             //FALTA INICIALIZAR X, Y y Z
-            
+            if(n_aleman == alemanes.size()){
+                in = this.blockingReceive();
+                if(in.getPerformative()==ACLMessage.REQUEST){
+                    alemanes.add(desparsearPosicion(in));
+                }else{
+                    Info(in.getContent());
+                    abortSession();
+                }
+            }
             
             if(hay_energia(2)){
                 JsonObject read = new JsonObject();
@@ -435,7 +443,7 @@ public class Rescuer extends IntegratedAgent {
             Info("RECARGUEMOSSSSSSSSSSS");
             recargar();
         }
-            
+        movimientos.add("touchD");    
         for(int i = 0; i < movimientos.size(); i++){
 
                                 

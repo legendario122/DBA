@@ -645,7 +645,7 @@ public class Seeker extends IntegratedAgent {
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
-        out.setProtocol("REGULAR");  
+        out.setProtocol("ANALYTICS");  
         out.setContent("");
         out.setEncoding("");
         out.setConversationId(ConversationID);
