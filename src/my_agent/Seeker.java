@@ -324,7 +324,7 @@ public class Seeker extends IntegratedAgent {
         }
         
     }
-    in=this.blockingReceive();
+    
     
     out = new ACLMessage();
     out.setSender(getAID());
@@ -645,12 +645,13 @@ public class Seeker extends IntegratedAgent {
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
-        out.setProtocol("ANALYTICS");  
+        out.setProtocol("REGULAR");  
         out.setContent("");
         out.setEncoding("");
         out.setConversationId(ConversationID);
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
+        
         in = this.blockingReceive();
         Info(in.getContent());
 

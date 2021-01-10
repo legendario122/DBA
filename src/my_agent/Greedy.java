@@ -300,6 +300,7 @@ public class Greedy extends IntegratedAgent {
                 if(comparaEstado(hijoMoveUp)){
                     hijoMoveUp.acciones.add("moveUP");
                     hijoMoveUp.setDistancia(hijoMoveUp.distancia(hijoMoveUp.getSt(), destino));
+                    hijoMoveUp.añadirValor(2);
                     cola.add(hijoMoveUp);
                 }     
             }

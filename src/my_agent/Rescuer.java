@@ -276,10 +276,59 @@ public class Rescuer extends IntegratedAgent {
 
                                 
 
+                if(energy<260){
+                    Info("ENTRO EN RECARGAR DENTRO DE MOVIMIENTOS");
+                    estimacion_energia2 = coste_movimientos();  
+                    if(!hay_energia( estimacion_energia2 )){
+                        //NECESITAMOS PERCIBIR PARA TENER X E Y 
+                        JsonObject read = new JsonObject();
+                        read.add("operation", "read");
+
+                        out = new ACLMessage();
+                        out.setSender(getAID());
+                        out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                        out.setProtocol("REGULAR");
+                        out.setContent(read.toString());
+                        out.setConversationId(ConversationID);
+                        out.setPerformative(ACLMessage.QUERY_REF);
+                        this.send(out);
+
+                        do{
+                            in = this.blockingReceive();
+                            if(in.getPerformative()==ACLMessage.REQUEST){
+                                alemanes.add(desparsearPosicion(in));
+                            }
+                        }while(in.getPerformative()!= ACLMessage.INFORM);
+
+                        if(in.getPerformative() != ACLMessage.INFORM){
+                            Info(in.getContent());
+                            abortSession();
+                        }else{
+
+                            Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                            Info(in.getContent() + " " + in.getSender());
+                            desparsearRead(in);  
+                        }
+                        altura = z - Greedy.obtenerAltura(x, y);
+                        int altura_actual=altura;
+
+                        while(altura > 0){
+                            prerecarga();
+                            altura = z - Greedy.obtenerAltura(x, y);
+                        }
+
+                        Info("RECARGUEMOSSSSSSSSSSS");
+                        recargar();
+                        postrecarga(altura_actual);
+                    }
+                }
                 movimiento.add("operation", movimientos.get(i));
                 Info("MOVIMIENTOS RESCUER");
-                if(movimientos.get(i).equals("moveUP")){
+                if(movimientos.get(i).equals("moveUP") || movimientos.get(i).equals("moveD")){
                     z+=5;
+                    energy-=20;
+                }else if(movimientos.get(i).equals("moveF") ||movimientos.get(i).equals("rotateL") || movimientos.get(i).equals("rotateR")  ){
+                    energy-=4;
                 }
                 Info(movimientos.get(i));
                 out = new ACLMessage();
@@ -390,11 +439,56 @@ public class Rescuer extends IntegratedAgent {
         for(int i = 0; i < movimientos.size(); i++){
 
                                 
+            if(energy<400){
+                
+                estimacion_energia2 = coste_movimientos();  
+                if(!hay_energia(400 + estimacion_energia2 )){
+                        JsonObject read = new JsonObject();
+                        read.add("operation", "read");
 
+                        out = new ACLMessage();
+                        out.setSender(getAID());
+                        out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                        out.setProtocol("REGULAR");
+                        out.setContent(read.toString());
+                        out.setConversationId(ConversationID);
+                        out.setPerformative(ACLMessage.QUERY_REF);
+                        this.send(out);
+
+                        
+                        in = this.blockingReceive();
+                            
+
+                        if(in.getPerformative() != ACLMessage.INFORM){
+                            Info(in.getContent());
+                            abortSession();
+                        }else{
+
+                            Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                            Info(in.getContent() + " " + in.getSender());
+                            desparsearRead(in);  
+                        }    
+                    altura = z - Greedy.obtenerAltura(x, y);
+                    System.out.print("ALTURA DEL RESCUER es" + altura);
+                    int altura_actual=altura;
+                    while(altura > 0){
+                        prerecarga();
+                        altura = z - Greedy.obtenerAltura(x, y);
+                    }
+
+                    Info("RECARGUEMOSSSSSSSSSSS");
+                    recargar();
+                    
+                    postrecarga(altura_actual);
+                }
+            }
             movimiento.add("operation", movimientos.get(i));
             Info("MOVIMIENTOS RESCUER");
-            if(movimientos.get(i).equals("moveUP")){
+            if(movimientos.get(i).equals("moveUP") || movimientos.get(i).equals("moveD")){
                 z+=5;
+                energy-=20;
+            }else if(movimientos.get(i).equals("moveF") ||movimientos.get(i).equals("rotateL") || movimientos.get(i).equals("rotateR")  ){
+                energy-=4;
             }
             Info(movimientos.get(i));
             out = new ACLMessage();
@@ -543,6 +637,7 @@ public class Rescuer extends IntegratedAgent {
                 }
                 Info("SOLICITANDO RECARGA AL BBVA");
                 Info(in.getContent());
+                energy=1000;
             }else{
                 hay_tickets=false;
             }
@@ -590,6 +685,42 @@ public class Rescuer extends IntegratedAgent {
                 Info(in.getContent());
                 abortSession();
             }
+        }
+        
+    public void postrecarga(int altura) {
+
+            String accion = "moveUP";
+            JsonObject movimiento = new JsonObject();
+            int n_movimientos=altura/5;
+            for(int i=0; i<n_movimientos; i++){
+                z+=5;
+                movimiento.add("operation", accion);
+
+                out = new ACLMessage();
+                out.setSender(getAID());
+                out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                out.setProtocol("REGULAR");
+                out.setContent(movimiento.toString());
+                out.setConversationId(ConversationID);
+                out.setPerformative(ACLMessage.REQUEST);
+                this.send(out);
+
+                do{
+                    in = this.blockingReceive();
+                    if(in.getPerformative()==ACLMessage.REQUEST){
+                        alemanes.add(desparsearPosicion(in));
+                    }
+                }while(in.getPerformative()!= ACLMessage.INFORM);
+
+                if(in.getPerformative() != ACLMessage.INFORM){
+                    Info(in.getContent());
+                    abortSession();
+                }
+            }
+            
+            
+            
+            
         }
         
     public boolean hay_energia(int coste){
