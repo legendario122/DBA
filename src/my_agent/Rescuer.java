@@ -132,10 +132,10 @@ public class Rescuer extends IntegratedAgent {
         JsonObject objeto = new JsonObject();
         objeto.add("operation", "login");
         objeto.add("attach", vector);
-        objeto.add("posx", 0);
-        objeto.add("posy", 0);
-        x=0;
-        y=0;
+        objeto.add("posx", 90);
+        objeto.add("posy", 10);
+        x=90;
+        y=10;
         z=Greedy.obtenerAltura(x, y);
 
         out = new ACLMessage();
@@ -228,8 +228,10 @@ public class Rescuer extends IntegratedAgent {
             posini.add("y2", alemanes.get(n_aleman).getY());
             posini.add("z2", Greedy.obtenerAltura(alemanes.get(n_aleman).getX(), alemanes.get(n_aleman).getY()));
             posini.add("orientacion2", alemanes.get(n_aleman).getOrientacion());
-
             
+            Info("RESCUER PROCEDE A RESCATAR AL ALEMAN:");
+            
+            System.out.println(alemanes.get(n_aleman).getX()+ "  "+alemanes.get(n_aleman).getY());
 
             out = new ACLMessage();
             out.setSender(getAID());
@@ -332,11 +334,14 @@ public class Rescuer extends IntegratedAgent {
                 }
                 movimiento.add("operation", movimientos.get(i));
                 Info("MOVIMIENTOS RESCUER");
-                if(movimientos.get(i).equals("moveUP") || movimientos.get(i).equals("moveD")){
+                if(movimientos.get(i).equals("moveUP")){
                     z+=5;
                     energy-=20;
                 }else if(movimientos.get(i).equals("moveF") ||movimientos.get(i).equals("rotateL") || movimientos.get(i).equals("rotateR")  ){
                     energy-=4;
+                }else if(movimientos.get(i).equals("moveD")){
+                    z-=5;
+                    energy-=20;
                 }
                 Info(movimientos.get(i));
                 out = new ACLMessage();
@@ -401,9 +406,9 @@ public class Rescuer extends IntegratedAgent {
         posini.add("y1", y);
         posini.add("z1", z);
         posini.add("orientacion1", orientacion);
-        posini.add("x2", 0);
-        posini.add("y2", 0);
-        posini.add("z2", Greedy.obtenerAltura(0, 0));
+        posini.add("x2", 90);
+        posini.add("y2", 10);
+        posini.add("z2", Greedy.obtenerAltura(90, 10));
         posini.add("orientacion2", 90);
 
             
@@ -492,11 +497,15 @@ public class Rescuer extends IntegratedAgent {
             }
             movimiento.add("operation", movimientos.get(i));
             Info("MOVIMIENTOS RESCUER");
-            if(movimientos.get(i).equals("moveUP") || movimientos.get(i).equals("moveD")){
+            if(movimientos.get(i).equals("moveUP")){
+                
                 z+=5;
                 energy-=20;
             }else if(movimientos.get(i).equals("moveF") ||movimientos.get(i).equals("rotateL") || movimientos.get(i).equals("rotateR")  ){
                 energy-=4;
+            }else if(movimientos.get(i).equals("moveD")){
+                z-=5;
+                energy-=20;
             }
             Info(movimientos.get(i));
             out = new ACLMessage();

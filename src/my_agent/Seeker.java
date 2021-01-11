@@ -265,6 +265,7 @@ public class Seeker extends IntegratedAgent {
             Info("recibo respuesta de greedy");
             if(in.getPerformative() != ACLMessage.INFORM){
                Info(in.getContent());
+               System.err.println(in.getSender());
                abortSession();
             }else{
                Info(in.getContent()); //PERCIBO.

@@ -32,10 +32,10 @@ public class Greedy extends IntegratedAgent {
     static final double AVANZAR=1;
     public void setup() {
         super.setup();
-        String playground = "Playground2.png";
-        String world = "World1.png";
+        String playground = "Playground1.png";
+        String world = "World2.png";
         try {
-            mapa = mapa.loadMap(playground);
+            mapa = mapa.loadMap(world);
             
             Info("HE LEIDO CORRECTAMENTE EL MAPA");
         } catch (IOException ex) {
@@ -79,7 +79,7 @@ public class Greedy extends IntegratedAgent {
 
     public boolean puedoSubir(Estado e){
         boolean puedo_subir = false;
-        if(e.z<255){
+        if(e.z<300){
             puedo_subir = true;
             e.z+=5;
         }
@@ -96,7 +96,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x-1][y] > estado.z){
-                if(mapa.getLevel(y-1, x) > estado.z){
+                if(mapa.getLevel( x,y-1) > estado.z){
                     resultado=true;              
                 }else{
                     estado.y=y-1;
@@ -110,7 +110,7 @@ public class Greedy extends IntegratedAgent {
 
             }else{
                 //if(mapa[x-1][y+1] > estado.z){
-                if(mapa.getLevel(y-1, x-1) > estado.z){    
+                if(mapa.getLevel( x-1,y-1) > estado.z){    
                    resultado=true;
                    
                 }else{
@@ -124,7 +124,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x][y+1] > estado.z){
-                if(mapa.getLevel(y, x+1) > estado.z){
+                if(mapa.getLevel( x+1,y) > estado.z){
                     resultado=true;
                 
                 }else{
@@ -138,7 +138,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x+1][y+1] > estado.z){
-                if(mapa.getLevel(y+1, x+1) > estado.z){
+                if(mapa.getLevel( x+1,y+1) > estado.z){
                     resultado=true;
                 
                 }else{
@@ -152,7 +152,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x+1][y] > estado.z){
-                if(mapa.getLevel(y+1, x) > estado.z){
+                if(mapa.getLevel(x,y+1) > estado.z){
                     resultado=true;
                 }else{
                     estado.y=y+1;
@@ -165,7 +165,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x+1][y-1] > estado.z){
-                if(mapa.getLevel(y+1, x-1) > estado.z){
+                if(mapa.getLevel( x-1,y+1) > estado.z){
                     resultado=true;
                 }else{
                     estado.y=y+1;
@@ -178,7 +178,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x][y-1] > estado.z){
-                if(mapa.getLevel(y, x-1) > estado.z){
+                if(mapa.getLevel( x-1,y) > estado.z){
                     resultado=true;
                 }else{
                     estado.y=y;
@@ -191,7 +191,7 @@ public class Greedy extends IntegratedAgent {
                 resultado=true;
             }else{
                 //if(mapa[x-1][y-1] > estado.z){
-                if(mapa.getLevel(y-1, x-1) > estado.z){
+                if(mapa.getLevel( x-1,y-1) > estado.z){
                     resultado=true;
                 }else{
                     estado.y=y-1;
@@ -214,12 +214,13 @@ public class Greedy extends IntegratedAgent {
     String answer;
     JsonObject objeto = new JsonObject();
     in = this.blockingReceive();
+    Info("MENSAJES DEL RESCUER");
     Info(in.getContent());
     //while(siga_recibiendo_mensajes){
     while(in.getPerformative() == ACLMessage.REQUEST){
-                
+        Info("MENSAJES DEL greedy");        
         answer = in.getContent();
-        
+        Info(in.getContent());
         objeto = Json.parse(answer).asObject();
         x1 = objeto.get("x1").asInt();
         y1 = objeto.get("y1").asInt();
@@ -264,7 +265,7 @@ public class Greedy extends IntegratedAgent {
             if(comparaEstado(hijoTurnR)){
                 hijoTurnR.acciones.add("rotateR");
                 hijoTurnR.setDistancia(hijoTurnR.distancia(hijoTurnR.getSt(), destino));
-                hijoTurnR.añadirValor(-GIRAR);
+                //hijoTurnR.añadirValor(-GIRAR);
                 cola.add(hijoTurnR);
             }
 
@@ -276,7 +277,8 @@ public class Greedy extends IntegratedAgent {
                 hijoTurnL.acciones.add("rotateL");
                 
                 hijoTurnL.setDistancia(hijoTurnL.distancia(hijoTurnL.getSt(), destino));
-                hijoTurnL.añadirValor(-GIRAR);
+                //hijoTurnL.añadirValor(-GIRAR);
+                
                 cola.add(hijoTurnL);
             }
         
@@ -300,7 +302,7 @@ public class Greedy extends IntegratedAgent {
                 if(comparaEstado(hijoMoveUp)){
                     hijoMoveUp.acciones.add("moveUP");
                     hijoMoveUp.setDistancia(hijoMoveUp.distancia(hijoMoveUp.getSt(), destino));
-                    hijoMoveUp.añadirValor(2);
+                    //hijoMoveUp.añadirValor(2); //PARA PLAYGROUNDFUNCIONA
                     cola.add(hijoMoveUp);
                 }     
             }

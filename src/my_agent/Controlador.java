@@ -35,6 +35,7 @@ public class Controlador extends IntegratedAgent {
     ArrayList<String> seekers;
     ArrayList<String> referencias_tickets = new ArrayList<String>();
     ArrayList<String> referencias_sensores = new ArrayList<String>();
+    ArrayList<posicion> alemanes = new ArrayList<posicion>(); 
     int dinero = 0;
     /**
     * Variables para el controlador
@@ -150,7 +151,7 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID(pepe.get(0),AID.ISLOCALNAME));  //No se como poner world manager bien
         out.setProtocol("ANALYTICS");
-        out.setContent(new JsonObject().add("problem", "Playground2").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("problem", "World2").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
@@ -445,7 +446,7 @@ public class Controlador extends IntegratedAgent {
                 out.setSender(getAID());
                 out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
                 out.setProtocol("");
-                out.setContent(World); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                out.setContent(World); //
                 Info(out.getContent());
                 out.setEncoding("");
                 out.setPerformative(ACLMessage.INFORM);
@@ -509,14 +510,21 @@ public class Controlador extends IntegratedAgent {
                 count++;
                 System.out.println("CONTADOR DE ADIOS"+ count);
             }else{
-                out = new ACLMessage();
-                out.setSender(getAID());
-                out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));    
-                out.setProtocol("");
-                out.setContent(in.getContent());
-                out.setEncoding("");
-                out.setPerformative(ACLMessage.REQUEST);
-                this.send(out);
+                
+                if(NoEsta(desparsearPosicion(in))){
+                    alemanes.add(desparsearPosicion(in));
+                    Info("GERMAN");
+                    System.out.println(alemanes.get((alemanes.size()-1)).getX()+ "  "+ alemanes.get((alemanes.size()-1)).getY());
+                    out = new ACLMessage();
+                    out.setSender(getAID());
+                    out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));    
+                    out.setProtocol("");
+                    out.setContent(in.getContent());
+                    out.setEncoding("");
+                    out.setPerformative(ACLMessage.REQUEST);
+                    this.send(out);
+                }
+                
             }
         }else if(in.getPerformative() == ACLMessage.REQUEST && "ticketRecarga".equals(in.getContent())){
 
@@ -562,6 +570,17 @@ public class Controlador extends IntegratedAgent {
     
     }
     
+    boolean NoEsta(posicion aux){
+        boolean no_esta=true;
+        
+        for(int i=0; i<alemanes.size(); i++){
+            if(alemanes.get(i).getX()==aux.getX() && alemanes.get(i).getY()==aux.getY()){
+                no_esta=false;
+            }
+        }
+        
+        return no_esta;
+    }
     
     void seleccionar_productos(ArrayList<producto> lista_ordenada){ //devuelvo un array con rescuer un gps y energy, seeker thermal y energy; 4 energy, 3 thermal y 1 gps;
         //lista_compra
@@ -626,7 +645,22 @@ public class Controlador extends IntegratedAgent {
     /**
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */ 
-       
+    
+    public posicion desparsearPosicion(ACLMessage in){
+        
+        String answer = in.getContent();
+        JsonObject objeto = new JsonObject();
+        objeto = Json.parse(answer).asObject();
+        int x = objeto.get("x").asInt();
+        int y = objeto.get("y").asInt();
+        int z = objeto.get("z").asInt();
+        int orientacion = objeto.get("orientacion").asInt();
+        
+        posicion pos = new posicion(x,y,z,orientacion);
+        
+        
+        return pos;
+    }
   
     @Override
     public void takeDown() {
