@@ -628,6 +628,7 @@ public class Controlador extends IntegratedAgent {
      */ 
        
   
+    @Override
     public void takeDown() {
         Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();
@@ -653,7 +654,7 @@ public class Controlador extends IntegratedAgent {
         in = this.blockingReceive();
         //Info(getDetailsLARVA(in));
 
-        doCheckoutLARVA();
+        //doCheckoutLARVA();
     }
     
     public void desparsearMonedas(ACLMessage in){

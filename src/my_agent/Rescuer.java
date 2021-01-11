@@ -538,10 +538,10 @@ public class Rescuer extends IntegratedAgent {
      * Funcion que se encarga de hacer el checkout de larva y la plataforma.
      */    
     public void takeDown() {
-        Info("Request closing the session with " + "BBVA");
+        Info("Request closing the session with " + "Sphinx");
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+        out.addReceiver(new AID("Sphinx", AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");
         out.setContent("");
         out.setConversationId(ConversationID);
@@ -550,7 +550,7 @@ public class Rescuer extends IntegratedAgent {
         in = this.blockingReceive();
         //Info(getDetailsLARVA(in));
 
-        doCheckoutLARVA();
+        //doCheckoutLARVA();
     }
     
     public void desparsearMovimientos(ACLMessage in){
