@@ -50,11 +50,11 @@ public class Controlador extends IntegratedAgent {
     YellowPages yp;
     public static ArrayList<posicion> get_trayectoria(String world, String nombre){
         if(world.equals("BasePlayground1")){
-            if(nombre.equals("seek1")){
+            if(nombre.equals("seeker1")){
                 return Trayectoria_BasePlayground1_seek1;
-            }else if(nombre.equals("seek2")){
+            }else if(nombre.equals("seeker2")){
                 return Trayectoria_BasePlayground1_seek2;
-            }else if(nombre.equals("seek3")){
+            }else if(nombre.equals("seeker3")){
                 return Trayectoria_BasePlayground1_seek3;
             }
         }
@@ -236,7 +236,7 @@ public class Controlador extends IntegratedAgent {
         Info("Haciendo Query-if a Drones"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("seek1",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("seeker1",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -245,7 +245,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("seek2",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("seeker2",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -254,7 +254,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("seek3",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("seeker3",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -263,7 +263,7 @@ public class Controlador extends IntegratedAgent {
 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("resc",AID.ISLOCALNAME));  
+        out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));  
         out.setProtocol("");
         out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -402,9 +402,9 @@ public class Controlador extends IntegratedAgent {
             
         }
         seekers = new ArrayList<String>();
-        seekers.add("seek1");
-        seekers.add("seek2");
-        seekers.add("seek3");
+        seekers.add("seeker1");
+        seekers.add("seeker2");
+        seekers.add("seeker3");
         int cont1, cont2;
         for(int j=0; j< seekers.size(); j++){
             cont1=0;
@@ -467,7 +467,7 @@ public class Controlador extends IntegratedAgent {
         
             out = new ACLMessage();
             out.setSender(getAID());
-            out.addReceiver(new AID("resc",AID.ISLOCALNAME));    
+            out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));    
             out.setProtocol("");
             out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
             out.setEncoding("");
@@ -478,7 +478,7 @@ public class Controlador extends IntegratedAgent {
         }else if (partes[0].equals("ENERGY") && energy != 1){
             out = new ACLMessage();
             out.setSender(getAID());
-            out.addReceiver(new AID("resc",AID.ISLOCALNAME));    
+            out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));    
             out.setProtocol("");
             out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
             out.setEncoding("");
@@ -511,7 +511,7 @@ public class Controlador extends IntegratedAgent {
             }else{
                 out = new ACLMessage();
                 out.setSender(getAID());
-                out.addReceiver(new AID("resc",AID.ISLOCALNAME));    
+                out.addReceiver(new AID("rescuer",AID.ISLOCALNAME));    
                 out.setProtocol("");
                 out.setContent(in.getContent());
                 out.setEncoding("");

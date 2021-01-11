@@ -97,7 +97,7 @@ public class Rescuer extends IntegratedAgent {
         Info("Enviando monedas a controlador"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
+        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));    
         out.setProtocol("");
         out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -521,7 +521,7 @@ public class Rescuer extends IntegratedAgent {
         
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
+        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));
         out.setProtocol("");  
         out.setContent("Adios");
         out.setEncoding("");
@@ -601,7 +601,7 @@ public class Rescuer extends IntegratedAgent {
         String ticket;    
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
+        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));
         out.setProtocol("");
         out.setContent("ticketRecarga");
         out.setEncoding("");

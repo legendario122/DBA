@@ -94,7 +94,7 @@ public class Seeker extends IntegratedAgent {
         Info("Enviando monedas a controlador"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
+        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));    
         out.setProtocol("");
         out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -222,7 +222,7 @@ public class Seeker extends IntegratedAgent {
                 aux.add("z",lista_encontrados.get(i).getZ());
                 aux.add("orientacion",lista_encontrados.get(i).getOrientacion());
                 out.setSender(getAID());
-                out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
+                out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));    
                 out.setProtocol("");
                 out.setContent(aux.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
                 out.setEncoding("");
@@ -328,14 +328,14 @@ public class Seeker extends IntegratedAgent {
         
     out = new ACLMessage();
     out.setSender(getAID());
-    out.addReceiver(new AID("controlador",AID.ISLOCALNAME));
+    out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));
     out.setProtocol("");  
     out.setContent("Adios");
     out.setEncoding("");
     out.setPerformative(ACLMessage.INFORM);
     this.send(out);
     
-    
+    Info("SEKEEEER HA TERRRRMINAAAAAAAAAAAAAAAAADOOOOOOOOOOO");
     
     
     }
@@ -481,7 +481,7 @@ public class Seeker extends IntegratedAgent {
         if(actual.getX()==trayectoria.get(0).getX() && actual.getY()==trayectoria.get(0).getY()){
             out = new ACLMessage();
             out.setSender(getAID());
-            out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
+            out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));    
             out.setProtocol("");
             out.setContent("ticketRecarga"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
             out.setEncoding("");
@@ -560,7 +560,7 @@ public class Seeker extends IntegratedAgent {
                                
                                 out = new ACLMessage();
                                 out.setSender(getAID());
-                                out.addReceiver(new AID("controlador",AID.ISLOCALNAME));    
+                                out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));    
                                 out.setProtocol("");
                                 out.setContent("ticketRecarga"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
                                 out.setEncoding("");
@@ -644,7 +644,9 @@ public class Seeker extends IntegratedAgent {
 */
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
+        //out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
+        out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));
+        //out.addReceiver(new AID(_identitymanager,AID.ISLOCALNAME));
         out.setProtocol("ANALYTICS");  
         out.setContent("");
         out.setEncoding("");
@@ -655,6 +657,7 @@ public class Seeker extends IntegratedAgent {
         in = this.blockingReceive();
         Info(in.getContent());
 
+        //EL DOCHECKOUT DE LARVA ESTABA COMENTADO
         //doCheckoutLARVA();
         
         

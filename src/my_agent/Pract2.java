@@ -16,11 +16,11 @@ public class Pract2{
         ConsoleBoot _app = new ConsoleBoot("Pract2",args);
         _app.selectConnection();
         _app.launchAgent("AWACS", awacs.Awacs.class);
-        _app.launchAgent("controlador", Controlador.class);
-        _app.launchAgent("seek1", Seeker.class);
-        _app.launchAgent("seek2", Seeker.class);
-        _app.launchAgent("seek3", Seeker.class);
-        _app.launchAgent("resc", Rescuer.class);
+        _app.launchAgent("controlador2", Controlador.class);
+        _app.launchAgent("seeker1", Seeker.class);
+        _app.launchAgent("seeker2", Seeker.class);
+        _app.launchAgent("seeker3", Seeker.class);
+        _app.launchAgent("rescuer", Rescuer.class);
         _app.launchAgent("greedy", Greedy.class);
         _app.shutDown();
         
