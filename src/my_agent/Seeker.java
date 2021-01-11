@@ -325,7 +325,7 @@ public class Seeker extends IntegratedAgent {
         
     }
     
-    
+        
     out = new ACLMessage();
     out.setSender(getAID());
     out.addReceiver(new AID("controlador",AID.ISLOCALNAME));

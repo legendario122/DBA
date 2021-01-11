@@ -629,7 +629,7 @@ public class Controlador extends IntegratedAgent {
        
   
     public void takeDown() {
-        Info("Request closing the session with " + "BBA");
+        Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
@@ -653,7 +653,7 @@ public class Controlador extends IntegratedAgent {
         in = this.blockingReceive();
         //Info(getDetailsLARVA(in));
 
-//        doCheckoutLARVA();
+        doCheckoutLARVA();
     }
     
     public void desparsearMonedas(ACLMessage in){
