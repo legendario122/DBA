@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import static my_agent.Controlador.ConversationID;
 /**
  *
- * @author samuel
+ * @author Samuel, Adrián y Rafael
  */
 public class Rescuer extends IntegratedAgent {
 
@@ -153,34 +153,7 @@ public class Rescuer extends IntegratedAgent {
 
         ACLMessage prueba = new ACLMessage();
         
-        in =this.blockingReceive();
-        
-        movimientos.add("rescue");
-        movimientos.add("moveUP");
-        movimientos.add("moveD");
-        movimientos.add("touchD");
-        recargar();
-        for(int i=0;i<movimientos.size();i++){
-            JsonObject movimiento = new JsonObject();
-            movimiento.add("operation", movimientos.get(i));
-            out = new ACLMessage();
-            out.setSender(getAID());
-            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
-            out.setProtocol("REGULAR");
-            out.setContent(movimiento.toString());
-            out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.REQUEST);
-            this.send(out);
-            do{
-              in = this.blockingReceive();
-              Info(in.getContent());
-              if(in.getPerformative()==ACLMessage.REQUEST){
-                  alemanes.add(desparsearPosicion(in));
-              }
-            }while(in.getPerformative()!= ACLMessage.INFORM);
-        }
-        
-        /*if(in.getPerformative() != ACLMessage.INFORM){
+        if(in.getPerformative() != ACLMessage.INFORM){
             Info(in.getContent());
             abortSession();
         }else{
@@ -585,7 +558,7 @@ public class Rescuer extends IntegratedAgent {
             }                
 
         }
-        */
+        
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));
