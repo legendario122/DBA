@@ -33,7 +33,7 @@ public class Greedy extends IntegratedAgent {
     public void setup() {
         super.setup();
         String playground = "Playground1.png";
-        String world = "World4.png";
+        String world = "World5.png";
         try {
             mapa = mapa.loadMap(world);
             

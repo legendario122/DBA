@@ -23,7 +23,7 @@ public class Rescuer extends IntegratedAgent {
 
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
-    ArrayList<String> movimientos = null;
+    ArrayList<String> movimientos = new ArrayList<String>();
     static String ConvID = new String();
     boolean hay_tiquets = true;
     ArrayList<posicion> alemanes = new ArrayList<posicion>();
@@ -97,7 +97,7 @@ public class Rescuer extends IntegratedAgent {
         Info("Enviando monedas a controlador"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));    
+        out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));    
         out.setProtocol("");
         out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
         out.setEncoding("");
@@ -128,14 +128,16 @@ public class Rescuer extends IntegratedAgent {
         for(int i = 0; i < sensores.size(); i++)
             vector.add(sensores.get(i));
 
+        in = this.blockingReceive();
+        alemanes.add(desparsearPosicion(in));
 
         JsonObject objeto = new JsonObject();
         objeto.add("operation", "login");
         objeto.add("attach", vector);
-        objeto.add("posx", 90);
-        objeto.add("posy", 10);
-        x=90;
-        y=10;
+        objeto.add("posx", alemanes.get(0).getX());
+        objeto.add("posy", alemanes.get(0).getY());
+        x=alemanes.get(0).getX();
+        y=alemanes.get(0).getY();
         z=Greedy.obtenerAltura(x, y);
 
         out = new ACLMessage();
@@ -152,7 +154,33 @@ public class Rescuer extends IntegratedAgent {
         ACLMessage prueba = new ACLMessage();
         
         in =this.blockingReceive();
-        if(in.getPerformative() != ACLMessage.INFORM){
+        
+        movimientos.add("rescue");
+        movimientos.add("moveUP");
+        movimientos.add("moveD");
+        movimientos.add("touchD");
+        recargar();
+        for(int i=0;i<movimientos.size();i++){
+            JsonObject movimiento = new JsonObject();
+            movimiento.add("operation", movimientos.get(i));
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+            out.setProtocol("REGULAR");
+            out.setContent(movimiento.toString());
+            out.setConversationId(ConversationID);
+            out.setPerformative(ACLMessage.REQUEST);
+            this.send(out);
+            do{
+              in = this.blockingReceive();
+              Info(in.getContent());
+              if(in.getPerformative()==ACLMessage.REQUEST){
+                  alemanes.add(desparsearPosicion(in));
+              }
+            }while(in.getPerformative()!= ACLMessage.INFORM);
+        }
+        
+        /*if(in.getPerformative() != ACLMessage.INFORM){
             Info(in.getContent());
             abortSession();
         }else{
@@ -400,15 +428,45 @@ public class Rescuer extends IntegratedAgent {
             }
             
         }
+        recargar();
+        for(int i=z;i<160;i+=5){
+            z+=5;
+            energy-=20;
+            String accion= "moveUP";
+            JsonObject movimiento = new JsonObject();
+            movimiento.add("operation", accion);
+
+                out = new ACLMessage();
+                out.setSender(getAID());
+                out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                out.setProtocol("REGULAR");
+                out.setContent(movimiento.toString());
+                out.setConversationId(ConversationID);
+                out.setPerformative(ACLMessage.REQUEST);
+                this.send(out);
+
+                do{
+                    in = this.blockingReceive();
+                    if(in.getPerformative()==ACLMessage.REQUEST){
+                        alemanes.add(desparsearPosicion(in));
+                    }
+                }while(in.getPerformative()!= ACLMessage.INFORM);
+
+                if(in.getPerformative() != ACLMessage.INFORM){
+                    Info(in.getContent());
+                    abortSession();
+                }
+        }
+        
         orientacion = 90;
         JsonObject posini = new JsonObject();
         posini.add("x1", x);
         posini.add("y1", y);
         posini.add("z1", z);
         posini.add("orientacion1", orientacion);
-        posini.add("x2", 90);
-        posini.add("y2", 10);
-        posini.add("z2", Greedy.obtenerAltura(90, 10));
+        posini.add("x2", 50);
+        posini.add("y2", 50);
+        posini.add("z2", Greedy.obtenerAltura(50, 50));
         posini.add("orientacion2", 90);
 
             
@@ -527,10 +585,10 @@ public class Rescuer extends IntegratedAgent {
             }                
 
         }
-        
+        */
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));
+        out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));
         out.setProtocol("");  
         out.setContent("Adios");
         out.setEncoding("");
@@ -557,6 +615,7 @@ public class Rescuer extends IntegratedAgent {
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
         in = this.blockingReceive();
+        Info(in.getContent());
         //Info(getDetailsLARVA(in));
 
         //doCheckoutLARVA();
@@ -610,7 +669,7 @@ public class Rescuer extends IntegratedAgent {
         String ticket;    
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID("controlador2",AID.ISLOCALNAME));
+        out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));
         out.setProtocol("");
         out.setContent("ticketRecarga");
         out.setEncoding("");
