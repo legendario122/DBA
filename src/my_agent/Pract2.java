@@ -17,9 +17,9 @@ public class Pract2{
         _app.selectConnection();
         _app.launchAgent("AWACS", awacs.Awacs.class);
         _app.launchAgent("controlador2", Controlador.class);
-        _app.launchAgent("seeker1", Seeker.class);
-        _app.launchAgent("seeker2", Seeker.class);
-        _app.launchAgent("seeker3", Seeker.class);
+        _app.launchAgent("seeker_1", Seeker.class);
+        _app.launchAgent("seeker_2", Seeker.class);
+        _app.launchAgent("seeker_3", Seeker.class);
         _app.launchAgent("rescuer", Rescuer.class);
         _app.launchAgent("greedy", Greedy.class);
         _app.shutDown();
