@@ -36,7 +36,11 @@ public class Rescuer extends IntegratedAgent {
     boolean recarga = true;
     boolean hay_tickets = true;
     int altura;
-
+    
+    /**
+     * @author Samuel, Adrián y Rafael
+     * Funcion que se encarga de hacer el checkin en Sphinx.
+     */
     public void setup() {
         super.setup();
          Info("Haciendo checkin to" + "Sphinx" + "rescuer");
@@ -58,26 +62,27 @@ public class Rescuer extends IntegratedAgent {
 
 
     }
-
+    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Es el comportamiento principal del Agente rescuer. Primero recibe un mensaje con el conversationID. Se suscribe a
+     * World Manager y recibe las monedas, que seguidamente se las manda a controlador. Despues recibe los sensores del 
+     * agente controlador y se los manda a World Manager. Hace login y le pasa la posicion donde aparecerá el dron.
+     * Se queda esperando y cuando recibe un mensaje con la posicion de un aleman. Le manda la posicion de inicio al 
+     * agente greedy junto a la del objetivo para que le de una lista con los movimientos que tiene que hacer para llegar 
+     * al alemán. Si ve que no tiene energía le pide un ticket de regarga a controlador y procede a recargar. Si ya ha 
+     * rescatado un alemán se queda esperando a recibir otro.
+     */
     public void plainExecute() {
 
-        //bucle (si no hay mas tickets de energia o recibe mensaje de controlador diciendo que no hay mas seeker y lista de alemanes vacia se sale)
-        //{
-        //Espera mensaje con la posicion del aleman 
-        //percibe energy y gps
-        //llama a greedy y le pasa su posicion y la posicion del aleman 
-        //Recibe mensaje con lista de acciones
-        //comprobar energia
-        //ejecuta lista de acciones}
-        //mensaje a drone de adios
 
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.REQUEST){
-            // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
              abortSession();
          }  
-        //ConvID = in.get(); El conversation ID viene en el content del mensaje que nos llega y hay que desparsearlo
-
+        
         Info("Haciendo SUSCRIBE a WorldManager en rescuer"); 
         out = new ACLMessage();
         out.setSender(getAID());
@@ -91,7 +96,6 @@ public class Rescuer extends IntegratedAgent {
 
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
              abortSession();
         } 
         Info("Enviando monedas a controlador"); 
@@ -99,7 +103,7 @@ public class Rescuer extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));    
         out.setProtocol("");
-        out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(in.getContent()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.INFORM);
         this.send(out);
@@ -111,16 +115,11 @@ public class Rescuer extends IntegratedAgent {
             in = this.blockingReceive();
 
             if(in.getPerformative() != ACLMessage.INFORM){
-                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
             }else{
                 Info(in.getContent());
-
-
                 sensores.add(in.getContent());
                 mensj_recibidos++;
-
-
             }
 
         }
@@ -162,11 +161,10 @@ public class Rescuer extends IntegratedAgent {
         }
 
         in = this.blockingReceive();
-        Info(in.getContent() +": ALEMAAAAAAAAAAAAAAAAAAAAN");
+        Info(in.getContent() +": ALEMAN");
         alemanes.add(desparsearPosicion(in));
         
         while(hay_tickets && n_aleman!=1 ){
-            //FALTA INICIALIZAR X, Y y Z
             if(n_aleman == alemanes.size()){
                 in = this.blockingReceive();
                 if(in.getPerformative()==ACLMessage.REQUEST){
@@ -202,20 +200,16 @@ public class Rescuer extends IntegratedAgent {
                     abortSession();
                 }else{
 
-                    Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-                    Info(in.getContent() + " " + in.getSender());
                     desparsearRead(in);  
                 }
             
             }else{
                 altura = z - Greedy.obtenerAltura(x, y);
-                System.out.print("ALTURA DEL RESCUER es" + altura);
-       
                 while(altura > 0){
                     prerecarga();
                     altura = z - Greedy.obtenerAltura(x, y);
                 }
-                Info("RECARGUEMOSSSSSSSSSSS");
+                Info("RECARGAMOS");
                 recargar();
             }
             
@@ -262,24 +256,18 @@ public class Rescuer extends IntegratedAgent {
 
             }
 
-            System.out.print("TAMAÑO MOVIMIENTOS: "+movimientos.size());
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //AQUI VAMOS A DESPARSEAR LA LISTA DE MOOVIMIENTOS QUE AUN NO HE PENSADO COMO 
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////
             int estimacion_energia = abs((z - Greedy.obtenerAltura(alemanes.get(n_aleman).getX(), alemanes.get(n_aleman).getY()))*4);
             int estimacion_energia2 = coste_movimientos();
             
             JsonObject movimiento = new JsonObject();
             if(!hay_energia(estimacion_energia + estimacion_energia2 )){
                 altura = z - Greedy.obtenerAltura(x, y);
-                System.out.print("ALTURA DEL RESCUER es" + altura);
-       
+                
                 while(altura > 0){
                     prerecarga();
                     altura = z - Greedy.obtenerAltura(x, y);
                 }
                 
-                Info("RECARGUEMOSSSSSSSSSSS");
                 recargar();
             }
             
@@ -288,7 +276,6 @@ public class Rescuer extends IntegratedAgent {
                                 
 
                 if(energy<260){
-                    Info("ENTRO EN RECARGAR DENTRO DE MOVIMIENTOS");
                     estimacion_energia2 = coste_movimientos();  
                     if(!hay_energia( estimacion_energia2 )){
                         //NECESITAMOS PERCIBIR PARA TENER X E Y 
@@ -315,9 +302,6 @@ public class Rescuer extends IntegratedAgent {
                             Info(in.getContent());
                             abortSession();
                         }else{
-
-                            Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-                            Info(in.getContent() + " " + in.getSender());
                             desparsearRead(in);  
                         }
                         altura = z - Greedy.obtenerAltura(x, y);
@@ -328,7 +312,6 @@ public class Rescuer extends IntegratedAgent {
                             altura = z - Greedy.obtenerAltura(x, y);
                         }
 
-                        Info("RECARGUEMOSSSSSSSSSSS");
                         recargar();
                         postrecarga(altura_actual);
                     }
@@ -379,8 +362,6 @@ public class Rescuer extends IntegratedAgent {
                 }
                 
                 rescatar();
-                
-                
                 do{
                     in = this.blockingReceive();
                     if(in.getPerformative()==ACLMessage.REQUEST){
@@ -476,7 +457,6 @@ public class Rescuer extends IntegratedAgent {
                 altura = z - Greedy.obtenerAltura(x, y);
             }
                 
-            Info("RECARGUEMOSSSSSSSSSSS");
             recargar();
         }
         movimientos.add("touchD");    
@@ -508,7 +488,6 @@ public class Rescuer extends IntegratedAgent {
                             abortSession();
                         }else{
 
-                            Info("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
                             Info(in.getContent() + " " + in.getSender());
                             desparsearRead(in);  
                         }    
@@ -520,7 +499,6 @@ public class Rescuer extends IntegratedAgent {
                         altura = z - Greedy.obtenerAltura(x, y);
                     }
 
-                    Info("RECARGUEMOSSSSSSSSSSS");
                     recargar();
                     
                     postrecarga(altura_actual);
@@ -573,10 +551,12 @@ public class Rescuer extends IntegratedAgent {
     
     
 
-    @Override
     /**
-     * Funcion que se encarga de hacer el checkout de larva y la plataforma.
-     */    
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de hacer el logout de Sphinx.
+    */    
     public void takeDown() {
         Info("Request closing the session with " + "Sphinx");
         out = new ACLMessage();
@@ -589,11 +569,16 @@ public class Rescuer extends IntegratedAgent {
         this.send(out);
         in = this.blockingReceive();
         Info(in.getContent());
-        //Info(getDetailsLARVA(in));
 
-        //doCheckoutLARVA();
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear los movimientos y los añade al array movimientos.
+     * @param in
+    */     
     public void desparsearMovimientos(ACLMessage in){
         JsonObject json = new JsonObject();
         JsonArray vector = new JsonArray();
@@ -607,6 +592,14 @@ public class Rescuer extends IntegratedAgent {
         }
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear una posicion.
+     * @param in
+     * @return posicion
+    */     
     public posicion desparsearPosicion(ACLMessage in){
         
         String answer = in.getContent();
@@ -623,10 +616,15 @@ public class Rescuer extends IntegratedAgent {
         return pos;
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de rescatar cuando esta encima de un aleman.
+    */ 
     public void rescatar(){
             JsonObject objeto = new JsonObject();
             objeto.add("operation", "rescue");
-            Info("RESCATANDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             out = new ACLMessage();
             out.setSender(getAID());
             out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
@@ -636,7 +634,12 @@ public class Rescuer extends IntegratedAgent {
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
     }
-    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de pedir a controlador un tiquet de recarga y hacer la peticion de recarga a BBVA.
+    */     
     public void recargar(){
 
         String ticket;    
@@ -693,7 +696,13 @@ public class Rescuer extends IntegratedAgent {
             
         }            
     }
-    
+
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de hacer que el dron aterrice para poder recargar correctamente.
+    */     
         public void prerecarga() {
 
             String accion = "";
@@ -735,7 +744,14 @@ public class Rescuer extends IntegratedAgent {
                 abortSession();
             }
         }
-        
+
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de levantar al dron después de una recarga.
+     * @param altura
+    */         
     public void postrecarga(int altura) {
 
             String accion = "moveUP";
@@ -772,6 +788,13 @@ public class Rescuer extends IntegratedAgent {
             
         }
         
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de comprobar si hay energia suficiente para aterrizar.
+     * @param coste
+    */     
     public boolean hay_energia(int coste){
         Boolean resultado = false;
         if(energy>coste){
@@ -781,6 +804,13 @@ public class Rescuer extends IntegratedAgent {
         return resultado;
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que calcula el coste que hay en el array movimientos.
+     * @return coste
+    */     
     public int coste_movimientos(){
         int coste=0;
         String move;
@@ -796,6 +826,14 @@ public class Rescuer extends IntegratedAgent {
         return coste;
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de hacer el desparseo despues de haber enviado una peticion de read para asignar los valores
+     * de la posicion y de la energia.
+     * @param in
+    */     
     private void desparsearRead(ACLMessage in){
         String answer = in.getContent();
         Info(in.getContent());
@@ -807,7 +845,6 @@ public class Rescuer extends IntegratedAgent {
         JsonArray prueba1 = new JsonArray();
         JsonObject json = new JsonObject();
         json = Json.parse(answer).asObject();
-        //String resultado = json.get("result").asString();
 
         vector = json.get("details").asObject().get("perceptions").asArray();
         for(JsonValue j : vector){

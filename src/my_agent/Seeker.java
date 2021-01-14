@@ -36,6 +36,10 @@ public class Seeker extends IntegratedAgent {
     
     static String ConvID = new String();
     
+    /**
+     * @author Samuel, Adrián y Rafael
+     * Funcion que se encarga de hacer el checkin en Sphinx.
+     */     
     public void setup() {
         super.setup();
          Info("Haciendo checkin to" + "Sphinx" + " seeker");
@@ -55,7 +59,15 @@ public class Seeker extends IntegratedAgent {
         }      
         Info("Checkeo realizado");
     }
-
+    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Es el comportamiento principal del Agente seeker. Primero recibe un mensaje con el conversationID. Se suscribe a
+     * World Manager y recibe las monedas, que seguidamente se las manda a controlador. Despues recibe los sensores del 
+     * agente controlador y se los manda a World Manager. Recibe la trayectoria 
+     */
     public void plainExecute(){
         //recibe mensaje con trayectorias.
         //comprobar si tengo energia para percibir una vez
@@ -96,7 +108,7 @@ public class Seeker extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));    
         out.setProtocol("");
-        out.setContent(in.getContent()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(in.getContent()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.INFORM);
         this.send(out);
@@ -341,6 +353,12 @@ public class Seeker extends IntegratedAgent {
     
     }
     
+   /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     *Funcion que calcula el coste de todos los movimientos que hay en el array movimientos.
+     */    
     public int coste_movimientos(){
         int coste=0;
         String move;
@@ -356,8 +374,14 @@ public class Seeker extends IntegratedAgent {
         return coste;
     }
     
-    
-    //ESTA EN PRUEBAS ME FALTA POR SABER DONDE ESTA EL 0,0 en LOS MAPAS DEL PROFESOR. SE HA HECHO SUPONIENDO EL 0,0 en la esquina superior izquierda.
+   /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que mediante la lectura del sensor thermar comprueba si debajo hay un aleman.Si hay un alemán 
+     * lo añade al array encontrados. Y si encuentra un alemán devuelve true.
+     * @return encontrado_b
+     */
     public boolean hay_aleman(){
         boolean encontrado_b=false;
         int i=0, j=0;
@@ -420,6 +444,13 @@ public class Seeker extends IntegratedAgent {
         return encontrado_b;
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear los movimientos y los añade al array movimientos.
+     * @param in
+    */    
     public void desparsearMovimientos(ACLMessage in){
         JsonObject json = new JsonObject();
         JsonArray vector = new JsonArray();
@@ -433,8 +464,21 @@ public class Seeker extends IntegratedAgent {
         }
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear los movimientos y los añade al array movimientos.
+    */    
     
-    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de hacer el desparseo despues de haber enviado una peticion de read para asignar los valores
+     * a la matriz thermal y de la energia.
+     * @param in
+    */      
     public void desparsearSensores(ACLMessage in){
         JsonObject json = new JsonObject();        
         JsonObject json1 = new JsonObject();
@@ -476,7 +520,14 @@ public class Seeker extends IntegratedAgent {
         }
         
     }
-    //Calcular moveUP para saber cuanto hay que bajar para recargar.
+    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de que el dron baje hasta el suelo y aterrice. Le pide un ticket de recarga al controlador 
+     * le manda la peticion de recargar a BBVA.
+    */      
     public void recargar(){
         String ticket = "";
         if(actual.getX()==trayectoria.get(0).getX() && actual.getY()==trayectoria.get(0).getY()){
@@ -617,6 +668,13 @@ public class Seeker extends IntegratedAgent {
     }
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de comprobar si hay energia suficiente para aterrizar.
+     * @param coste
+    */     
     public boolean hay_energia(int coste){
         Boolean resultado = false;
         if(energia>coste){
@@ -626,23 +684,14 @@ public class Seeker extends IntegratedAgent {
         return resultado;
     }
 
-    @Override
+
     /**
-     * Funcion que se encarga de hacer el checkout de larva y la plataforma.
-     */    
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de hacer el logout de Sphinx.
+    */  
     public void takeDown() {
-        //HACEMOS CANCEL A SPHINX CREO QUE AQUI HAY ERROR
-        /*
-        Info("Request closing the session with " + _identitymanager);
-        out = new ACLMessage();
-        out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
-        out.setProtocol("ANALYTICS");
-        out.setContent("");
-        out.setConversationId(ConversationID);
-        out.setPerformative(ACLMessage.CANCEL);
-        this.send(out);
-*/
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("Sphinx",AID.ISLOCALNAME));

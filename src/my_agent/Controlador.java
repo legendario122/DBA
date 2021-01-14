@@ -18,8 +18,9 @@ import YellowPages.YellowPages;
 public class Controlador extends IntegratedAgent {
     
     /**
-    * Variables para el panel de control.
-    **/   
+     *
+     * @author Samuel, Adrián y Rafael
+     */  
     TTYControlPanel myControlPanel;
     int width; 
     int height;
@@ -37,11 +38,7 @@ public class Controlador extends IntegratedAgent {
     ArrayList<String> referencias_sensores = new ArrayList<String>();
     ArrayList<posicion> alemanes = new ArrayList<posicion>(); 
     int dinero = 0;
-    /**
-    * Variables para el controlador
-    * DBAMap mapa = new DBAMap();
-        mapa.fromJson(map);
-    **/
+
     static ArrayList<posicion> Trayectoria_BasePlayground1_seek1 = new ArrayList<posicion>();
     static ArrayList<posicion> Trayectoria_BasePlayground1_seek2 = new ArrayList<posicion>();
     static ArrayList<posicion> Trayectoria_BasePlayground1_seek3 = new ArrayList<posicion>();
@@ -49,6 +46,12 @@ public class Controlador extends IntegratedAgent {
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     YellowPages yp;
+    
+    /**
+     * @author Samuel, Adrián y Rafael
+     * Devuelve la trayectoria de uno de los drones seeker.
+     * @return ArrayList<posicion>
+     */
     public static ArrayList<posicion> get_trayectoria(String world, String nombre){
         if(world.equals("BasePlayground1")){
             if(nombre.equals("buscatrufas_1")){
@@ -62,8 +65,11 @@ public class Controlador extends IntegratedAgent {
         return null;
     }
     
+   /**
+     * @author Samuel, Adrián y Rafael
+     * Inicializa la primera posicion de los drones seeker para ver desde donde se empiezan a mover.
+     */
     void inicializar_trayectorias(){
-        //BASEPLAYGROUNd1:
         
         for(int i=15; i<200; i+=30){
             posicion aux = new posicion(15,i,255,90);
@@ -94,9 +100,11 @@ public class Controlador extends IntegratedAgent {
         Trayectoria_BasePlayground1_seek3.add(aux);
     }
     @Override
-        /**
-     * Funcion que se encarga de hacer el checkin en larva y en la plataforma. Tambien se encarga de inicializar el panel de
-     * control donde veremos la informacion de los sensores.
+    /**
+     * @author Samuel, Adrián y Rafael
+     * Funcion que se encarga de hacer el checkin en Sphinx y en nuestro agente BBVA. Obtiene también las
+     * páginas amarillas. Se encarga de desparsear el mapa y enviarselo al agente que nos muestra el mapa
+     * en una ventana aparte.
      */
     public void setup() {
         super.setup();
@@ -112,15 +120,13 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-           // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }      
         Info("Checkeo realizado");
         inicializar_trayectorias();
 
         myControlPanel = new TTYControlPanel(getAID());
-        
-        
+            
          Info("Requiriendo paginas amarillas");
         out = new ACLMessage();
         out.setSender(getAID());
@@ -132,26 +138,20 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in =this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-          //  Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }  
 
         yp = new YellowPages();
         yp.updateYellowPages(in);
-        //System.out.println("\n" + yp.prettyPrint());
         
         ArrayList<String> pepe = new ArrayList(yp.queryProvidersofService("Analytics groupid 13"));
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //////CHECKING EN WORLD MANAGER///////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      
-        Info("Haciendo checkin to" + "BBVA"); //No se como poner world manager bien
+            
+        Info("Haciendo checkin to" + "BBVA"); 
         out = new ACLMessage();
         out.setSender(getAID());
-        out.addReceiver(new AID(pepe.get(0),AID.ISLOCALNAME));  //No se como poner world manager bien
+        out.addReceiver(new AID(pepe.get(0),AID.ISLOCALNAME)); 
         out.setProtocol("ANALYTICS");
-        out.setContent(new JsonObject().add("problem", "World5").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("problem", "World5").toString()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
@@ -163,16 +163,12 @@ public class Controlador extends IntegratedAgent {
             abortSession();
         }      
         
-        //Descarga y almacenamiento del mapa
-        //Falta guardar el mapa en matriz de enteros
-        //falta averiguar agentes/servicios de las paginas amarillas
         System("Save map of world ");
         JsonObject jscontent = getJsonContentACLM(in);
         if (jscontent.names().contains("map")) {
 	        JsonObject jsonMapFile = jscontent.get("map").asObject();
 	        String mapfilename = jsonMapFile.getString("filename", "nonamefound");
             Info("Found map " + mapfilename);            
-            //myMap.loadMap(mapfilename);
             myMap = new Map2DGrayscale();
             if (myMap.fromJson(jsonMapFile)) {
         	    Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight() + "rows ) saved on disk (project's root folder) and ready in memory");
@@ -190,7 +186,6 @@ public class Controlador extends IntegratedAgent {
 	        Info("\t" + "There is no map found in the message");
         }
 
-        //ConversationID = in.getConversationId();
         desparsearConvID(in);
         Info(ConversationID);
 
@@ -211,26 +206,14 @@ public class Controlador extends IntegratedAgent {
      * @author Adrian
      * @author Rafael
      * @author Samuel
-     * 
-     * Funcion donde se define como va a comportarse el drone.
-     * Primeramente, llama a la funcion loguearse. Tras esto y mientras no alcancemos
-     * el objetivo, ejecutara un bucle. Leemos las percepciones, se las pasamos al 
-     * panel de control y en funcion de la accion anterior y las percepciones anteriores
-     * se decidio que el drone entrara ahora al estado pertinente que podria ser:
-     * 1 Estado orientarse
-     * 2 Estado desplazamiento
-     * 3 Esado objetivo
-     * 4 Estado recargar
-     * 5 Estado finalizado
-     * 
-     * Las operaciones que realizamos en dichos estados (switch-case) devuelve siempre
-     * el estado siguiente del drone.
-     * 
-     * Tras esta fase de decision de accion y estado siguiente. Se entra a la funcion 
-     * ejecutar para realizar la accion pertinente. Asi hasta que el drone llegue al objetivo
-     * el estado sea finalizado y on target==true.
-     * 
-     * @return Nada. 
+     * Es el comportamiento principal del Agente controlador. Primero le manda los convesationID a los drones seeker
+     * y rescuer para que se puedan comunicar con el World Manager, seguidamente espera a que los drones les manden
+     * las monedas que les corresponde a cada uno. Obtiene las páginas amarillas y los objetos que hay en la tienda.
+     * Compra los sensores que necesitamos y se los manda a cada dron. Y tiene un while donde mientras no reciba 4 adios
+     * se encarga de esperar para ver si la performativa es INFORM o REQUEST, si es INFORM puede ser para que un dron se 
+     * desconecte o que un seeker ha encontrado un aleman y se lo envia al rescuer. Si es REQUEST es que algun dron esta 
+     * pidiendo un tiquet de recarga. Una vez que este bucle ha terminado significa que ya han acabado todos los drones 
+     * seeker y rescuer y le manda un mensaje a greedy para que se desconecte.
      */
     public void plainExecute() {
 
@@ -239,7 +222,7 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID("buscatrufas_1",AID.ISLOCALNAME));  
         out.setProtocol("");
-        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.REQUEST);
         this.send(out);
@@ -248,7 +231,7 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID("buscatrufas_2",AID.ISLOCALNAME));  
         out.setProtocol("");
-        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.REQUEST);
         this.send(out);
@@ -277,20 +260,15 @@ public class Controlador extends IntegratedAgent {
         do{
             in = this.blockingReceive();
             if(in.getPerformative() != ACLMessage.INFORM){
-                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
-                abortSession();
+               abortSession();
             }else{
                 Info(in.getContent());
                 desparsearMonedas(in);
-                //Bitcoins.add(in.getContent());
                 cont++;
             }
             
         }while(cont<4);
         
-        // PAGINAS AMARILLAS
-
-      
         Info("Requiriendo paginas amarillas");
         out = new ACLMessage();
         out.setSender(getAID());
@@ -302,15 +280,12 @@ public class Controlador extends IntegratedAgent {
         this.send(out);
         in =this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-          //  Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }  
 
         yp = new YellowPages();
         yp.updateYellowPages(in);
-        //System.out.println("\n" + yp.prettyPrint());
         
-
         Info("Obtuve las paginas amarillas");
         
         ArrayList<String> Tiendas = new ArrayList<String>(yp.queryProvidersofService("shop@"+ConversationID));
@@ -330,15 +305,12 @@ public class Controlador extends IntegratedAgent {
         do{
             in = this.blockingReceive();
             if(in.getPerformative() != ACLMessage.INFORM){
-                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
             }else{
                 Info(in.getContent());
-                desparsearProductos(in);
-                //guardar lista de objetos            
+                desparsearProductos(in);          
                 cont++;
             }
-           //PEPE
         }while(cont<Tiendas.size());
         Info("Obtuve los productos");
         
@@ -348,19 +320,13 @@ public class Controlador extends IntegratedAgent {
         
         
         lista_productos_ordenada = ordenar_productos(lista_productos);
-        /*for(int i = 0; i < lista_productos.size(); i++){
-            
-            Info(lista_productos.get(i).getReferencia());
-            System.out.print(lista_productos.get(i).getPrecio()+"\n");
 
-        }*/
-        seleccionar_productos(lista_productos_ordenada); //AHORA TENEMOS EN LISTA_COMPRA LOS SENSORES A COMPRAR FALTAN TICKETS.
+        seleccionar_productos(lista_productos_ordenada); 
         
         //COMPRAR SENSORES
         for(int i=0; i<lista_compra.size(); i++){
             out = new ACLMessage();
             out.setSender(getAID());
-            //out.addReceiver(new AID(lista_compra.get(i).getTienda(),AID.ISLOCALNAME));
             out.addReceiver(lista_compra.get(i).getTienda());
             out.setProtocol("REGULAR");
             JsonArray pago = new JsonArray();
@@ -378,16 +344,10 @@ public class Controlador extends IntegratedAgent {
             out.setConversationId(ConversationID);
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
-            //Info(out.getContent());
             in = this.blockingReceive();
-            //Info(in.getContent());
             if(in.getPerformative() != ACLMessage.INFORM){
-                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
-            }else{
-                //Info(in.getContent());
-                
-                //DIVIDIR ENTRE SENSORES Y TICKETS DE RECARGA.
+            }else{                
                 String referencia = desparsearReferencia(in);
                 String partes[];
                 partes = referencia.split("#");
@@ -418,7 +378,7 @@ public class Controlador extends IntegratedAgent {
                     out.setSender(getAID());
                     out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
                     out.setProtocol("");
-                    out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                    out.setContent(referencias_sensores.get(i)); 
                     out.setEncoding("");
                     out.setPerformative(ACLMessage.INFORM);
                     cont1++;
@@ -429,7 +389,7 @@ public class Controlador extends IntegratedAgent {
                     out.setSender(getAID());
                     out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
                     out.setProtocol("");
-                    out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                    out.setContent(referencias_sensores.get(i)); 
                     out.setEncoding("");
                     out.setPerformative(ACLMessage.INFORM);
                     this.send(out);
@@ -439,7 +399,6 @@ public class Controlador extends IntegratedAgent {
                 
             }
             
-            //AQUI HABRIA QUE CAMBIAR LA ASIGNACION DE TRAYECTORIAS AL CAMBIAR DE MUNDO
             ArrayList<posicion> aux = new ArrayList<posicion>();
             
                 out = new ACLMessage();
@@ -470,7 +429,7 @@ public class Controlador extends IntegratedAgent {
             out.setSender(getAID());
             out.addReceiver(new AID("spidercerdo",AID.ISLOCALNAME));    
             out.setProtocol("");
-            out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+            out.setContent(referencias_sensores.get(i));
             out.setEncoding("");
             out.setPerformative(ACLMessage.INFORM);
             this.send(out);
@@ -481,7 +440,7 @@ public class Controlador extends IntegratedAgent {
             out.setSender(getAID());
             out.addReceiver(new AID("spidercerdo",AID.ISLOCALNAME));    
             out.setProtocol("");
-            out.setContent(referencias_sensores.get(i)); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+            out.setContent(referencias_sensores.get(i)); 
             out.setEncoding("");
             out.setPerformative(ACLMessage.INFORM);
             this.send(out);
@@ -493,12 +452,7 @@ public class Controlador extends IntegratedAgent {
         if(gps == 1 && energy == 1)
             lotenemos = true;
     }
-    //si es INFORM es un aleman encontrado
-    //se recibe JSON con la posicion x e y del aleman
-    //mandamos un mensaje a rescuer con la posicion del aleman
-    //el mensaje que tenga el protocolo INFORM tambien
-    //si es un REQUEST es una peticion de ticket de recarga de algun dron
-    //se manda el mensaje con el ticket de recarga al dron con un INFORM
+
     int count=0;
     int especial=0;
     while(count<4){
@@ -509,12 +463,10 @@ public class Controlador extends IntegratedAgent {
             String mensaje = in.getContent();
             if("Adios".equals(mensaje)){
                 count++;
-                System.out.println("CONTADOR DE ADIOS"+ count);
             }else{
                 
                 if(NoEsta(desparsearPosicion(in)) && especial<1){
                     alemanes.add(desparsearPosicion(in));
-                    Info("GERMAN");
                     System.out.println(alemanes.get((alemanes.size()-1)).getX()+ "  "+ alemanes.get((alemanes.size()-1)).getY());
                     out = new ACLMessage();
                     out.setSender(getAID());
@@ -557,21 +509,16 @@ public class Controlador extends IntegratedAgent {
     out.setEncoding("");
     out.setPerformative(ACLMessage.INFORM);
     this.send(out);
-        //generar agente greedy (pasarle el mapa) 
-        //comprar sensores y tickets de recarga
-        //generar drones seeker y rescuer
-        //pasamos trayectorias a seeker.
-        //se queda escuchando:
-        // mensaje de seeker con ubicacion de aleman, añadimos a la lista alemanes interceptados y  le pasamos la ubicacion al rescuer.
-        //mensaje de recarga de seeker y rescuer
-        //(Si seeker termina trayectoria o se queda sin bateria y no hay mas tickets de recarga) mensaje de cancel, lista de drones activos delete
-        //(Si no hay mas seeker activos y no hay mas alemanes en lista rescuer o esta sin bateria y no hay tickets de recarga) mensaje de cancel, lista de drones activos delete)
-        //if lista drones activos es ==0)
-        //mensaje de cancel a greedy
-        //takedown del mundo 
-    
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que comprueba si el aleman que le ha pasado un seeker por mensaje está en el vector de alemanes 
+     * encontrados.
+     * @return true si no está y false si ya está.
+     */    
     boolean NoEsta(posicion aux){
         boolean no_esta=true;
         
@@ -584,6 +531,12 @@ public class Controlador extends IntegratedAgent {
         return no_esta;
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Función que se encarga de añadir a la lista de la compra los sensores y tiquets de recarga que necesitamos.
+     */      
     void seleccionar_productos(ArrayList<producto> lista_ordenada){ //devuelvo un array con rescuer un gps y energy, seeker thermal y energy; 4 energy, 3 thermal y 1 gps;
         //lista_compra
         dinero = billetes.size();
@@ -621,7 +574,13 @@ public class Controlador extends IntegratedAgent {
         }
     }
     
-    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Función que devuelve un arrayList de productos con los mismos ordenados por el precio de menos¡r a mayor
+     * @return Un ArrayList de productos.
+    */    
     public ArrayList<producto> ordenar_productos(ArrayList<producto> lista){
         int tam = lista.size();
         int a=0, b=0;
@@ -643,11 +602,13 @@ public class Controlador extends IntegratedAgent {
         return lista;
     }
     
-    
     /**
-     * Funcion que se encarga de hacer el checkout de larva y la plataforma.
-     */ 
-    
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear una posición y lo devuelve en una posición.
+     * @return posicion.
+    */    
     public posicion desparsearPosicion(ACLMessage in){
         
         String answer = in.getContent();
@@ -664,7 +625,12 @@ public class Controlador extends IntegratedAgent {
         return pos;
     }
   
-    @Override
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de hacer el logout de Sphinx y BBVA
+    */ 
     public void takeDown() {
         Info("Request closing the session with " + "BBVA");
         out = new ACLMessage();
@@ -693,6 +659,12 @@ public class Controlador extends IntegratedAgent {
         //doCheckoutLARVA();
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear los mensajes de monedas para añadirlas al array que tenemos con todas las monedas.
+    */     
     public void desparsearMonedas(ACLMessage in){
         String answer = in.getContent();
         JsonObject objeto = new JsonObject();
@@ -707,6 +679,12 @@ public class Controlador extends IntegratedAgent {
         }
     }
     
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear productos de la tienda y los añade a nuestra lista de productos.
+    */ 
     public void desparsearProductos(ACLMessage in){
         String answer = in.getContent();
         JsonObject objeto = new JsonObject();
@@ -733,6 +711,13 @@ public class Controlador extends IntegratedAgent {
         }
     }
     
+        /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear la conversationID de un mensaje y lo guarda en nuestra variable global
+     * para que el resto de drones la usen para comunicarse con World Manager.
+    */ 
     public void desparsearConvID(ACLMessage in){
         String answer = in.getContent();
         JsonObject objeto = new JsonObject();
@@ -742,7 +727,13 @@ public class Controlador extends IntegratedAgent {
             ConversationID = in.getConversationId();
         }
     }
-    
+    /**
+     * @author Adrian
+     * @author Rafael
+     * @author Samuel
+     * Funcion que se encarga de desparsear un mensaje con una referencia.
+     * @return String.
+    */     
     public String desparsearReferencia(ACLMessage in){
         String reference="";
         String answer = in.getContent();
