@@ -251,8 +251,6 @@ public class Greedy extends IntegratedAgent {
     String answer;
     JsonObject objeto = new JsonObject();
     in = this.blockingReceive();
-    Info("MENSAJES DEL RESCUER");
-    Info(in.getContent());
 
     while(in.getPerformative() == ACLMessage.REQUEST){
         Info("MENSAJES DEL greedy");        
@@ -341,8 +339,6 @@ public class Greedy extends IntegratedAgent {
             }
         }
         acciones = actual.getAcciones();
-        Info("ha calculado el caminoOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PARA IR DE AHI A ALLI");
-        Info(in.getContent());
         JsonObject obj = new JsonObject();
         ACLMessage out = in.createReply();
         JsonArray vector = new JsonArray();

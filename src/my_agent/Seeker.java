@@ -19,7 +19,7 @@ import static java.lang.Math.abs;
 import java.util.ArrayList;
 /**
  *
- * @author samuel
+ * @author Adrian
  */
 public class Seeker extends IntegratedAgent {
     int energia;
@@ -42,7 +42,7 @@ public class Seeker extends IntegratedAgent {
      */     
     public void setup() {
         super.setup();
-         Info("Haciendo checkin to" + "Sphinx" + " seeker");
+        Info("Haciendo checkin to" + "Sphinx" + " seeker");
         out = new ACLMessage();
         
         out.setSender(getAID());
@@ -54,7 +54,6 @@ public class Seeker extends IntegratedAgent {
         this.send(out);
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-           // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
             abortSession();
         }      
         Info("Checkeo realizado");
@@ -66,41 +65,38 @@ public class Seeker extends IntegratedAgent {
      * @author Samuel
      * Es el comportamiento principal del Agente seeker. Primero recibe un mensaje con el conversationID. Se suscribe a
      * World Manager y recibe las monedas, que seguidamente se las manda a controlador. Despues recibe los sensores del 
-     * agente controlador y se los manda a World Manager. Recibe la trayectoria 
+     * agente controlador y se los manda a World Manager. Recibe la trayectoria y se suscribe al mundo con los sensores,
+     * y en el primer punto de la trayectoria, accediendo al bucle principal de su ejecucion. Mientras queden tickets de recarga
+     * y no llegue al final de la trayectoria:
+     * 
+     * 1. Si no tiene energia para percibir, recarga. Tras esto percibe los sensores que recibio de controlador.
+     * 2. Interpreta la percepcion anterior, para averiguar si hay un aleman cerca suya y en el caso de que lo hubiera
+     * manda la posicion del aleman al agente controlador.
+     * 3. Comprueba si se encuentra en la ultima posicion de la trayectoria, en caso de que no lo este, solicita al
+     * agente greedy el camino a seguir (movimientos a ejecutar) para llegar hasta la siguiente posicion. Comprueba
+     * que le queda energia suficiente para realizar los movimientos, si no hubiera, recarga. Y realiza los movimientos
+     * indicados por greedy.
      */
     public void plainExecute(){
-        //recibe mensaje con trayectorias.
-        //comprobar si tengo energia para percibir una vez
-        //Bucle: (si estoy en mi ultima posicion me salgo o si no hay tickets de recarga)
-        //
-        //2. Percibo con thermal y reviso si hay algun aleman:
-        //2.1 si encuentro un aleman, calculo su posicion y la envio al controlador
-        //3. if Posicion!= Trayectoria.size()-1 (Calculo acciones a realizar 
-        //( envio mi posicion inicial Trayectoria[x] y posicion final Trayectoria[x+1])) espero mensaje con acciones, posicion++.
-        //4. comprobar energia (Si no tengo solicito ticket de recarga y recargo)
-        //5. Ejecuto las acciones. 
-        //Fuera del bucle:
-        // mensaje al controlador para decirle que ya no estoy activo.
+        
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.REQUEST){
-            // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
              abortSession();
          }  
-        //ConvID = in.getConversationId(); El conversation ID viene en el content del mensaje que nos llega y hay que desparsearlo
+        
         Info("Haciendo SUSCRIBE a WorldManager en seeker"); 
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));   
         out.setConversationId(ConversationID);
         out.setProtocol("REGULAR");
-        out.setContent(new JsonObject().add("type", "SEEKER").toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("type", "SEEKER").toString()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.SUBSCRIBE);
         this.send(out);
     
         in = this.blockingReceive();
         if(in.getPerformative() != ACLMessage.INFORM){
-            // Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
              abortSession();
         } 
         Info("Enviando monedas a controlador"); 
@@ -113,7 +109,6 @@ public class Seeker extends IntegratedAgent {
         out.setPerformative(ACLMessage.INFORM);
         this.send(out);
         
-        //in = this.blockingReceive();
         
         Info("Recibiendo sensores de controlador y enviandoselas a sphinx");
         int mensj_recibidos = 0;
@@ -122,20 +117,13 @@ public class Seeker extends IntegratedAgent {
         in = this.blockingReceive();
 
             if(in.getPerformative() != ACLMessage.INFORM){
-                //Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to "+ getDetailsLarva(in));
                 abortSession();
             }else{
                 Info(in.getContent());
-
-
                 sensores.add(in.getContent());
                 mensj_recibidos++;
-
-
-            }
-    
-    }
-    
+            }    
+    }    
     //mensaje con trayectorias    
     in =this.blockingReceive();
     if(in.getPerformative() != ACLMessage.INFORM){
@@ -144,8 +132,7 @@ public class Seeker extends IntegratedAgent {
         Info(in.getContent());
         String world = in.getContent();
         AID pepe = new AID();
-        pepe = getAID();
-        
+        pepe = getAID();        
         trayectoria = new ArrayList<posicion>(Controlador.get_trayectoria(world,pepe.getLocalName() ));
     }
     
@@ -194,34 +181,29 @@ public class Seeker extends IntegratedAgent {
     
     
     while((recarga!=false) && (salir!=true)){
-        if(hay_energia(coste_percibir)){
-            out = in.createReply();
-            out.setContent(new JsonObject().add("operation", "read").toString());
-            out.setEncoding("");
-            out.setConversationId(ConversationID);
-            out.setPerformative(ACLMessage.QUERY_REF);
-            this.send(out);
-            
-            in =this.blockingReceive();
-            if(in.getPerformative() != ACLMessage.INFORM){
-               Info(in.getContent());
-               abortSession();
-            }else{
-               Info(in.getContent()); //PERCIBO.
-               desparsearSensores(in); //IMPLEMENTAR DESPARSEO DE ENERGY Y THERMALDELUX.
         
-            }
-        }else{
+        
+        if(!hay_energia(coste_percibir)){
             recargar();
         }
-        for(int i=0; i<31; i++){
-            for(int j=0; j<31; j++){
-               int aux = (int) thermal[i][j];
-               System.out.print(aux+" ");
-            }
-            System.out.println("");
+        out = in.createReply();
+        out.setContent(new JsonObject().add("operation", "read").toString());
+        out.setEncoding("");
+        out.setConversationId(ConversationID);
+        out.setPerformative(ACLMessage.QUERY_REF);
+        this.send(out);
+            
+        in =this.blockingReceive();
+        if(in.getPerformative() != ACLMessage.INFORM){
+            Info(in.getContent());
+            abortSession();
+        }else{
+            Info(in.getContent()); //PERCIBO.
+            desparsearSensores(in); //IMPLEMENTAR DESPARSEO DE ENERGY Y THERMALDELUX.
+        
         }
-        System.out.print(energia);
+        
+        
         if(hay_aleman()){
             
             
@@ -236,7 +218,7 @@ public class Seeker extends IntegratedAgent {
                 out.setSender(getAID());
                 out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));    
                 out.setProtocol("");
-                out.setContent(aux.toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                out.setContent(aux.toString()); 
                 out.setEncoding("");
                 out.setPerformative(ACLMessage.INFORM);
                 this.send(out);
@@ -248,7 +230,7 @@ public class Seeker extends IntegratedAgent {
         
         if(pos_actual!=trayectoria.size()-1){
             pos_actual++;
-            Info("pillado");
+        
             out = new ACLMessage();
             JsonObject aux = new JsonObject();
             aux.add("x1",actual.getX());
@@ -260,7 +242,7 @@ public class Seeker extends IntegratedAgent {
             aux.add("z2",trayectoria.get(pos_actual).getZ());
             aux.add("orientacion2",trayectoria.get(pos_actual).getOrientacion());
             
-            Info("EL SEEKER TIENE QUE MOVERSE HACIA: ");
+            
             System.out.print(trayectoria.get(pos_actual).getX() + trayectoria.get(pos_actual).getY() + trayectoria.get(pos_actual).getZ());
             
             
@@ -271,10 +253,10 @@ public class Seeker extends IntegratedAgent {
             out.setEncoding("");
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
-            Info("SEEKER ESPERANDO A GREEDY");
+            
 
             in = this.blockingReceive();
-            Info("recibo respuesta de greedy");
+            
             if(in.getPerformative() != ACLMessage.INFORM){
                Info(in.getContent());
                System.err.println(in.getSender());
@@ -286,9 +268,8 @@ public class Seeker extends IntegratedAgent {
             }
             
             int cost = coste_movimientos();
-            System.out.print("COOOOOOOOOOOOOOOOSTE de lista movimientos" + cost);
+            
             if(!hay_energia(cost)){
-                Info("ENTRO EN RECARGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR");
                 recargar();
             }
             
@@ -304,10 +285,9 @@ public class Seeker extends IntegratedAgent {
         //CALCULAR COSTE PARA LLEGAR A LA SIGUIENTE POSICION.
        
         int iterator=0;
-        System.out.print("TAAAAAAAAAAAAAAAAAAAAMAÑO" + movimientos.size());
+        
         while(!movimientos.isEmpty()){
-            Info("ENTRANDO EN REALIZAR MOVIMIENTOS SEEKER");
-            Info(movimientos.get(iterator));
+          
             out = new ACLMessage();
             out.setSender(getAID());
             out.addReceiver(new AID("BBVA",AID.ISLOCALNAME));
@@ -324,9 +304,6 @@ public class Seeker extends IntegratedAgent {
             in =this.blockingReceive();
             
             if(in.getPerformative() != ACLMessage.INFORM){
-                Info("EJECUTANDO ACCIONES EN SEEKER");
-                Info(out.getConversationId());
-                Info(in.getConversationId());
                 Info(in.getContent());
                 abortSession();
             }else{
@@ -346,10 +323,7 @@ public class Seeker extends IntegratedAgent {
     out.setContent("Adios");
     out.setEncoding("");
     out.setPerformative(ACLMessage.INFORM);
-    this.send(out);
-    
-    Info("SEKEEEER HA TERRRRMINAAAAAAAAAAAAAAAAADOOOOOOOOOOO");
-    
+    this.send(out);   
     
     }
     
@@ -362,7 +336,6 @@ public class Seeker extends IntegratedAgent {
     public int coste_movimientos(){
         int coste=0;
         String move;
-        System.out.print("TAMAÑO LISTA DE MOVIMIENTOS: "+ movimientos.size());
         for(int i=0; i<movimientos.size(); i++){
             move=movimientos.get(i);
             if(move.equals("moveF") || move.equals("rotateL") || move.equals("rotateR")){
@@ -397,34 +370,21 @@ public class Seeker extends IntegratedAgent {
                     indice_i=i;
                     indice_j=j;
                     encontrado_b=true;
-                    Info("He encontrado un ALEMAAAAAAAAAN");
+                    
                     if(encontrado_b==true){
                         encontrado = new posicion(-1,-1,-1,-1);
                         encontrado.setOrientacion(90);
                         if(indice_j<15){
-                            System.out.println("EL INDICE DE j es menor: " + indice_j);
-                            System.out.println("DISTANCIA j: " + distancia_j);
-                            System.out.println("ACTUAL POSICION ES: " + actual.getX());
-                            
                             encontrado.setX(actual.getX()-distancia_j);
-                        }else if(indice_j>15){
-                            System.out.println("EL INDICE DE j es mayor: " + indice_j);
-                            System.out.println("DISTANCIA J: " + distancia_j);
-                            System.out.println("ACTUAL POSICION ES: " + actual.getX());
+                        }else if(indice_j>15){                           
                             encontrado.setX(actual.getX()+distancia_j);
                         }else{
                             encontrado.setX(actual.getX());
                         }
 
-                        if(indice_i<15){
-                            System.out.println("EL INDICE DE i es menor: " + indice_i);
-                            System.out.println("DISTANCIA i: " + distancia_i);
-                            System.out.println("ACTUAL POSICION  Y ES: " + actual.getY());
+                        if(indice_i<15){                           
                             encontrado.setY(actual.getY()-distancia_i);
                         }else if(indice_i>15){
-                            System.out.println("EL INDICE DE i es mayor: " + indice_i);
-                            System.out.println("DISTANCIA i: " + distancia_i);
-                            System.out.println("ACTUAL POSICION  Y ES: " + actual.getY());
                             encontrado.setY(actual.getY()+distancia_i);
                         }else{
                             encontrado.setY(actual.getY());
@@ -535,7 +495,7 @@ public class Seeker extends IntegratedAgent {
             out.setSender(getAID());
             out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));    
             out.setProtocol("");
-            out.setContent("ticketRecarga"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+            out.setContent("ticketRecarga"); 
             out.setEncoding("");
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
@@ -545,8 +505,8 @@ public class Seeker extends IntegratedAgent {
                Info(in.getContent());
                abortSession();
             }else{
-               Info(in.getContent()); //PERCIBO.
-               ticket = in.getContent(); //IMPLEMENTAR DESPARSEO DE ENERGY Y THERMALDELUX.
+               Info(in.getContent()); 
+               ticket = in.getContent(); 
                
             }
             
@@ -568,12 +528,12 @@ public class Seeker extends IntegratedAgent {
                Info(in.getContent());
                abortSession();
             }else{
-               Info(in.getContent()); //PERCIBO.
+               Info(in.getContent()); 
                
         
             }
         }else{
-            //FUNCION QUE DEVUELVE EL GREEDY
+            
             if(actual.getZ()!=Greedy.obtenerAltura(actual.getX(),actual.getY())){
                 while(actual.getZ()>Greedy.obtenerAltura(actual.getX(),actual.getY())){
                     out = new ACLMessage();
@@ -591,7 +551,7 @@ public class Seeker extends IntegratedAgent {
                        Info(in.getContent());
                        abortSession();
                     }else{
-                       Info(in.getContent()); //PERCIBO.
+                       Info(in.getContent()); 
                        if(actual.getZ()== Greedy.obtenerAltura(actual.getX(),actual.getY())){
                             out = new ACLMessage();
                             out.setSender(getAID());
@@ -614,7 +574,7 @@ public class Seeker extends IntegratedAgent {
                                 out.setSender(getAID());
                                 out.addReceiver(new AID("controlador2_bbva",AID.ISLOCALNAME));    
                                 out.setProtocol("");
-                                out.setContent("ticketRecarga"); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+                                out.setContent("ticketRecarga"); 
                                 out.setEncoding("");
                                 out.setPerformative(ACLMessage.REQUEST);
                                 this.send(out);
@@ -703,11 +663,6 @@ public class Seeker extends IntegratedAgent {
         this.send(out);
         
         in = this.blockingReceive();
-        Info(in.getContent());
-
-        //EL DOCHECKOUT DE LARVA ESTABA COMENTADO
-        //doCheckoutLARVA();
-        
-        
+        Info(in.getContent());         
     }
 }

@@ -27,21 +27,20 @@ public class Controlador extends IntegratedAgent {
     int maxflight = 256;
     static String ConversationID = "";
     Map2DGrayscale myMap;
-    String myWorld = "problem1";
+    
     ArrayList<producto> lista_productos = new ArrayList<producto>();
     ArrayList<producto> lista_compra = new ArrayList<producto>();
     ArrayList<producto> lista_productos_ordenada;
     ArrayList<String> billetes = new ArrayList<String>();
-    String World = "BasePlayground1";
     ArrayList<String> seekers;
     ArrayList<String> referencias_tickets = new ArrayList<String>();
     ArrayList<String> referencias_sensores = new ArrayList<String>();
     ArrayList<posicion> alemanes = new ArrayList<posicion>(); 
     int dinero = 0;
 
-    static ArrayList<posicion> Trayectoria_BasePlayground1_seek1 = new ArrayList<posicion>();
-    static ArrayList<posicion> Trayectoria_BasePlayground1_seek2 = new ArrayList<posicion>();
-    static ArrayList<posicion> Trayectoria_BasePlayground1_seek3 = new ArrayList<posicion>();
+    static ArrayList<posicion> Trayectoria_seek1 = new ArrayList<posicion>();
+    static ArrayList<posicion> Trayectoria_seek2 = new ArrayList<posicion>();
+    static ArrayList<posicion> Trayectoria_seek3 = new ArrayList<posicion>();
     
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
@@ -52,14 +51,14 @@ public class Controlador extends IntegratedAgent {
      * Devuelve la trayectoria de uno de los drones seeker.
      * @return ArrayList<posicion>
      */
-    public static ArrayList<posicion> get_trayectoria(String world, String nombre){
-        if(world.equals("BasePlayground1")){
+    public static ArrayList<posicion> get_trayectoria(String tam, String nombre){
+        if(tam.equals("100")){
             if(nombre.equals("buscatrufas_1")){
-                return Trayectoria_BasePlayground1_seek1;
+                return Trayectoria_seek1;
             }else if(nombre.equals("buscatrufas_2")){
-                return Trayectoria_BasePlayground1_seek2;
+                return Trayectoria_seek2;
             }else if(nombre.equals("buscatrufas_3")){
-                return Trayectoria_BasePlayground1_seek3;
+                return Trayectoria_seek3;
             }
         }
         return null;
@@ -71,33 +70,33 @@ public class Controlador extends IntegratedAgent {
      */
     void inicializar_trayectorias(){
         
-        for(int i=15; i<200; i+=30){
+        for(int i=15; i<100; i+=30){
             posicion aux = new posicion(15,i,255,90);
-            Trayectoria_BasePlayground1_seek1.add(aux);
+            Trayectoria_seek1.add(aux);
         }
-        Trayectoria_BasePlayground1_seek1.get(0).setZ(0);
+        Trayectoria_seek1.get(0).setZ(0);
         posicion aux = new posicion(15,85,255,90);
-        Trayectoria_BasePlayground1_seek1.add(aux);
-        for(int i=15; i<200; i+=30){
+        Trayectoria_seek1.add(aux);
+        for(int i=15; i<100; i+=30){
              aux = new posicion(45,i,255,90);
-            Trayectoria_BasePlayground1_seek2.add(aux);
+            Trayectoria_seek2.add(aux);
         }
-        Trayectoria_BasePlayground1_seek2.get(0).setZ(0);
+        Trayectoria_seek2.get(0).setZ(0);
         aux = new posicion(45,85,255,90);
-        Trayectoria_BasePlayground1_seek2.add(aux);
-        for(int i=15; i<200; i+=30){
+        Trayectoria_seek2.add(aux);
+        for(int i=15; i<100; i+=30){
              aux = new posicion(75,i,255,90);
-            Trayectoria_BasePlayground1_seek3.add(aux);
+            Trayectoria_seek3.add(aux);
         }
-        Trayectoria_BasePlayground1_seek3.get(0).setZ(0);
+        Trayectoria_seek3.get(0).setZ(0);
         aux = new posicion(75,85,255,90);
-        Trayectoria_BasePlayground1_seek3.add(aux);
+        Trayectoria_seek3.add(aux);
         for(int i=85; i>0; i-=30){
              aux = new posicion(85,i,255,90);
-            Trayectoria_BasePlayground1_seek3.add(aux);
+            Trayectoria_seek3.add(aux);
         }
         aux = new posicion(85,15,255,90);
-        Trayectoria_BasePlayground1_seek3.add(aux);
+        Trayectoria_seek3.add(aux);
     }
     @Override
     /**
@@ -158,7 +157,7 @@ public class Controlador extends IntegratedAgent {
         in = this.blockingReceive();
         
         if(in.getPerformative() != ACLMessage.INFORM){
-            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to ");//+ getDetailsLarva(in));
+            Error(ACLMessage.getPerformative(in.getPerformative()) + " Could not"+" confirm the registration in LARVA due to ");
             Info(in.getContent());
             abortSession();
         }      
@@ -240,7 +239,7 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID("buscatrufas_3",AID.ISLOCALNAME));  
         out.setProtocol("");
-        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.REQUEST);
         this.send(out);
@@ -249,13 +248,12 @@ public class Controlador extends IntegratedAgent {
         out.setSender(getAID());
         out.addReceiver(new AID("spidercerdo",AID.ISLOCALNAME));  
         out.setProtocol("");
-        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); //Aqui se pone {"problem":"id-problema"} pero no se como se pone bien
+        out.setContent(new JsonObject().add("ConversationID", ConversationID).toString()); 
         out.setEncoding("");
         out.setPerformative(ACLMessage.REQUEST);
         this.send(out);
 
         int cont=0;
-        ArrayList<String> Bitcoins = new ArrayList<String>();
 
         do{
             in = this.blockingReceive();
@@ -312,12 +310,7 @@ public class Controlador extends IntegratedAgent {
                 cont++;
             }
         }while(cont<Tiendas.size());
-        Info("Obtuve los productos");
-        
-        
-
-        Info("NUMERO DE PRODUCTOS: " + lista_productos.size());
-        
+        Info("Obtuve los productos");  
         
         lista_productos_ordenada = ordenar_productos(lista_productos);
 
@@ -405,7 +398,7 @@ public class Controlador extends IntegratedAgent {
                 out.setSender(getAID());
                 out.addReceiver(new AID(seekers.get(j),AID.ISLOCALNAME));  
                 out.setProtocol("");
-                out.setContent(World); //
+                out.setContent("100"); 
                 Info(out.getContent());
                 out.setEncoding("");
                 out.setPerformative(ACLMessage.INFORM);
@@ -413,9 +406,6 @@ public class Controlador extends IntegratedAgent {
             
             
         }
-        
-        Info("EL numero de tickets de recarga es: " + referencias_tickets.size());
-        Info("EL numero de sensores es: " +referencias_sensores.size());
         
     String[] partes;
     int gps = 0, energy = 0;  
@@ -457,8 +447,6 @@ public class Controlador extends IntegratedAgent {
     int especial=0;
     while(count<4){
         in = this.blockingReceive();
-        Info("MENSAJES DE CONTROLADOR");
-        Info(in.getContent());
         if(in.getPerformative() == ACLMessage.INFORM){
             String mensaje = in.getContent();
             if("Adios".equals(mensaje)){
@@ -654,9 +642,7 @@ public class Controlador extends IntegratedAgent {
         out.setPerformative(ACLMessage.CANCEL);
         this.send(out);
         in = this.blockingReceive();
-        //Info(getDetailsLARVA(in));
 
-        //doCheckoutLARVA();
     }
     
     /**

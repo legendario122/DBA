@@ -161,7 +161,6 @@ public class Rescuer extends IntegratedAgent {
         }
 
         in = this.blockingReceive();
-        Info(in.getContent() +": ALEMAN");
         alemanes.add(desparsearPosicion(in));
         
         while(hay_tickets && n_aleman!=1 ){
@@ -209,7 +208,6 @@ public class Rescuer extends IntegratedAgent {
                     prerecarga();
                     altura = z - Greedy.obtenerAltura(x, y);
                 }
-                Info("RECARGAMOS");
                 recargar();
             }
             
@@ -222,11 +220,7 @@ public class Rescuer extends IntegratedAgent {
             posini.add("x2", alemanes.get(n_aleman).getX());
             posini.add("y2", alemanes.get(n_aleman).getY());
             posini.add("z2", Greedy.obtenerAltura(alemanes.get(n_aleman).getX(), alemanes.get(n_aleman).getY()));
-            posini.add("orientacion2", alemanes.get(n_aleman).getOrientacion());
-            
-            Info("RESCUER PROCEDE A RESCATAR AL ALEMAN:");
-            
-            System.out.println(alemanes.get(n_aleman).getX()+ "  "+alemanes.get(n_aleman).getY());
+            posini.add("orientacion2", alemanes.get(n_aleman).getOrientacion());            
 
             out = new ACLMessage();
             out.setSender(getAID());
@@ -236,7 +230,6 @@ public class Rescuer extends IntegratedAgent {
             out.setEncoding("");
             out.setPerformative(ACLMessage.REQUEST);
             this.send(out);
-            Info("RESCUER ESPERANDO A GREEDY");
             
             do{
                 in = this.blockingReceive();
@@ -390,26 +383,26 @@ public class Rescuer extends IntegratedAgent {
             JsonObject movimiento = new JsonObject();
             movimiento.add("operation", accion);
 
-                out = new ACLMessage();
-                out.setSender(getAID());
-                out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
-                out.setProtocol("REGULAR");
-                out.setContent(movimiento.toString());
-                out.setConversationId(ConversationID);
-                out.setPerformative(ACLMessage.REQUEST);
-                this.send(out);
+            out = new ACLMessage();
+            out.setSender(getAID());
+            out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+            out.setProtocol("REGULAR");
+            out.setContent(movimiento.toString());
+            out.setConversationId(ConversationID);
+            out.setPerformative(ACLMessage.REQUEST);
+            this.send(out);
 
-                do{
-                    in = this.blockingReceive();
-                    if(in.getPerformative()==ACLMessage.REQUEST){
-                        alemanes.add(desparsearPosicion(in));
-                    }
-                }while(in.getPerformative()!= ACLMessage.INFORM);
-
-                if(in.getPerformative() != ACLMessage.INFORM){
-                    Info(in.getContent());
-                    abortSession();
+            do{
+                in = this.blockingReceive();
+                if(in.getPerformative()==ACLMessage.REQUEST){
+                    alemanes.add(desparsearPosicion(in));
                 }
+            }while(in.getPerformative()!= ACLMessage.INFORM);
+
+            if(in.getPerformative() != ACLMessage.INFORM){
+                Info(in.getContent());
+                abortSession();
+            }
         }
         
         orientacion = 90;
@@ -467,30 +460,30 @@ public class Rescuer extends IntegratedAgent {
                 
                 estimacion_energia2 = coste_movimientos();  
                 if(!hay_energia(400 + estimacion_energia2 )){
-                        JsonObject read = new JsonObject();
-                        read.add("operation", "read");
+                    JsonObject read = new JsonObject();
+                    read.add("operation", "read");
 
-                        out = new ACLMessage();
-                        out.setSender(getAID());
-                        out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
-                        out.setProtocol("REGULAR");
-                        out.setContent(read.toString());
-                        out.setConversationId(ConversationID);
-                        out.setPerformative(ACLMessage.QUERY_REF);
-                        this.send(out);
+                    out = new ACLMessage();
+                    out.setSender(getAID());
+                    out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
+                    out.setProtocol("REGULAR");
+                    out.setContent(read.toString());
+                    out.setConversationId(ConversationID);
+                    out.setPerformative(ACLMessage.QUERY_REF);
+                    this.send(out);
 
                         
-                        in = this.blockingReceive();
+                    in = this.blockingReceive();
                             
 
-                        if(in.getPerformative() != ACLMessage.INFORM){
-                            Info(in.getContent());
-                            abortSession();
-                        }else{
+                    if(in.getPerformative() != ACLMessage.INFORM){
+                        Info(in.getContent());
+                        abortSession();
+                    }else{
 
-                            Info(in.getContent() + " " + in.getSender());
-                            desparsearRead(in);  
-                        }    
+                        Info(in.getContent() + " " + in.getSender());
+                        desparsearRead(in);  
+                    }    
                     altura = z - Greedy.obtenerAltura(x, y);
                     System.out.print("ALTURA DEL RESCUER es" + altura);
                     int altura_actual=altura;
@@ -505,9 +498,7 @@ public class Rescuer extends IntegratedAgent {
                 }
             }
             movimiento.add("operation", movimientos.get(i));
-            Info("MOVIMIENTOS RESCUER");
-            if(movimientos.get(i).equals("moveUP")){
-                
+            if(movimientos.get(i).equals("moveUP")){  
                 z+=5;
                 energy-=20;
             }else if(movimientos.get(i).equals("moveF") ||movimientos.get(i).equals("rotateL") || movimientos.get(i).equals("rotateR")  ){
@@ -516,7 +507,7 @@ public class Rescuer extends IntegratedAgent {
                 z-=5;
                 energy-=20;
             }
-            Info(movimientos.get(i));
+
             out = new ACLMessage();
             out.setSender(getAID());
             out.addReceiver(new AID("BBVA", AID.ISLOCALNAME));
@@ -654,7 +645,6 @@ public class Rescuer extends IntegratedAgent {
 
         in = this.blockingReceive();
         Info("SOLICITANDO TICKET DE RECARGA");
-        Info(in.getContent());
         if(in.getPerformative() != ACLMessage.INFORM){
             Info(in.getContent());
             abortSession();
@@ -688,7 +678,6 @@ public class Rescuer extends IntegratedAgent {
                     abortSession();
                 }
                 Info("SOLICITANDO RECARGA AL BBVA");
-                Info(in.getContent());
                 energy=1000;
             }else{
                 hay_tickets=false;
